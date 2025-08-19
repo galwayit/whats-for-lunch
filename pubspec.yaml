@@ -36,28 +36,44 @@ dependencies:
 
   # Local Database
   drift: ^2.14.1
-  sqlite3_flutter_libs: ^0.5.0
-  path_provider: ^2.1.1
+  sqlite3_flutter_libs: ^0.5.0  # Updated for better AGP compatibility
+  path_provider: ^2.1.1  # Re-enabled for photo storage
   path: ^1.8.3
+  # Web database support is included in drift package
 
   # Navigation
   go_router: ^13.0.0
 
-  # Location Services (for future stages)
-  geolocator: ^10.1.0
+  # Location Services & Maps
+  geolocator: ^11.1.0
   permission_handler: ^11.1.0
+  google_maps_flutter: ^2.6.1
+  google_polyline_algorithm: ^3.1.0
+# Temporarily disabled due to compatibility issues
+  # google_maps_cluster_manager: ^3.1.0
+  url_launcher: ^6.2.2
 
   # HTTP Client
   dio: ^5.4.0
 
-  # Image Optimization
+  # Image Optimization & Photo Handling
   cached_network_image: ^3.3.0
+  image_picker: ^1.0.7
+  image: ^4.1.7
 
   # UI Enhancement
   cupertino_icons: ^1.0.8
+  fl_chart: ^0.66.2
+
+  # AI Integration
+  google_generative_ai: ^0.3.2
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  
+  # Integration testing
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -67,12 +83,17 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
+  # Testing utilities
+  mockito: ^5.4.4
+
   # Drift code generation
   drift_dev: ^2.14.1
   build_runner: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+# Temporary dependency overrides removed - using default versions
 
 # The following section is specific to Flutter packages.
 flutter:
