@@ -1,0 +1,253 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Web related
+/web/favicon.png
+/web/icons/
+
+# Claude Code related
+.claude/
+*.claude
+CLAUDE.md
+.claude-code/
+
+# Environment and config files
+.env
+.env.local
+.env.production
+.env.development
+*.env
+config.json
+secrets.json
+credentials.json
+
+# API Keys and Secrets
+**/api_keys/
+**/secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.cert
+*.crt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+database.lock
+
+# User data and personal information
+/user_data/
+/personal_data/
+/private/
+*.private
+*.personal
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+*.temp
+*.cache
+*.old
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.mocks.dart
+*.config.dart
+
+# Coverage
+coverage/
+*.lcov
+.coverage
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Node (if using any Node tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase.json
+.firebaserc
+
+# Google Services (for Android/iOS)
+google-services.json
+GoogleService-Info.plist
+
+# Sensitive project files
+/android/key.properties
+/android/app/upload-keystore.jks
+/android/app/release.keystore
+/ios/Runner/GoogleService-Info.plist
+
+# Test data
+/test_data/
+/mock_data/
+*.test.json
+
+# Local configuration
+local.properties
+local_config.dart
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+/out/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Sensitive documentation
+PRIVATE_*.md
+SECRET_*.md
+*_PRIVATE.md
+*_SECRET.md
+
+# Application specific sensitive data
+/data/users/
+/data/credentials/
+/config/production/
+restaurant_api_keys.json
+maps_config.json
+payment_keys.json
