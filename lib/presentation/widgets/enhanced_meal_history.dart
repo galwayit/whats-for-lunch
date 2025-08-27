@@ -490,7 +490,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      meal.restaurantName,
+                                      meal.restaurantName ?? meal.displayMealType,
                                       style: theme.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: theme.colorScheme.onSurface,

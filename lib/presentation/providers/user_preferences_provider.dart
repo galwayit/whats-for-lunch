@@ -4,6 +4,7 @@ import '../../domain/entities/user.dart';
 import '../../domain/entities/user_preferences.dart';
 import '../../domain/repositories/user_repository.dart';
 import 'database_provider.dart';
+import 'simple_providers.dart';
 
 class UserPreferencesNotifier extends StateNotifier<UserPreferences?> {
   final UserRepository _userRepository;
@@ -25,14 +26,20 @@ class UserPreferencesNotifier extends StateNotifier<UserPreferences?> {
   Future<void> updatePreferences(UserPreferences preferences) async {
     if (_currentUserId == null) return;
 
-    // Update local state
-    state = preferences;
+    try {
+      // Update local state first
+      state = preferences;
 
-    // Update in database
-    final user = await _userRepository.getUserById(_currentUserId!);
-    if (user != null) {
-      final updatedUser = user.copyWith(preferences: preferences.toJson());
-      await _userRepository.updateUser(updatedUser);
+      // Update in database
+      final user = await _userRepository.getUserById(_currentUserId!);
+      if (user != null) {
+        final updatedUser = user.copyWith(preferences: preferences.toJson());
+        await _userRepository.updateUser(updatedUser);
+      }
+    } catch (e) {
+      // If database update fails, revert state and rethrow
+      state = null;
+      rethrow;
     }
   }
 
@@ -72,9 +79,6 @@ class UserPreferencesNotifier extends StateNotifier<UserPreferences?> {
     }
   }
 }
-
-// Current user ID provider - this would typically come from authentication
-final currentUserIdProvider = StateProvider<int?>((ref) => null);
 
 // User preferences provider
 final userPreferencesProvider = StateNotifierProvider<UserPreferencesNotifier, UserPreferences?>((ref) {

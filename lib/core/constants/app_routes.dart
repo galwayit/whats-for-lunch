@@ -6,4 +6,8 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String onboarding = '/onboarding';
   static const String preferences = '/preferences';
+  static const String budgetSetup = '/budget-setup';
+  static const String aiRecommendations = '/ai-recommendations';
+  static const String mealHistory = '/meal-history';
+  static const String editMeal = '/edit-meal';
 }

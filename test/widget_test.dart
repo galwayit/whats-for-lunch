@@ -20,6 +20,9 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
 
+    // Allow animations to complete
+    await tester.pumpAndSettle();
+
     // The app should be configured with the correct title.
     final MaterialApp app = tester.widget(find.byType(MaterialApp));
     expect(app.title, equals('What We Have For Lunch'));

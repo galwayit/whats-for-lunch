@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/ux_components.dart';
 
@@ -80,7 +81,7 @@ class HungryPage extends ConsumerWidget {
                                 const SizedBox(width: UXComponents.paddingS),
                                 Expanded(
                                   child: Text(
-                                    'Coming in Stage 4',
+                                    'Smart Recommendations Available',
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: Theme.of(context).colorScheme.primary,
@@ -91,12 +92,12 @@ class HungryPage extends ConsumerWidget {
                             ),
                             const SizedBox(height: UXComponents.paddingS),
                             LinearProgressIndicator(
-                              value: 0.25, // 25% complete (Stage 1 of 4)
+                              value: 0.85, // 85% complete - most features available
                               backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             ),
                             const SizedBox(height: UXComponents.paddingS),
                             Text(
-                              'AI Recommendation Engine in development',
+                              'Personalized recommendations based on your preferences',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -125,10 +126,10 @@ class HungryPage extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: UXSecondaryButton(
-                          onPressed: () => _showExploreComingSoon(context),
+                          onPressed: () => context.go('/discover'),
                           text: 'Explore Map',
                           icon: Icons.map,
-                          semanticLabel: 'Explore restaurants on map - coming soon',
+                          semanticLabel: 'Explore restaurants on interactive map',
                         ),
                       ),
                       const SizedBox(width: UXComponents.paddingM),
@@ -158,7 +159,7 @@ class HungryPage extends ConsumerWidget {
           children: [
             Icon(Icons.info, color: Colors.white),
             SizedBox(width: 8),
-            Text('Map exploration coming in Stage 3!'),
+            Text('Discover amazing restaurants near you!'),
           ],
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -173,7 +174,7 @@ class HungryPage extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Start Tracking'),
         content: const Text(
-          'Ready to start tracking your meals? You can log meals manually right now, with voice and photo logging coming in Stage 2.',
+          'Ready to start tracking your meals? Start logging your dining experiences and build your food investment portfolio today!',
         ),
         actions: [
           TextButton(

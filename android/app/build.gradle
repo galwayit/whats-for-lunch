@@ -7,16 +7,16 @@ plugins {
 
 android {
     namespace = "au.iapp.guess_what.what_we_have_for_lunch"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk 35
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11
     }
 
     defaultConfig {
@@ -24,10 +24,17 @@ android {
         applicationId = "au.iapp.guess_what.what_we_have_for_lunch"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk 21
+        targetSdk 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled true
+        
+        // Load Google Maps API key from environment or use a placeholder for development
+        manifestPlaceholders = [
+            GOOGLE_MAPS_API_KEY: System.getenv('GOOGLE_MAPS_API_KEY') ?: 'YOUR_API_KEY_HERE',
+            applicationName: 'io.flutter.app.FlutterApplication'
+        ]
     }
 
     buildTypes {

@@ -58,8 +58,12 @@ dependencies:
 
   # Image Optimization & Photo Handling
   cached_network_image: ^3.3.0
+  flutter_cache_manager: ^3.3.1
   image_picker: ^1.0.7
   image: ^4.1.7
+  
+  # Performance & Monitoring
+  connectivity_plus: ^6.0.5
 
   # UI Enhancement
   cupertino_icons: ^1.0.8
@@ -67,6 +71,11 @@ dependencies:
 
   # AI Integration
   google_generative_ai: ^0.3.2
+
+  # Security Dependencies
+  flutter_secure_storage: ^9.0.0
+  crypto: ^3.0.3
+  flutter_certificate_pinning: ^1.0.1
 
 dev_dependencies:
   flutter_test:

@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_routes.dart';
-import '../../domain/entities/user_preferences.dart';
-import '../providers/budget_providers.dart';
-import '../providers/meal_providers.dart';
+import '../../domain/entities/restaurant.dart';
+import '../providers/discovery_providers.dart';
 import '../providers/simple_providers.dart' as simple;
-import '../widgets/enhanced_navigation.dart';
-import '../widgets/investment_charts.dart';
-import '../widgets/ux_components.dart';
-import '../widgets/ux_investment_components.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -20,497 +16,574 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> 
+class _HomePageState extends ConsumerState<HomePage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  final ScrollController _scrollController = ScrollController();
-  bool _showFloatingHeader = false;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
-    _scrollController.addListener(_onScroll);
-    
-    // Start welcome animation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _animationController.forward();
-    });
+
+    // Start gentle pulse animation
+    _pulseController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    _scrollController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    const threshold = 120.0;
-    if (_scrollController.offset > threshold && !_showFloatingHeader) {
-      setState(() {
-        _showFloatingHeader = true;
-      });
-    } else if (_scrollController.offset <= threshold && _showFloatingHeader) {
-      setState(() {
-        _showFloatingHeader = false;
-      });
-    }
-  }
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    // Ensure demo user exists in database
+    ref.watch(simple.ensureDemoUserProvider);
+
     final currentUser = ref.watch(simple.currentUserProvider);
     final preferences = ref.watch(simple.simpleUserPreferencesProvider);
-    final weeklyInvestment = ref.watch(weeklyInvestmentProvider);
 
     return Scaffold(
-      appBar: EnhancedAppBar(
-        title: 'DietBuddy',
-        subtitle: _showFloatingHeader ? 'Investment Dashboard' : null,
-        showInvestmentIndicator: weeklyInvestment.weeklyCapacity > 0,
-        investmentProgress: weeklyInvestment.capacityProgress,
-        onInvestmentTap: () {
-          context.go(AppRoutes.track);
-        },
+      backgroundColor: const Color(0xFFFFF8E7), // Warm, appetizing cream color
+      appBar: AppBar(
+        title: Text(
+          'What We Have For Lunch',
+          style: TextStyle(
+            color: const Color(0xFF2E7D3E), // Fresh green
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: currentUser != null
-          ? _buildEnhancedContent(context, ref, currentUser['name'] ?? 'User', preferences)
+          ? _buildSimpleContent(context, currentUser['name'] ?? 'User')
           : _buildLoadingState(),
-      floatingActionButton: EnhancedFloatingActionButton(
-        onQuickLog: () {
-          HapticFeedback.mediumImpact();
-          context.go(AppRoutes.track);
-        },
-        onTakePhoto: () {
-          HapticFeedback.mediumImpact();
-          _showComingSoonDialog('Photo Recognition');
-        },
-        onAIRecommend: () {
-          HapticFeedback.mediumImpact();
-          context.go('/ai-recommendations');
-        },
-      ),
     );
   }
 
-  Widget _buildEnhancedContent(BuildContext context, WidgetRef ref, String userName, UserPreferences? preferences) {
-    final weeklyInvestment = ref.watch(weeklyInvestmentProvider);
-    final recentMealsAsync = ref.watch(recentMealsProvider);
-    
-    return RefreshIndicator(
-      onRefresh: () async {
-        HapticFeedback.lightImpact();
-        await ref.read(weeklyInvestmentProvider.notifier).refreshData();
-        ref.invalidate(recentMealsProvider);
-      },
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
+  Widget _buildSimpleContent(BuildContext context, String userName) {
+    final searchState = ref.watch(simple.homeSearchProvider);
+
+    // Show search results if search completed with a recommendation
+    if (searchState.hasSearched && !searchState.isSearching && searchState.recommendedRestaurant != null) {
+      return _buildRecommendationResult(context, userName, searchState.recommendedRestaurant!);
+    }
+
+    // Show no results if search completed without a recommendation
+    if (searchState.hasSearched && !searchState.isSearching && searchState.recommendedRestaurant == null) {
+      return _buildNoRecommendationResult(context, userName);
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Welcome header with investment overview
-            _buildWelcomeHeader(context, userName, weeklyInvestment),
-            
-            // Quick action shortcuts
-            const SizedBox(height: UXComponents.paddingL),
-            _buildQuickActionShortcuts(context),
-            
-            // Investment capacity ring (prominent display)
-            if (weeklyInvestment.weeklyCapacity > 0) ...[
-              const SizedBox(height: UXComponents.paddingL),
-              _buildInvestmentCapacitySection(context, weeklyInvestment),
-            ],
-            
-            // Charts and data visualizations
-            const SizedBox(height: UXComponents.paddingL),
-            recentMealsAsync.when(
-              data: (meals) => meals.isNotEmpty 
-                ? _buildDataVisualizationSection(context, meals, weeklyInvestment)
-                : _buildEmptyDataState(context),
-              loading: () => _buildLoadingCharts(),
-              error: (error, stack) => _buildErrorState(context, error.toString()),
-            ),
-            
-            // Weekly investment overview
-            if (weeklyInvestment.weeklyCapacity > 0) ...[
-              const SizedBox(height: UXComponents.paddingL),
-              UXWeeklyInvestmentOverview(
-                weeklySpent: weeklyInvestment.currentSpent,
-                weeklyCapacity: weeklyInvestment.weeklyCapacity,
-                experiencesLogged: weeklyInvestment.experiencesLogged,
-                targetExperiences: weeklyInvestment.targetExperiences,
-                achievements: [], // Will be populated when achievement system is integrated
-                onViewDetails: () {
-                  context.go(AppRoutes.track);
-                },
+            // Warm greeting
+            Text(
+              'Hello, $userName! 👋',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF2E7D3E), // Fresh green
               ),
-            ],
-            
-            // Bottom padding for FAB
-            const SizedBox(height: 100),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 16),
+
+            Text(
+              'Ready for a delicious meal?',
+              style: TextStyle(
+                fontSize: 18,
+                color: const Color(0xFF6B4E3D), // Warm brown
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 60),
+
+            // Progress indicator or main button
+            if (searchState.isSearching) _buildSearchingState() else _buildHungryButton(),
+
+            const SizedBox(height: 40),
+
+            if (!searchState.isSearching)
+              Text(
+                'Tap to find the perfect meal for you',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: const Color(0xFF8B6F47), // Warm brown variant
+                ),
+                textAlign: TextAlign.center,
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLoadingState() {
-    return const Center(
+  Widget _buildHungryButton() {
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: 1.0 + (_pulseController.value * 0.05),
+          child: Container(
+            width: 200,
+            height: 200,
+            child: ElevatedButton(
+              onPressed: () => ref.read(simple.homeSearchProvider.notifier).searchForRestaurant(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6B35), // Appetizing orange
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                elevation: 8,
+                shadowColor: const Color(0xFFFF6B35).withOpacity(0.4),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.restaurant_menu,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'I am\nhungry',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchingState() {
+    return Container(
+      width: 200,
+      height: 200,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: UXComponents.paddingM),
-          Text('Loading your investment dashboard...'),
+          Container(
+            width: 80,
+            height: 80,
+            child: CircularProgressIndicator(
+              color: const Color(0xFFFF6B35),
+              strokeWidth: 6,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Finding your\nperfect meal...',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2E7D3E),
+              height: 1.3,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Based on your preferences',
+            style: TextStyle(
+              fontSize: 14,
+              color: const Color(0xFF6B4E3D),
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildWelcomeHeader(BuildContext context, String userName, WeeklyInvestmentState weeklyState) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      margin: const EdgeInsets.all(UXComponents.paddingM),
-      padding: const EdgeInsets.all(UXComponents.paddingL),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.secondary,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back, $userName!',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: UXComponents.paddingS),
-                    Text(
-                      weeklyState.weeklyCapacity > 0
-                          ? 'Your investment journey continues...'
-                          : 'Ready to start your investment journey?',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
+  Widget _buildRecommendationResult(BuildContext context, String userName, Restaurant restaurant) {
+    final preferences = ref.watch(simple.simpleUserPreferencesProvider);
+    final reasons = ref.read(simple.homeSearchProvider.notifier).getRecommendationReasons(restaurant, preferences);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Success message
+            Text(
+              'Perfect match found! 🎉',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2E7D3E),
               ),
-              if (weeklyState.weeklyCapacity > 0)
-                Container(
-                  padding: const EdgeInsets.all(UXComponents.paddingM),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 32),
+
+            // Restaurant card
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.trending_up,
-                        color: Colors.white,
-                        size: 24,
+                      // Restaurant icon and name
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B35).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFFF6B35).withOpacity(0.3),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.restaurant,
+                          color: const Color(0xFFFF6B35),
+                          size: 30,
+                        ),
                       ),
-                      const SizedBox(height: 4),
+
+                      const SizedBox(height: 16),
+
                       Text(
-                        '\$${weeklyState.remainingCapacity.toStringAsFixed(0)}',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
+                        restaurant.name,
+                        style: TextStyle(
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: const Color(0xFF2E7D3E),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      if (restaurant.cuisineType != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          restaurant.cuisineType!,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: const Color(0xFF6B4E3D),
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 16),
+
+                      // Why this restaurant
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2E7D3E).withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Why this is perfect for you:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF2E7D3E),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ...reasons.take(2).map((reason) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_outline,
+                                        size: 16,
+                                        color: const Color(0xFF4CAF50),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          reason,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: const Color(0xFF6B4E3D),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ],
                         ),
                       ),
-                      Text(
-                        'left',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withOpacity(0.8),
-                        ),
+
+                      const SizedBox(height: 16),
+
+                      // Quick info
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if (restaurant.rating != null)
+                            _buildQuickInfo(
+                              Icons.star,
+                              '${restaurant.rating!.toStringAsFixed(1)}',
+                              const Color(0xFFFFC107),
+                            ),
+                          if (restaurant.priceLevel != null)
+                            _buildQuickInfo(
+                              Icons.attach_money,
+                              '\$' * restaurant.priceLevel!,
+                              const Color(0xFF4CAF50),
+                            ),
+                          if (restaurant.distanceFromUser != null)
+                            _buildQuickInfo(
+                              Icons.location_on,
+                              '${restaurant.distanceFromUser!.toStringAsFixed(1)}km',
+                              const Color(0xFF2196F3),
+                            ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionShortcuts(BuildContext context) {
-    final quickActions = [
-      QuickAction(
-        icon: Icons.restaurant,
-        label: 'Hungry',
-        color: Colors.orange,
-        onTap: () => context.go(AppRoutes.hungry),
-      ),
-      QuickAction(
-        icon: Icons.explore,
-        label: 'Discover',
-        color: Colors.blue,
-        onTap: () => context.go(AppRoutes.discover),
-      ),
-      QuickAction(
-        icon: Icons.add_circle,
-        label: 'Log Meal',
-        color: Colors.green,
-        onTap: () => context.go(AppRoutes.track),
-      ),
-      QuickAction(
-        icon: Icons.analytics,
-        label: 'Insights',
-        color: Colors.purple,
-        onTap: () => context.go('/ai-recommendations'),
-      ),
-      QuickAction(
-        icon: Icons.settings,
-        label: 'Settings',
-        color: Colors.grey,
-        onTap: () => context.go(AppRoutes.profile),
-      ),
-    ];
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-          child: Text(
-            'Quick Actions',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: UXComponents.paddingM),
-        QuickActionShortcuts(actions: quickActions),
-      ],
-    );
-  }
 
-  Widget _buildInvestmentCapacitySection(BuildContext context, WeeklyInvestmentState weeklyState) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(UXComponents.paddingL),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Weekly Investment Capacity',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: UXComponents.paddingS),
-                        Text(
-                          'Track your dining investment progress',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+            const SizedBox(height: 32),
+
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Meh meme face button for "Search Again"
+                Container(
+                  width: 140,
+                  height: 80,
+                  child: ElevatedButton(
+                    onPressed: () => ref.read(simple.homeSearchProvider.notifier).resetSearch(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6B35).withOpacity(0.5),
+                      foregroundColor: const Color(0xFFFF6B35),
+                      shape: const CircleBorder(),
+                      elevation: 2,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: Icon(
+                      Icons.sentiment_dissatisfied,
+                      size: 32,
+                      color: Colors.white,
                     ),
                   ),
-                  UXInvestmentCapacityRing(
-                    currentSpent: weeklyState.currentSpent,
-                    weeklyCapacity: weeklyState.weeklyCapacity,
-                    remainingCapacity: weeklyState.remainingCapacity,
-                    animate: true,
-                    onTap: () {
-                      context.go(AppRoutes.track);
-                    },
+                ),
+
+                // Green round "GO" button for directions
+                Container(
+                  width: 140,
+                  height: 90,
+                  child: ElevatedButton(
+                    onPressed: () => _openMapDirections(restaurant),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
+                      shape: const CircleBorder(),
+                      elevation: 6,
+                      shadowColor: const Color(0xFF4CAF50).withOpacity(0.4),
+                    ),
+                    child: Text(
+                      'GO',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDataVisualizationSection(BuildContext context, List meals, WeeklyInvestmentState weeklyState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-          child: Text(
-            'Investment Analysis',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+  Widget _buildNoRecommendationResult(BuildContext context, String userName) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: const Color(0xFF8B6F47).withOpacity(0.5),
             ),
-          ),
+            const SizedBox(height: 24),
+            Text(
+              'Sorry, $userName',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2E7D3E),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'The restaurants are not available\nfor your current preferences',
+              style: TextStyle(
+                fontSize: 18,
+                color: const Color(0xFF6B4E3D),
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                context.go(AppRoutes.discover);
+              },
+              icon: Icon(Icons.explore),
+              label: Text('Try Discover'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6B35),
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => ref.read(simple.homeSearchProvider.notifier).resetSearch(),
+              child: Text(
+                'Search Again',
+                style: TextStyle(
+                  color: const Color(0xFF6B4E3D),
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: UXComponents.paddingM),
-        
-        // Spending pattern chart
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-          child: InvestmentSpendingChart(
-            meals: meals.cast(),
-            timeframe: 'week',
-            weeklyBudget: weeklyState.weeklyCapacity,
-            showAnimation: true,
-          ),
-        ),
-        
-        const SizedBox(height: UXComponents.paddingL),
-        
-        // Category distribution chart
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-          child: MealCategoryChart(
-            meals: meals.cast(),
-            showAnimation: true,
+      ),
+    );
+  }
+
+  Widget _buildQuickInfo(IconData icon, String text, Color color) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: color,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyDataState(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      margin: const EdgeInsets.all(UXComponents.paddingM),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(UXComponents.paddingXL),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(UXComponents.paddingL),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.psychology,
-                  size: 48,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: UXComponents.paddingL),
-              Text(
-                'Start Your Investment Journey',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: UXComponents.paddingM),
-              Text(
-                'Log your first dining experience to see beautiful visualizations of your investment in happiness and well-being.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: UXComponents.paddingL),
-              UXPrimaryButton(
-                onPressed: () {
-                  context.go(AppRoutes.track);
-                },
-                text: 'Log First Experience',
-                icon: Icons.restaurant_menu,
-              ),
-            ],
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: const Color(0xFFFF6B35),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingCharts() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-      height: 200,
-      child: Card(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              const SizedBox(height: UXComponents.paddingM),
-              Text('Loading investment insights...'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState(BuildContext context, String error) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingM),
-      child: UXErrorState(
-        title: 'Unable to Load Data',
-        message: 'We\'re having trouble loading your investment data. Please try again.',
-        onRetry: () {
-          ref.invalidate(recentMealsProvider);
-        },
-      ),
-    );
-  }
-
-  void _showComingSoonDialog(String feature) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
-            const Text('Coming Soon!'),
-          ],
-        ),
-        content: Text(
-          '$feature is in development and will be available in the next update. Stay tuned for exciting new features!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it!'),
+          const SizedBox(height: 16),
+          Text(
+            'Getting ready...',
+            style: TextStyle(
+              color: const Color(0xFF6B4E3D),
+              fontSize: 16,
+            ),
           ),
         ],
       ),
     );
   }
+
+
+  Future<void> _openMapDirections(Restaurant restaurant) async {
+    try {
+      HapticFeedback.mediumImpact();
+
+      String url;
+
+      if (restaurant.latitude != null && restaurant.longitude != null) {
+        // Use coordinates if available for more accurate directions
+        url =
+            'https://maps.apple.com/?daddr=${restaurant.latitude},${restaurant.longitude}&dirflg=d';
+      } else {
+        // Fallback to address-based search
+        final encodedAddress =
+            Uri.encodeComponent('${restaurant.name}, ${restaurant.location}');
+        url = 'https://maps.apple.com/?q=$encodedAddress&dirflg=d';
+      }
+
+      final uri = Uri.parse(url);
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        // Fallback to Google Maps if Apple Maps is not available
+        final googleMapsUrl = restaurant.latitude != null &&
+                restaurant.longitude != null
+            ? 'https://www.google.com/maps/dir/?api=1&destination=${restaurant.latitude},${restaurant.longitude}'
+            : 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${restaurant.name}, ${restaurant.location}')}';
+
+        final googleUri = Uri.parse(googleMapsUrl);
+
+        if (await canLaunchUrl(googleUri)) {
+          await launchUrl(googleUri, mode: LaunchMode.externalApplication);
+        } else {
+          // Show error if no map app is available
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No map application available'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to open map application'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
 }

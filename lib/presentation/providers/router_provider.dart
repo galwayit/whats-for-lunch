@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_routes.dart';
+import '../pages/ai_recommendations_page.dart';
+import '../pages/budget_setup_page.dart';
 import '../pages/discover_page.dart';
 import '../pages/home_page.dart';
 import '../pages/hungry_page.dart';
@@ -11,10 +12,10 @@ import '../pages/preferences_page.dart';
 import '../pages/profile_page.dart';
 import '../pages/track_page.dart';
 import '../widgets/main_scaffold.dart';
-import 'simple_providers.dart';
+import 'simple_providers.dart' as simple;
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final currentUserId = ref.watch(currentUserIdProvider);
+  final currentUserId = ref.watch(simple.currentUserIdProvider);
   
   return GoRouter(
     initialLocation: currentUserId == null ? AppRoutes.onboarding : AppRoutes.home,
@@ -62,11 +63,19 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.profile,
             builder: (context, state) => const ProfilePage(),
           ),
+          GoRoute(
+            path: AppRoutes.aiRecommendations,
+            builder: (context, state) => const AIRecommendationsPage(),
+          ),
         ],
       ),
       GoRoute(
         path: AppRoutes.preferences,
         builder: (context, state) => const PreferencesPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.budgetSetup,
+        builder: (context, state) => const BudgetSetupPage(),
       ),
     ],
   );

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:what_we_have_for_lunch/data/database/database.dart';
+import 'package:what_we_have_for_lunch/data/mappers/entity_mappers.dart';
 import 'package:what_we_have_for_lunch/domain/entities/budget_tracking.dart' as entity;
 import 'package:what_we_have_for_lunch/domain/entities/meal.dart' as entity;
 import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart' as entity;
@@ -36,7 +37,7 @@ void main() {
       );
 
       // Act
-      final userId = await database.insertUser(database.userToCompanion(user));
+      final userId = await database.insertUser(EntityMappers.userToCompanion(user));
       final retrievedUser = await database.getDatabaseUserById(userId);
 
       // Assert
@@ -54,7 +55,7 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      final userId = await database.insertUser(database.userToCompanion(user));
+      final userId = await database.insertUser(EntityMappers.userToCompanion(user));
 
       // Act
       final updatedPreferences = const UserPreferences(budgetLevel: 4);
@@ -65,14 +66,14 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      final success = await database.updateUser(database.userToCompanion(updatedUser));
+      final success = await database.updateUser(EntityMappers.userToCompanion(updatedUser));
       final retrievedUser = await database.getDatabaseUserById(userId);
 
       // Assert
       expect(success, isTrue);
       expect(retrievedUser, isA<Object>());
       final retrievedPreferences = UserPreferences.fromJson(
-        database.userFromTable(retrievedUser!).preferences,
+        EntityMappers.userFromDatabase(retrievedUser!).preferences,
       );
       expect(retrievedPreferences.budgetLevel, equals(4));
     });
@@ -91,8 +92,8 @@ void main() {
       );
 
       // Act
-      await database.insertUser(database.userToCompanion(user1));
-      await database.insertUser(database.userToCompanion(user2));
+      await database.insertUser(EntityMappers.userToCompanion(user1));
+      await database.insertUser(EntityMappers.userToCompanion(user2));
       final users = await database.getAllDatabaseUsers();
 
       // Assert
@@ -111,7 +112,7 @@ void main() {
         preferences: const UserPreferences().toJson(),
         createdAt: DateTime.now(),
       );
-      userId = await database.insertUser(database.userToCompanion(user));
+      userId = await database.insertUser(EntityMappers.userToCompanion(user));
     });
 
     test('should create and retrieve meal', () async {
@@ -126,7 +127,7 @@ void main() {
       );
 
       // Act
-      final mealId = await database.insertMeal(database.mealToCompanion(meal));
+      final mealId = await database.insertMeal(EntityMappers.mealToCompanion(meal));
       final meals = await database.getMealsByUserId(userId);
 
       // Assert
@@ -162,9 +163,9 @@ void main() {
       );
 
       // Act
-      await database.insertMeal(database.mealToCompanion(meal1));
-      await database.insertMeal(database.mealToCompanion(meal2));
-      await database.insertMeal(database.mealToCompanion(meal3));
+      await database.insertMeal(EntityMappers.mealToCompanion(meal1));
+      await database.insertMeal(EntityMappers.mealToCompanion(meal2));
+      await database.insertMeal(EntityMappers.mealToCompanion(meal3));
 
       final mealsInRange = await database.getMealsByDateRange(
         userId,
@@ -188,7 +189,7 @@ void main() {
         preferences: const UserPreferences().toJson(),
         createdAt: DateTime.now(),
       );
-      userId = await database.insertUser(database.userToCompanion(user));
+      userId = await database.insertUser(EntityMappers.userToCompanion(user));
     });
 
     test('should create and retrieve budget tracking', () async {
@@ -202,7 +203,7 @@ void main() {
 
       // Act
       final entryId = await database.insertBudgetTracking(
-        database.budgetTrackingToCompanion(budgetEntry),
+        EntityMappers.budgetTrackingToCompanion(budgetEntry),
       );
       final entries = await database.getBudgetTrackingByUserId(userId);
 
@@ -228,7 +229,7 @@ void main() {
       );
 
       // Act
-      await database.insertRestaurant(database.restaurantToCompanion(restaurant));
+      await database.insertRestaurant(EntityMappers.restaurantToCompanion(restaurant));
       final retrievedRestaurant = await database.getRestaurantByPlaceId('test_place_id');
 
       // Assert
@@ -261,8 +262,8 @@ void main() {
       );
 
       // Act
-      await database.insertRestaurant(database.restaurantToCompanion(restaurant1));
-      await database.insertRestaurant(database.restaurantToCompanion(restaurant2));
+      await database.insertRestaurant(EntityMappers.restaurantToCompanion(restaurant1));
+      await database.insertRestaurant(EntityMappers.restaurantToCompanion(restaurant2));
       
       final allRestaurants = await database.getAllRestaurants();
       final retrievedRestaurant = await database.getRestaurantByPlaceId('test_place_id');
@@ -290,10 +291,10 @@ void main() {
       );
 
       // Act
-      final companion = database.userToCompanion(originalUser);
+      final companion = EntityMappers.userToCompanion(originalUser);
       final userId = await database.insertUser(companion);
       final retrievedUser = await database.getDatabaseUserById(userId);
-      final convertedUser = database.userFromTable(retrievedUser!);
+      final convertedUser = EntityMappers.userFromDatabase(retrievedUser!);
 
       // Assert
       expect(convertedUser.name, equals(originalUser.name));
@@ -307,7 +308,7 @@ void main() {
         preferences: const UserPreferences().toJson(),
         createdAt: DateTime.now(),
       );
-      final userId = await database.insertUser(database.userToCompanion(user));
+      final userId = await database.insertUser(EntityMappers.userToCompanion(user));
 
       final originalMeal = entity.Meal(
         userId: userId,
@@ -319,10 +320,10 @@ void main() {
       );
 
       // Act
-      final companion = database.mealToCompanion(originalMeal);
+      final companion = EntityMappers.mealToCompanion(originalMeal);
       final mealId = await database.insertMeal(companion);
       final retrievedMeals = await database.getMealsByUserId(userId);
-      final convertedMeal = database.mealFromTable(retrievedMeals.first);
+      final convertedMeal = EntityMappers.mealFromDatabase(retrievedMeals.first);
 
       // Assert
       expect(convertedMeal.userId, equals(originalMeal.userId));

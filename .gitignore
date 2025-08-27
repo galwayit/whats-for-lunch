@@ -56,8 +56,13 @@ CLAUDE.md
 .env
 .env.local
 .env.production
-.env.development
+.env.staging
 *.env
+
+# Keep example and development files for documentation
+!.env.example
+!.env.development
+
 config.json
 secrets.json
 credentials.json

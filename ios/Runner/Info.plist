@@ -45,5 +45,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Google Maps API Key - Loaded from build configuration for security -->
+	<key>GMSApiKey</key>
+	<string>$(GOOGLE_MAPS_API_KEY)</string>
+	
+	<!-- Camera and photo permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to take photos of your meals for logging and tracking your dining experiences.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to select photos of meals for logging and tracking your dining experiences.</string>
+	
+	<!-- Location permissions for restaurant discovery -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location to find nearby restaurants and provide personalized dining recommendations based on your location.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to location to find nearby restaurants and provide personalized dining recommendations based on your location.</string>
 </dict>
 </plist>

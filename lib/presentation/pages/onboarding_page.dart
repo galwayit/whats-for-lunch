@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_routes.dart';
 import '../../domain/entities/user_preferences.dart';
-import '../providers/simple_providers.dart';
+import '../providers/simple_providers.dart' as simple;
 import '../widgets/ux_components.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
@@ -19,6 +19,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _customDietController = TextEditingController();
   late AnimationController _fadeController;
   
   int _currentPage = 0;
@@ -28,7 +29,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   final List<String> _pageDescriptions = [
     'Welcome to your personalized lunch companion',
     'Let\'s get to know you better',
-    'Set your dining preferences',
+    'Set your budget and distance preferences',
+    'Tell us about your dietary needs',
     'You\'re ready to discover great food!'
   ];
 
@@ -46,6 +48,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   void dispose() {
     _pageController.dispose();
     _nameController.dispose();
+    _customDietController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -77,6 +80,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                     _buildWelcomePage(),
                     _buildNameInputPage(),
                     _buildPreferencesPage(),
+                    _buildDietaryPage(),
                     _buildCompletePage(),
                   ],
                 ),
@@ -91,7 +95,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   Widget _buildProgressIndicator() {
     return UXProgressIndicator(
       currentStep: _currentPage,
-      totalSteps: 4,
+      totalSteps: 5,
     );
   }
 
@@ -187,29 +191,36 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               semanticLabel: 'Enter your name for personalization',
             ),
             const SizedBox(height: UXComponents.paddingXXL),
-            Row(
-              children: [
-                Expanded(
-                  child: UXSecondaryButton(
-                    onPressed: () => _previousPage(),
-                    text: 'Back',
-                    icon: Icons.arrow_back,
-                    semanticLabel: 'Go back to welcome page',
-                  ),
-                ),
-                const SizedBox(width: UXComponents.paddingM),
-                Expanded(
-                  flex: 2,
-                  child: UXPrimaryButton(
-                    onPressed: _nameController.text.trim().isNotEmpty 
-                        ? () => _nextPage() 
-                        : null,
-                    text: 'Next',
-                    icon: Icons.arrow_forward,
-                    semanticLabel: 'Continue to preferences setup',
-                  ),
-                ),
-              ],
+            // Use ValueListenableBuilder to make button reactive to text changes
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _nameController,
+              builder: (context, value, child) {
+                final isNameValid = value.text.trim().length >= 2;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: UXSecondaryButton(
+                        onPressed: () => _previousPage(),
+                        text: 'Back',
+                        icon: Icons.arrow_back,
+                        semanticLabel: 'Go back to welcome page',
+                      ),
+                    ),
+                    const SizedBox(width: UXComponents.paddingM),
+                    Expanded(
+                      flex: 2,
+                      child: UXPrimaryButton(
+                        onPressed: isNameValid 
+                            ? () => _nextPage() 
+                            : null,
+                        text: 'Next',
+                        icon: Icons.arrow_forward,
+                        semanticLabel: 'Continue to preferences setup',
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -225,7 +236,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Tell us your preferences',
+              'Budget & Distance',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -267,6 +278,106 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                     onPressed: () => _nextPage(),
                     text: 'Next',
                     icon: Icons.arrow_forward,
+                    semanticLabel: 'Continue to dietary preferences',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDietaryPage() {
+    const List<String> commonDiets = [
+      'No restrictions',
+      'Vegetarian',
+      'Vegan',
+      'Gluten-free',
+      'Keto',
+      'Paleo',
+      'Dairy-free',
+      'Nut allergies',
+      'Cannot find my diet',
+    ];
+
+    return UXFadeIn(
+      child: Padding(
+        padding: const EdgeInsets.all(UXComponents.paddingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dietary Preferences',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: UXComponents.paddingS),
+            Text(
+              _pageDescriptions[_currentPage],
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: UXComponents.paddingL),
+            Expanded(
+              child: ListView(
+                children: [
+                  Text(
+                    'Select your dietary needs (multiple selections allowed):',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: UXComponents.paddingM),
+                  ...commonDiets.map((diet) => _buildDietOption(diet)),
+                  
+                  // Custom diet input (only show if "Cannot find my diet" is selected)
+                  if (_preferences.dietaryRestrictions.contains('Cannot find my diet')) ...[
+                    const SizedBox(height: UXComponents.paddingL),
+                    Text(
+                      'Please specify your dietary needs:',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: UXComponents.paddingS),
+                    UXTextInput(
+                      controller: _customDietController,
+                      label: 'Custom dietary requirements',
+                      hint: 'e.g., Low sodium, Mediterranean, etc.',
+                      helperText: 'Describe any specific dietary needs or restrictions',
+                      textInputAction: TextInputAction.done,
+                      validator: (value) {
+                        if (_preferences.dietaryRestrictions.contains('Cannot find my diet') &&
+                            (value == null || value.trim().isEmpty)) {
+                          return 'Please specify your dietary needs';
+                        }
+                        return null;
+                      },
+                      semanticLabel: 'Enter custom dietary requirements',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: UXSecondaryButton(
+                    onPressed: () => _previousPage(),
+                    text: 'Back',
+                    icon: Icons.arrow_back,
+                    semanticLabel: 'Go back to budget and distance preferences',
+                  ),
+                ),
+                const SizedBox(width: UXComponents.paddingM),
+                Expanded(
+                  flex: 2,
+                  child: UXPrimaryButton(
+                    onPressed: _canProceedFromDietary() ? () => _nextPage() : null,
+                    text: 'Next',
+                    icon: Icons.arrow_forward,
                     semanticLabel: 'Continue to completion page',
                   ),
                 ),
@@ -276,6 +387,125 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         ),
       ),
     );
+  }
+
+  Widget _buildDietOption(String diet) {
+    final isSelected = _preferences.dietaryRestrictions.contains(diet);
+    final isNoRestrictions = diet == 'No restrictions';
+    final isCustom = diet == 'Cannot find my diet';
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            List<String> newRestrictions = List.from(_preferences.dietaryRestrictions);
+            
+            if (isNoRestrictions) {
+              // If "No restrictions" is selected, clear all others
+              if (isSelected) {
+                newRestrictions.clear();
+              } else {
+                newRestrictions = ['No restrictions'];
+                _customDietController.clear(); // Clear custom input
+              }
+            } else {
+              // If any specific diet is selected, remove "No restrictions"
+              newRestrictions.remove('No restrictions');
+              
+              if (isSelected) {
+                newRestrictions.remove(diet);
+                if (isCustom) {
+                  _customDietController.clear(); // Clear custom input when deselecting
+                }
+              } else {
+                newRestrictions.add(diet);
+              }
+            }
+            
+            _preferences = _preferences.copyWith(dietaryRestrictions: newRestrictions);
+          });
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected 
+                ? const Color(0xFFFF6B35) // Appetizing orange
+                : Colors.grey[300]!,
+              width: isSelected ? 2 : 1,
+            ),
+            color: isSelected 
+              ? const Color(0xFFFF6B35).withOpacity(0.1)
+              : null,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected 
+                      ? const Color(0xFFFF6B35)
+                      : Colors.grey[400]!,
+                    width: 2,
+                  ),
+                  color: isSelected 
+                    ? const Color(0xFFFF6B35)
+                    : Colors.transparent,
+                ),
+                child: isSelected 
+                  ? const Icon(
+                      Icons.check,
+                      size: 16,
+                      color: Colors.white,
+                    )
+                  : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  diet,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected 
+                      ? const Color(0xFFFF6B35)
+                      : Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
+              ),
+              if (isCustom)
+                Icon(
+                  Icons.edit,
+                  size: 18,
+                  color: isSelected 
+                    ? const Color(0xFFFF6B35)
+                    : Colors.grey[500],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _canProceedFromDietary() {
+    // Can proceed if no restrictions are selected OR
+    // if restrictions are selected and custom diet (if selected) has content
+    if (_preferences.dietaryRestrictions.isEmpty ||
+        _preferences.dietaryRestrictions.contains('No restrictions')) {
+      return true;
+    }
+    
+    if (_preferences.dietaryRestrictions.contains('Cannot find my diet')) {
+      return _customDietController.text.trim().isNotEmpty;
+    }
+    
+    return true;
   }
 
   Widget _buildBudgetSelector() {
@@ -510,12 +740,56 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
           ],
         ),
+        const SizedBox(height: UXComponents.paddingS),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Dietary:', style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _getDietarySummary(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
 
+  String _getDietarySummary() {
+    if (_preferences.dietaryRestrictions.isEmpty) {
+      return 'No restrictions';
+    }
+    
+    if (_preferences.dietaryRestrictions.contains('No restrictions')) {
+      return 'No restrictions';
+    }
+    
+    List<String> displayRestrictions = List.from(_preferences.dietaryRestrictions);
+    
+    // If custom diet is selected, replace it with the actual custom text
+    if (displayRestrictions.contains('Cannot find my diet') && 
+        _customDietController.text.trim().isNotEmpty) {
+      displayRestrictions.remove('Cannot find my diet');
+      displayRestrictions.add(_customDietController.text.trim());
+    }
+    
+    if (displayRestrictions.length == 1) {
+      return displayRestrictions.first;
+    } else if (displayRestrictions.length <= 3) {
+      return displayRestrictions.join(', ');
+    } else {
+      return '${displayRestrictions.take(2).join(', ')} & ${displayRestrictions.length - 2} more';
+    }
+  }
+
   void _nextPage() {
-    if (_currentPage < 3) {
+    if (_currentPage < 4) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -543,12 +817,24 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       // Provide haptic feedback for successful action
       HapticFeedback.mediumImpact();
       
-      // Create user with preferences
-      final createUser = ref.read(createUserProvider);
+      // Create user with preferences using the simple provider for Stage 1
+      final createUser = ref.read(simple.createUserProvider);
       await createUser(_nameController.text.trim());
       
-      // Update preferences
-      ref.read(userPreferencesProvider.notifier).updatePreferences(_preferences);
+      // Process dietary preferences (add custom diet to restrictions if specified)
+      List<String> finalDietaryRestrictions = List.from(_preferences.dietaryRestrictions);
+      if (finalDietaryRestrictions.contains('Cannot find my diet') && 
+          _customDietController.text.trim().isNotEmpty) {
+        finalDietaryRestrictions.remove('Cannot find my diet');
+        finalDietaryRestrictions.add(_customDietController.text.trim());
+      }
+      
+      final finalPreferences = _preferences.copyWith(
+        dietaryRestrictions: finalDietaryRestrictions,
+      );
+      
+      // Update preferences using the simple provider
+      ref.read(simple.simpleUserPreferencesProvider.notifier).updatePreferences(finalPreferences);
       
       // Add slight delay for better UX
       await Future.delayed(const Duration(milliseconds: 500));
