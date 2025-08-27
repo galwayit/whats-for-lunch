@@ -256,3 +256,4 @@ SECRET_*.md
 restaurant_api_keys.json
 maps_config.json
 payment_keys.json
+.env.development
