@@ -20,7 +20,7 @@ void main() {
 
         for (final input in maliciousInputs) {
           final result = InputValidator.validateUserName(input);
-          expect(result.isValid, isFalse, 
+          expect(result.isValid, isFalse,
               reason: 'Should reject malicious input: $input');
         }
       });
@@ -60,9 +60,9 @@ void main() {
       test('should validate location coordinates within bounds', () {
         final invalidCoordinates = [
           [-91.0, 0.0], // Invalid latitude
-          [91.0, 0.0],  // Invalid latitude
+          [91.0, 0.0], // Invalid latitude
           [0.0, -181.0], // Invalid longitude
-          [0.0, 181.0],  // Invalid longitude
+          [0.0, 181.0], // Invalid longitude
           [double.infinity, 0.0], // Infinity
           [double.nan, 0.0], // NaN
         ];
@@ -76,10 +76,10 @@ void main() {
 
       test('should handle excessive input sizes', () {
         final largeInput = 'A' * 10000; // Very large input
-        
+
         final nameResult = InputValidator.validateUserName(largeInput);
         expect(nameResult.isValid, isFalse);
-        
+
         final notesResult = InputValidator.validateNotes(largeInput);
         expect(notesResult.isValid, isFalse);
       });
@@ -87,7 +87,7 @@ void main() {
       test('should sanitize HTML entities correctly', () {
         final htmlInput = '<div>Hello & "World" \'test\'</div>';
         final sanitized = InputValidator.encodeHtmlEntities(htmlInput);
-        
+
         expect(sanitized, contains('&lt;'));
         expect(sanitized, contains('&gt;'));
         expect(sanitized, contains('&amp;'));
@@ -99,12 +99,12 @@ void main() {
         // Create deeply nested JSON
         Map<String, dynamic> deepJson = {};
         Map<String, dynamic> current = deepJson;
-        
+
         for (int i = 0; i < 15; i++) {
           current['level$i'] = <String, dynamic>{};
           current = current['level$i'] as Map<String, dynamic>;
         }
-        
+
         final jsonString = json.encode(deepJson);
         final result = InputValidator.validateJsonInput(jsonString);
         expect(result.isValid, isFalse,
@@ -115,11 +115,11 @@ void main() {
     group('Data Encryption Security Tests', () {
       test('should encrypt and decrypt user data correctly', () async {
         await DataEncryption.initialize();
-        
+
         const testData = 'sensitive user information';
         final encrypted = await DataEncryption.encryptUserData(testData);
         final decrypted = await DataEncryption.decryptUserData(encrypted);
-        
+
         expect(decrypted, equals(testData));
         expect(encrypted, isNot(equals(testData)));
         expect(encrypted.length, greaterThan(testData.length));
@@ -127,13 +127,14 @@ void main() {
 
       test('should handle location data encryption', () async {
         await DataEncryption.initialize();
-        
+
         const latitude = 37.7749;
         const longitude = -122.4194;
-        
-        final encrypted = await DataEncryption.encryptLocationData(latitude, longitude);
+
+        final encrypted =
+            await DataEncryption.encryptLocationData(latitude, longitude);
         final decrypted = await DataEncryption.decryptLocationData(encrypted);
-        
+
         expect(decrypted['lat'], equals(latitude));
         expect(decrypted['lng'], equals(longitude));
         expect(decrypted.containsKey('timestamp'), isTrue);
@@ -143,7 +144,7 @@ void main() {
         const testData = 'test data for hashing';
         final hash1 = DataEncryption.generateDataHash(testData);
         final hash2 = DataEncryption.generateDataHash(testData);
-        
+
         expect(hash1, equals(hash2));
         expect(hash1, hasLength(64)); // SHA-256 hex string
       });
@@ -151,19 +152,20 @@ void main() {
       test('should verify data integrity correctly', () {
         const testData = 'integrity test data';
         final hash = DataEncryption.generateDataHash(testData);
-        
+
         expect(DataEncryption.verifyDataIntegrity(testData, hash), isTrue);
-        expect(DataEncryption.verifyDataIntegrity('modified data', hash), isFalse);
+        expect(
+            DataEncryption.verifyDataIntegrity('modified data', hash), isFalse);
       });
 
       test('should fail decryption with invalid data', () async {
         await DataEncryption.initialize();
-        
+
         expect(
           () async => await DataEncryption.decryptUserData('invalid_base64'),
           throwsException,
         );
-        
+
         expect(
           () async => await DataEncryption.decryptUserData(''),
           throwsException,
@@ -172,17 +174,18 @@ void main() {
 
       test('should handle preferences encryption', () async {
         await DataEncryption.initialize();
-        
+
         final preferences = {
           'dietaryRestrictions': ['vegan', 'gluten-free'],
           'cuisinePreferences': ['italian', 'japanese'],
           'budgetLevel': 2,
         };
-        
+
         final encrypted = await DataEncryption.encryptPreferences(preferences);
         final decrypted = await DataEncryption.decryptPreferences(encrypted);
-        
-        expect(decrypted['dietaryRestrictions'], equals(preferences['dietaryRestrictions']));
+
+        expect(decrypted['dietaryRestrictions'],
+            equals(preferences['dietaryRestrictions']));
         expect(decrypted['budgetLevel'], equals(preferences['budgetLevel']));
       });
     });
@@ -191,7 +194,7 @@ void main() {
       test('should validate certificate hashes correctly', () {
         // Mock certificate validation
         const hostname = 'maps.googleapis.com';
-        
+
         // This would typically use real certificate data
         // For testing, we'll simulate the validation logic
         expect(hostname, isNotEmpty);
@@ -208,14 +211,15 @@ void main() {
 
         for (final url in maliciousUrls) {
           // Test would validate URL through request interceptor
-          expect(url, contains(RegExp(r'[<>"\'']|javascript:|data:|vbscript:')));
+          expect(
+              url, contains(RegExp(r'[<>"\' ']|javascript:|data:|vbscript:')));
         }
       });
 
       test('should enforce request size limits', () {
         const maxSize = 1024 * 1024; // 1MB
         final largeData = 'A' * (maxSize + 1);
-        
+
         expect(largeData.length, greaterThan(maxSize));
         // Request interceptor would reject this
       });
@@ -223,15 +227,19 @@ void main() {
       test('should validate security headers', () {
         final requiredHeaders = [
           'X-Content-Type-Options',
-          'X-Frame-Options', 
+          'X-Frame-Options',
           'Referrer-Policy',
         ];
-        
-        final securityHeaders = NetworkSecurity.createSecureDio().options.headers;
-        
+
+        final securityHeaders =
+            NetworkSecurity.createSecureDio().options.headers;
+
         for (final header in requiredHeaders) {
           // Check that security headers are present
-          expect(securityHeaders.keys.any((k) => k.toLowerCase().contains(header.toLowerCase())), isTrue);
+          expect(
+              securityHeaders.keys
+                  .any((k) => k.toLowerCase().contains(header.toLowerCase())),
+              isTrue);
         }
       });
     });
@@ -240,21 +248,21 @@ void main() {
       test('should handle privacy consent correctly', () async {
         // Clear any existing consent
         await PrivacyManager.clearAllPrivacyData();
-        
+
         // Initially should have no consent
         final initialConsent = await PrivacyManager.getPrivacyConsent();
         expect(initialConsent.grantedConsents, isEmpty);
         expect(await PrivacyManager.hasEssentialConsent(), isFalse);
-        
+
         // Grant essential consent
         final newConsent = PrivacyConsent(
           grantedConsents: ['essential', 'location'],
           consentDate: DateTime.now(),
           version: '1.0.0',
         );
-        
+
         await PrivacyManager.updatePrivacyConsent(newConsent);
-        
+
         // Verify consent is stored
         final storedConsent = await PrivacyManager.getPrivacyConsent();
         expect(storedConsent.hasConsent('essential'), isTrue);
@@ -264,17 +272,17 @@ void main() {
 
       test('should handle consent revocation', () async {
         await PrivacyManager.clearAllPrivacyData();
-        
+
         // Grant multiple consents
         final consent = PrivacyConsent(
           grantedConsents: ['essential', 'location', 'analytics'],
           consentDate: DateTime.now(),
           version: '1.0.0',
         );
-        
+
         await PrivacyManager.updatePrivacyConsent(consent);
         expect(await PrivacyManager.hasConsent('analytics'), isTrue);
-        
+
         // Revoke analytics consent
         await PrivacyManager.revokeConsent('analytics');
         expect(await PrivacyManager.hasConsent('analytics'), isFalse);
@@ -284,31 +292,33 @@ void main() {
       test('should enforce data retention policies', () {
         final oldDate = DateTime.now().subtract(const Duration(days: 400));
         final recentDate = DateTime.now().subtract(const Duration(days: 20));
-        
+
         expect(PrivacyManager.shouldDeleteData(oldDate, 'usage'), isTrue);
         expect(PrivacyManager.shouldDeleteData(recentDate, 'usage'), isFalse);
-        
+
         expect(PrivacyManager.shouldDeleteData(oldDate, 'location'), isTrue);
-        expect(PrivacyManager.shouldDeleteData(recentDate, 'location'), isFalse);
+        expect(
+            PrivacyManager.shouldDeleteData(recentDate, 'location'), isFalse);
       });
 
       test('should generate privacy compliance report', () async {
         await PrivacyManager.clearAllPrivacyData();
-        
+
         // Test without consent
         var report = await PrivacyManager.validateCompliance();
         expect(report.isCompliant, isFalse);
-        expect(report.issues, contains(contains('Essential consent not granted')));
-        
+        expect(
+            report.issues, contains(contains('Essential consent not granted')));
+
         // Grant essential consent
         final consent = PrivacyConsent(
           grantedConsents: ['essential'],
           consentDate: DateTime.now(),
           version: '1.0.0',
         );
-        
+
         await PrivacyManager.updatePrivacyConsent(consent);
-        
+
         report = await PrivacyManager.validateCompliance();
         expect(report.isCompliant, isTrue);
         expect(report.issues, isEmpty);
@@ -316,10 +326,10 @@ void main() {
 
       test('should handle data export for portability', () async {
         await PrivacyManager.clearAllPrivacyData();
-        
+
         const userId = 123;
         final exportData = await PrivacyManager.exportUserData(userId);
-        
+
         expect(exportData['userId'], equals(userId));
         expect(exportData['exportDate'], isNotNull);
         expect(exportData['privacyConsent'], isNotNull);
@@ -331,9 +341,8 @@ void main() {
     group('Secure Configuration Tests', () {
       test('should validate API key formats', () async {
         // Valid Google Maps API key format
-        expect(SecureConfig.generateApiKeyHash('AIzaSyA47-rYYHqDghRMva05HKKvNrt_yIuWCUY'), 
-               hasLength(64));
-        
+        expect(SecureConfig.generateApiKeyHash(''), hasLength(64));
+
         // Test hash consistency
         final hash1 = SecureConfig.generateApiKeyHash('test_key');
         final hash2 = SecureConfig.generateApiKeyHash('test_key');
@@ -342,7 +351,7 @@ void main() {
 
       test('should handle configuration security context', () {
         final summary = SecureConfig.getConfigSummary();
-        
+
         expect(summary.containsKey('initialized'), isTrue);
         expect(summary.containsKey('cacheSize'), isTrue);
         expect(summary.containsKey('securityLevel'), isTrue);
@@ -359,19 +368,19 @@ void main() {
     group('Rate Limiting Tests', () {
       test('should enforce input validation rate limits', () {
         InputRateLimit.clearHistory();
-        
+
         const identifier = 'test_user';
-        
+
         // Should allow initial requests
         for (int i = 0; i < 50; i++) {
           expect(InputRateLimit.isRateLimited(identifier), isFalse);
         }
-        
+
         // Should start rate limiting after many requests
         for (int i = 0; i < 60; i++) {
           InputRateLimit.isRateLimited(identifier);
         }
-        
+
         expect(InputRateLimit.isRateLimited(identifier), isTrue);
       });
     });
@@ -381,20 +390,21 @@ void main() {
         // Test full security chain
         await DataEncryption.initialize();
         await PrivacyManager.clearAllPrivacyData();
-        
+
         // 1. Validate input
         final nameResult = InputValidator.validateUserName('John Doe');
         expect(nameResult.isValid, isTrue);
-        
+
         // 2. Encrypt sensitive data
-        final encrypted = await DataEncryption.encryptUserData(nameResult.value!);
+        final encrypted =
+            await DataEncryption.encryptUserData(nameResult.value!);
         expect(encrypted, isNotEmpty);
-        
+
         // 3. Check privacy consent
         final hasConsent = await PrivacyManager.hasEssentialConsent();
         // Would be false initially, true after consent granted
         expect(hasConsent, isFalse);
-        
+
         // 4. Verify network security
         final secureDio = NetworkSecurity.createSecureDio();
         expect(secureDio.options.connectTimeout, isNotNull);
@@ -407,14 +417,15 @@ void main() {
           () async => await DataEncryption.decryptUserData('invalid'),
           throwsException,
         );
-        
+
         expect(
           InputValidator.validateLocation(91.0, 0.0).isValid,
           isFalse,
         );
-        
+
         expect(
-          InputValidator.validateUserName('<script>alert("xss")</script>').isValid,
+          InputValidator.validateUserName('<script>alert("xss")</script>')
+              .isValid,
           isFalse,
         );
       });
@@ -470,7 +481,8 @@ class SecurityTestUtils {
   ) {
     for (final payload in payloads) {
       if (validator(payload)) {
-        throw Exception('$testName: Security payload was not rejected: $payload');
+        throw Exception(
+            '$testName: Security payload was not rejected: $payload');
       }
     }
   }
