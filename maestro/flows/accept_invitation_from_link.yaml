@@ -1,0 +1,12 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: accept_invitation_from_link
+tags: [social]
+env:
+  INVITE_URL: "https://lunch.iapp.au/i/TESTCODE"
+---
+- openLink: ${INVITE_URL}
+- assertVisible: "invited you to lunch"
+- assertVisible: "Accept"
+- tapOn: "Accept"
+- assertVisible: "You're in"
+- assertVisible: "Add to calendar"

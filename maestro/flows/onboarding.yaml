@@ -1,0 +1,32 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: onboarding
+tags: [smoke]
+---
+- clearState
+- launchApp
+- assertVisible: "Welcome to"
+- tapOn: "Get Started"
+- assertVisible: "What should we call you?"
+- tapOn:
+    id: "onboarding_name_field"
+- inputText: "Sam"
+- tapOn: "Continue"
+- assertVisible: "Your budget"
+- tapOn: "$$"
+- tapOn: "Continue"
+- assertVisible: "Any dietary needs?"
+- tapOn: "Vegetarian"
+- tapOn: "Continue"
+- assertVisible: "Find lunch near you"
+- tapOn: "Allow location"
+- runFlow:
+    when:
+      visible: "Allow While Using App"
+    commands:
+      - tapOn: "Allow While Using App"
+- runFlow:
+    when:
+      visible: "While using the app"
+    commands:
+      - tapOn: "While using the app"
+- assertVisible: "Hi, Sam!"

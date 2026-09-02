@@ -1,0 +1,18 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: log_meal
+tags: [smoke]
+---
+- launchApp
+- tapOn: "Track"
+- assertVisible: "Quick meal log"
+- tapOn: "Lunch"
+- tapOn:
+    id: "meal_place_field"
+- inputText: "Green Garden Bowls"
+- tapOn:
+    id: "meal_cost_field"
+- inputText: "18.50"
+- tapOn: "Log this meal"
+- assertVisible: "Logged"
+- assertVisible: "Green Garden Bowls"
+- assertVisible: "$18.50"

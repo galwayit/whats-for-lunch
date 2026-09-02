@@ -1,0 +1,15 @@
+# Maestro workspace. Run: maestro test maestro/flows  (or one file)
+# App ids are identical on both platforms.
+flows:
+  - "flows/*.yaml"
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - onboarding
+    - hungry_search
+    - discover_filter_and_detail
+    - log_meal
+    - ai_gate_and_paywall
+    - start_trial_sandbox
+    - create_group_and_share
+    - accept_invitation_from_link

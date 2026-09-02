@@ -1,0 +1,6 @@
+# Copy to lunch.properties (git-ignored) and fill in from the Supabase and RevenueCat dashboards.
+supabaseUrl=https://YOUR-PROJECT-REF.supabase.co
+supabaseAnonKey=YOUR_SUPABASE_ANON_KEY
+backendBaseUrl=https://YOUR-PROJECT-REF.supabase.co/functions/v1
+revenueCatApiKey=goog_YOUR_REVENUECAT_PUBLIC_KEY
+inviteLinkBase=https://lunch.iapp.au/i/

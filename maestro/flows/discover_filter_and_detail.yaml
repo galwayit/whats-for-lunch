@@ -1,0 +1,24 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: discover_filter_and_detail
+tags: [smoke]
+---
+- launchApp
+- tapOn: "Discover"
+- extendedWaitUntil:
+    visible: "Restaurants Found"
+    timeout: 15000
+- tapOn: "Price"
+- assertVisible: "Maximum price level"
+- tapOn: "$$"
+- tapOn: "Apply"
+- assertVisible: "Price: $$"
+- tapOn:
+    id: "restaurant_card_0"
+- assertVisible: "Directions"
+- assertVisible: "Reviews"
+- swipe:
+    direction: DOWN
+- tapOn:
+    id: "favourite_button_0"
+- assertVisible:
+    id: "favourite_button_0_selected"

@@ -1,0 +1,20 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: hungry_search
+tags: [smoke]
+---
+- launchApp
+- assertVisible:
+    id: "hero_hungry_button"
+- tapOn:
+    id: "hero_hungry_button"
+- assertVisible: "Finding your perfect meal"
+- extendedWaitUntil:
+    visible:
+      id: "recommendation_card"
+    timeout: 15000
+- assertVisible: "Why this?"
+- tapOn: "Not this one"
+- extendedWaitUntil:
+    visible:
+      id: "recommendation_card"
+    timeout: 15000

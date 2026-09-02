@@ -1,0 +1,22 @@
+appId: au.iapp.guess_what.what_we_have_for_lunch
+name: create_group_and_share
+tags: [social]
+# Requires a Pro entitlement and a signed-in account.
+---
+- launchApp
+- tapOn: "Plan a group lunch"
+- assertVisible: "New group lunch"
+- tapOn:
+    id: "group_name_field"
+- inputText: "Friday team lunch"
+- tapOn: "Propose places"
+- extendedWaitUntil:
+    visible:
+      id: "proposal_card_0"
+    timeout: 20000
+- tapOn:
+    id: "proposal_card_0_choose"
+- assertVisible: "Invite friends"
+- copyTextFrom:
+    id: "invite_link_text"
+- tapOn: "Share invite"
