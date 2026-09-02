@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  Copy to Config/Lunch.plist (git-ignored) and fill in the real values.
+  The synchronised project folder picks up Lunch.plist automatically and bundles it.
+-->
+<dict>
+	<key>supabaseUrl</key>
+	<string>https://YOUR-PROJECT.supabase.co</string>
+	<key>supabaseAnonKey</key>
+	<string>YOUR_SUPABASE_ANON_KEY</string>
+	<key>backendBaseUrl</key>
+	<string>https://api.lunch.iapp.au</string>
+	<key>revenueCatApiKey</key>
+	<string>appl_YOUR_REVENUECAT_KEY</string>
+	<key>inviteLinkBase</key>
+	<string>https://lunch.iapp.au/invite</string>
+</dict>
+</plist>
