@@ -89,7 +89,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -117,7 +117,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
                     Text(
                       _formatTimeStamp(widget.recommendation.generatedAt),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                       ),
                     ),
                   ],
@@ -141,9 +141,9 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -172,7 +172,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha:0.3),
         child: InkWell(
           onTap: () => widget.onRestaurantSelected(restaurant),
           borderRadius: BorderRadius.circular(12),
@@ -198,7 +198,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
                             Text(
                               restaurant.address!,
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.7),
                               ),
                             ),
                           ],
@@ -216,13 +216,13 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
                           placeholder: (context, url) => Container(
                             width: 80,
                             height: 60,
-                            color: Theme.of(context).colorScheme.surfaceVariant,
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
                             child: const Icon(Icons.restaurant),
                           ),
                           errorWidget: (context, url, error) => Container(
                             width: 80,
                             height: 60,
-                            color: Theme.of(context).colorScheme.surfaceVariant,
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
                             child: const Icon(Icons.restaurant),
                           ),
                         ),
@@ -281,9 +281,9 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -304,7 +304,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: color.withOpacity(0.8),
+                  color: color.withValues(alpha:0.8),
                   fontSize: 10,
                 ),
               ),
@@ -364,10 +364,10 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha:0.3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.tertiary.withValues(alpha:0.3),
           ),
         ),
         child: Column(
@@ -415,7 +415,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.tertiary.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -497,7 +497,7 @@ class _AIRecommendationCardState extends State<AIRecommendationCard>
                     : Icons.star_border,
                 color: starIndex <= (_userRating ?? 0)
                     ? Colors.amber
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
               ),
               onPressed: () {
                 setState(() {
@@ -650,7 +650,7 @@ class AIRecommendationSummary extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getConfidenceColor(recommendation.overallConfidence)
-                        .withOpacity(0.1),
+                        .withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -675,7 +675,7 @@ class AIRecommendationSummary extends StatelessWidget {
               Text(
                 recommendation.investmentSummary,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.7),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -803,7 +803,7 @@ class _AIRecommendationLoadingState extends State<AIRecommendationLoading>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Theme.of(context).colorScheme.primary
-                          .withOpacity(_pulseAnimation.value * 0.2),
+                          .withValues(alpha:_pulseAnimation.value * 0.2),
                     ),
                   ),
                 ),
@@ -844,7 +844,7 @@ class _AIRecommendationLoadingState extends State<AIRecommendationLoading>
             Text(
               'This may take a few seconds...',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
               ),
               textAlign: TextAlign.center,
             ),

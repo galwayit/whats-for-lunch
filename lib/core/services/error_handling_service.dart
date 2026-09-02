@@ -256,7 +256,7 @@ class ErrorHandlingService {
   /// Get error statistics
   ErrorStatistics getErrorStatistics() {
     if (_errorHistory.isEmpty) {
-      return ErrorStatistics(
+      return const ErrorStatistics(
         totalErrors: 0,
         errorsByType: {},
         recentErrorRate: 0.0,

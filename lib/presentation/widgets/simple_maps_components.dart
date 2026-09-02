@@ -1,17 +1,13 @@
 import 'dart:async';
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/entities/restaurant.dart';
 import '../../domain/entities/user_preferences.dart';
-import 'ux_components.dart';
 
 /// Simple Maps component without clustering for compatibility
 class SimpleMapsView extends StatefulWidget {
@@ -43,8 +39,8 @@ class SimpleMapsView extends StatefulWidget {
 class _SimpleMapsViewState extends State<SimpleMapsView>
     with TickerProviderStateMixin {
   GoogleMapController? _controller;
-  Set<Marker> _markers = {};
-  Set<Circle> _circles = {};
+  final Set<Marker> _markers = {};
+  final Set<Circle> _circles = {};
   
   String? _errorMessage;
   bool _isDisposed = false;
@@ -52,15 +48,13 @@ class _SimpleMapsViewState extends State<SimpleMapsView>
   
   // Custom marker icons
   BitmapDescriptor? _userMarkerIcon;
-  Map<String, BitmapDescriptor> _customMarkerIcons = {};
+  final Map<String, BitmapDescriptor> _customMarkerIcons = {};
   
   // Animation controller for smooth transitions
   late AnimationController _animationController;
   
   // Favorites and directions
-  Set<String> _favoriteRestaurantIds = {};
-  Restaurant? _selectedRestaurant;
-  bool _showDirections = false;
+  final Set<String> _favoriteRestaurantIds = {};
 
   @override
   void initState() {
@@ -147,7 +141,7 @@ class _SimpleMapsViewState extends State<SimpleMapsView>
     final image = await picture.toImage(size, size);
     final bytes = await image.toByteData(format: ImageByteFormat.png);
     
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
   }
 
   /// Initialize markers for restaurants and user location
@@ -223,10 +217,6 @@ class _SimpleMapsViewState extends State<SimpleMapsView>
 
   /// Handle restaurant marker tap
   void _onRestaurantMarkerTapped(Restaurant restaurant) {
-    setState(() {
-      _selectedRestaurant = restaurant;
-    });
-    
     widget.onRestaurantSelected?.call(restaurant);
     
     // Show restaurant details bottom sheet
@@ -274,9 +264,9 @@ class _SimpleMapsViewState extends State<SimpleMapsView>
               
               Row(
                 children: [
-                  Icon(Icons.star, color: Colors.amber, size: 20),
+                  const Icon(Icons.star, color: Colors.amber, size: 20),
                   const SizedBox(width: 4),
-                  Text('${restaurant.rating?.toStringAsFixed(1) ?? 'No rating'}'),
+                  Text(restaurant.rating?.toStringAsFixed(1) ?? 'No rating'),
                   const SizedBox(width: 16),
                   Text('${restaurant.priceLevel ?? 'Price not available'}'),
                 ],
@@ -371,7 +361,7 @@ class _SimpleMapsViewState extends State<SimpleMapsView>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(_errorMessage!, textAlign: TextAlign.center),
             const SizedBox(height: 16),

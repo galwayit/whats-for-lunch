@@ -1,13 +1,8 @@
-import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mockito/mockito.dart';
-import 'package:geolocator/geolocator.dart';
 
-import '../../../lib/presentation/providers/discovery_providers.dart';
-import '../../../lib/domain/entities/restaurant.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/discovery_providers.dart';
 
 /// Discovery Provider Race Condition Tests
 /// These tests validate the fixes for race conditions that caused crashes
@@ -373,7 +368,7 @@ void main() {
       notifier.updateSearchRadius(5.0);
       
       // Error should be cleared by successful operations
-      final state = container.read(discoveryProvider);
+      container.read(discoveryProvider);
       // Note: In actual implementation, errors might be cleared by new operations
     });
 
@@ -384,7 +379,7 @@ void main() {
       final future = notifier.refresh();
       
       // Check loading state (might be true briefly)
-      final initialState = container.read(discoveryProvider);
+      container.read(discoveryProvider);
       
       await future;
       
@@ -395,40 +390,3 @@ void main() {
   });
 }
 
-// Helper functions (if needed)
-Position _createTestPosition(double latitude, double longitude) {
-  return Position(
-    latitude: latitude,
-    longitude: longitude,
-    timestamp: DateTime.now(),
-    accuracy: 10.0,
-    altitude: 0.0,
-    heading: 0.0,
-    speed: 0.0,
-    speedAccuracy: 0.0,
-    altitudeAccuracy: 0.0,
-    headingAccuracy: 0.0,
-  );
-}
-
-Restaurant _createTestRestaurant(
-  String placeId,
-  String name, {
-  double? latitude,
-  double? longitude,
-  double? rating,
-  int? priceLevel,
-}) {
-  return Restaurant(
-    placeId: placeId,
-    name: name,
-    location: 'Test Location',
-    latitude: latitude,
-    longitude: longitude,
-    rating: rating,
-    priceLevel: priceLevel,
-    supportedDietaryRestrictions: [],
-    allergenInfo: [],
-    cachedAt: DateTime.now(),
-  );
-}

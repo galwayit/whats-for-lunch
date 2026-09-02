@@ -28,7 +28,7 @@ void main() {
       test('should generate comprehensive user context', () async {
         const userId = 1;
         final now = DateTime.now();
-        final weekAgo = now.subtract(const Duration(days: 7));
+        now.subtract(const Duration(days: 7));
         
         // Mock database responses
         when(mockDatabase.getDatabaseUserById(userId))
@@ -371,27 +371,27 @@ extension RestaurantTestUtils on Restaurant {
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       priceLevel: priceLevel ?? this.priceLevel,
-      priceRanges: this.priceRanges,
-      cuisineType: this.cuisineType,
+      priceRanges: priceRanges,
+      cuisineType: cuisineType,
       averageMealCost: averageMealCost ?? this.averageMealCost,
       valueScore: valueScore ?? this.valueScore,
       cuisineTypes: cuisineTypes != null ? jsonEncode(cuisineTypes) : this.cuisineTypes,
       supportedDietaryRestrictions: supportedDietaryRestrictions != null ? jsonEncode(supportedDietaryRestrictions) : this.supportedDietaryRestrictions,
-      allergenInfo: this.allergenInfo,
-      dietaryCompatibilityScores: this.dietaryCompatibilityScores,
-      hasVerifiedDietaryInfo: this.hasVerifiedDietaryInfo,
-      communityVerificationCount: this.communityVerificationCount,
-      openingHours: this.openingHours,
+      allergenInfo: allergenInfo,
+      dietaryCompatibilityScores: dietaryCompatibilityScores,
+      hasVerifiedDietaryInfo: hasVerifiedDietaryInfo,
+      communityVerificationCount: communityVerificationCount,
+      openingHours: openingHours,
       features: features != null ? jsonEncode(features) : this.features,
-      mealTypeAverageCosts: this.mealTypeAverageCosts,
-      photoReferences: this.photoReferences,
+      mealTypeAverageCosts: mealTypeAverageCosts,
+      photoReferences: photoReferences,
       isOpenNow: isOpenNow ?? this.isOpenNow,
       cachedAt: cachedAt ?? this.cachedAt,
-      phoneNumber: this.phoneNumber,
-      website: this.website,
-      currentWaitTime: this.currentWaitTime,
-      lastVerified: this.lastVerified,
-      photoReference: this.photoReference,
+      phoneNumber: phoneNumber,
+      website: website,
+      currentWaitTime: currentWaitTime,
+      lastVerified: lastVerified,
+      photoReference: photoReference,
     );
   }
 }

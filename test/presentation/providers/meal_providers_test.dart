@@ -2,9 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:what_we_have_for_lunch/presentation/providers/meal_providers.dart';
-import 'package:what_we_have_for_lunch/presentation/providers/simple_providers.dart';
 import 'package:what_we_have_for_lunch/presentation/providers/user_preferences_provider.dart';
-import 'package:what_we_have_for_lunch/domain/entities/meal.dart';
 import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 import 'package:what_we_have_for_lunch/domain/repositories/user_repository.dart';
 import 'package:what_we_have_for_lunch/domain/entities/user.dart';

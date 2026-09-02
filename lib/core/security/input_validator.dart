@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import '../services/logging_service.dart';
 
@@ -64,18 +65,18 @@ class InputValidator {
       return ValidationResult.error('Name must be less than 50 characters', 'name', name);
     }
 
-    // Pattern validation - allow letters, numbers, spaces, basic punctuation, and HTML entities
-    final namePattern = RegExp("^[a-zA-Z0-9\\s\\-\\.'\"&;\$]+\$");
+    // Pattern validation - allow letters, numbers, spaces, hyphens, periods, apostrophes
+    final namePattern = RegExp(r"^[a-zA-Z0-9\s\-\.'\u00C0-\u024F]+$");
     if (!namePattern.hasMatch(trimmed)) {
       return ValidationResult.error('Name contains invalid characters', 'name', name);
     }
 
-    // XSS prevention
-    if (_containsMaliciousContent(trimmed)) {
+    // XSS prevention - check for HTML/script tags but allow apostrophes in names
+    if (_htmlTagPattern.hasMatch(trimmed) || _scriptPattern.hasMatch(trimmed) || _jsEventPattern.hasMatch(trimmed)) {
       return ValidationResult.error('Name contains invalid content', 'name', name);
     }
 
-    final sanitized = _sanitizeBasicInput(trimmed);
+    final sanitized = encodeHtmlEntities(trimmed);
     return ValidationResult.success(sanitized);
   }
 
@@ -393,7 +394,7 @@ class InputValidator {
 
   /// Round number to specified precision
   static double _roundToPrecision(double value, int precision) {
-    final factor = (precision * 10.0);
+    final factor = math.pow(10, precision).toDouble();
     return (value * factor).round() / factor;
   }
   

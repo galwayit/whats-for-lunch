@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/core/security/input_validator.dart';
+import 'package:what_we_have_for_lunch/core/security/input_validator.dart';
 
 /// Comprehensive security test suite for InputValidator
 /// Tests OWASP Top 10 vulnerabilities and security best practices
@@ -181,7 +181,7 @@ void main() {
     group('JSON Input Validation', () {
       test('should validate JSON structure and depth', () {
         // Test deeply nested JSON (should be rejected)
-        final deepJson = '{"a":{"b":{"c":{"d":{"e":{"f":{"g":{"h":{"i":{"j":{"k":"deep"}}}}}}}}}}';
+        const deepJson = '{"a":{"b":{"c":{"d":{"e":{"f":{"g":{"h":{"i":{"j":{"k":"deep"}}}}}}}}}}';
         expect(InputValidator.validateJsonInput(deepJson).isValid, false);
 
         // Test large JSON (should be rejected)
@@ -196,7 +196,7 @@ void main() {
       });
 
       test('should sanitize JSON values', () {
-        final maliciousJson = '{"name":"<script>alert(1)</script>","description":"safe text"}';
+        const maliciousJson = '{"name":"<script>alert(1)</script>","description":"safe text"}';
         final result = InputValidator.validateJsonInput(maliciousJson);
         
         expect(result.isValid, true);
@@ -207,7 +207,7 @@ void main() {
 
     group('Rate Limiting Tests', () {
       test('should enforce basic rate limiting', () {
-        final identifier = 'test_user_123';
+        const identifier = 'test_user_123';
         
         // Should allow normal usage
         expect(InputRateLimit.isRateLimited(identifier), false);
@@ -303,7 +303,7 @@ void main() {
       });
 
       test('should properly sanitize inputs', () {
-        final testInput = '<script>alert("test")</script>Safe Text';
+        const testInput = '<script>alert("test")</script>Safe Text';
         final sanitized = InputValidator.sanitizeInput(testInput);
         
         expect(sanitized, isNot(contains('<script>')));

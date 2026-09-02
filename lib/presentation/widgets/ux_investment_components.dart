@@ -83,7 +83,7 @@ class UXCompactInvestmentIndicator extends StatelessWidget {
             color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: progressColor.withOpacity(0.3),
+              color: progressColor.withValues(alpha:0.3),
               width: 1,
             ),
           ),
@@ -100,7 +100,7 @@ class UXCompactInvestmentIndicator extends StatelessWidget {
                     CircularProgressIndicator(
                       value: 1.0,
                       strokeWidth: 3,
-                      color: theme.colorScheme.outline.withOpacity(0.2),
+                      color: theme.colorScheme.outline.withValues(alpha:0.2),
                     ),
                     // Progress circle
                     CircularProgressIndicator(
@@ -149,7 +149,7 @@ class UXCompactInvestmentIndicator extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: progressColor.withOpacity(0.1),
+                  color: progressColor.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -268,7 +268,7 @@ class _UXInvestmentCapacityRingState extends State<UXInvestmentCapacityRing>
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
-              child: Container(
+              child: SizedBox(
                 width: 120,
                 height: 120,
                 child: Stack(
@@ -292,7 +292,7 @@ class _UXInvestmentCapacityRingState extends State<UXInvestmentCapacityRing>
                         strokeWidth: 8.0,
                         gradient: LinearGradient(
                           colors: [
-                            progressColor.withOpacity(0.6),
+                            progressColor.withValues(alpha:0.6),
                             progressColor,
                           ],
                         ),
@@ -328,7 +328,7 @@ class _UXInvestmentCapacityRingState extends State<UXInvestmentCapacityRing>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: progressColor.withOpacity(0.3),
+                              color: progressColor.withValues(alpha:0.3),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -538,7 +538,7 @@ class UXWeeklyInvestmentOverview extends StatelessWidget {
           const SizedBox(height: UXComponents.paddingS),
           LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
-            backgroundColor: theme.colorScheme.outline.withOpacity(0.2),
+            backgroundColor: theme.colorScheme.outline.withValues(alpha:0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
               progress < 0.8 ? Colors.green : 
               progress < 0.95 ? Colors.orange : Colors.red,
@@ -557,7 +557,7 @@ class UXWeeklyInvestmentOverview extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.emoji_events,
               color: Colors.amber,
               size: 20,
@@ -582,10 +582,10 @@ class UXWeeklyInvestmentOverview extends StatelessWidget {
                 vertical: UXComponents.paddingXS,
               ),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
+                color: Colors.amber.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.amber.withOpacity(0.3),
+                  color: Colors.amber.withValues(alpha:0.3),
                 ),
               ),
               child: Text(
@@ -668,7 +668,7 @@ class UXInvestmentGuidance extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(UXComponents.paddingS),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha:0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 20),
@@ -828,13 +828,13 @@ class _UXAchievementNotificationState extends State<UXAchievementNotification>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
                 border: Border.all(
-                  color: widget.color.withOpacity(0.3),
+                  color: widget.color.withValues(alpha:0.3),
                   width: 2,
                 ),
               ),
@@ -843,7 +843,7 @@ class _UXAchievementNotificationState extends State<UXAchievementNotification>
                   Container(
                     padding: const EdgeInsets.all(UXComponents.paddingM),
                     decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.2),
+                      color: widget.color.withValues(alpha:0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1188,7 +1188,7 @@ class InvestmentMetric extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: changeColor.withOpacity(0.2),
+          color: changeColor.withValues(alpha:0.2),
           width: 1,
         ),
       ),

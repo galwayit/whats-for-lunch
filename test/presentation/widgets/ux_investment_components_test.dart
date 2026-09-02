@@ -9,7 +9,7 @@ void main() {
     testWidgets('should render with basic properties', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 75.0,
@@ -70,7 +70,7 @@ void main() {
     testWidgets('should display correct progress colors based on usage', (WidgetTester tester) async {
       // Test low usage (green)
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 40.0, // 20% usage
@@ -89,7 +89,7 @@ void main() {
 
       // Test high usage (orange)
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 160.0, // 80% usage
@@ -106,7 +106,7 @@ void main() {
 
       // Test very high usage (red)
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 190.0, // 95% usage
@@ -125,7 +125,7 @@ void main() {
     testWidgets('should render with custom title and subtitle', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 75.0,
@@ -146,7 +146,7 @@ void main() {
     testWidgets('should handle animation correctly', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 100.0,
@@ -173,7 +173,7 @@ void main() {
     testWidgets('should handle glow effect for high usage', (WidgetTester tester) async {
       // Arrange & Act - High usage that should trigger glow effect
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 165.0, // 82.5% usage > 80%
@@ -194,7 +194,7 @@ void main() {
     testWidgets('should be accessible with proper semantics', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentCapacityRing(
               currentSpent: 75.0,
@@ -219,7 +219,7 @@ void main() {
     testWidgets('should render with investment metrics', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXWeeklyInvestmentOverview(
               weeklySpent: 150.0,
@@ -271,7 +271,7 @@ void main() {
     testWidgets('should display achievements section when achievements exist', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXWeeklyInvestmentOverview(
               weeklySpent: 100.0,
@@ -294,7 +294,7 @@ void main() {
     testWidgets('should not display achievements section when no achievements', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXWeeklyInvestmentOverview(
               weeklySpent: 100.0,
@@ -316,7 +316,7 @@ void main() {
     testWidgets('should render excellent guidance level correctly', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentGuidance(
               currentCost: 15.0,
@@ -337,7 +337,7 @@ void main() {
     testWidgets('should render good guidance level correctly', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentGuidance(
               currentCost: 25.0,
@@ -357,7 +357,7 @@ void main() {
     testWidgets('should render moderate guidance level correctly', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentGuidance(
               currentCost: 40.0,
@@ -377,7 +377,7 @@ void main() {
     testWidgets('should render high guidance level correctly', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXInvestmentGuidance(
               currentCost: 60.0,
@@ -445,7 +445,7 @@ void main() {
     testWidgets('should render achievement notification when shown', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXAchievementNotification(
               title: 'Test Achievement',
@@ -470,7 +470,7 @@ void main() {
     testWidgets('should not render when show is false', (WidgetTester tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXAchievementNotification(
               title: 'Test Achievement',
@@ -547,7 +547,7 @@ void main() {
 
       // Act - First render without showing
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXAchievementNotification(
               title: 'Test Achievement',
@@ -563,7 +563,7 @@ void main() {
 
       // Then show the notification
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXAchievementNotification(
               title: 'Test Achievement',

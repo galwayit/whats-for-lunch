@@ -170,7 +170,7 @@ class ApiConfig {
   static double get geminiDailyCostLimit => _geminiDailyCostLimit;
   static int get geminiMaxRequestsPerMinute => _geminiMaxRequestsPerMinute;
   static bool get geminiEnableCaching => _geminiEnableCaching;
-  static Duration get geminiCacheTtl => Duration(hours: _geminiCacheTtlHours);
+  static Duration get geminiCacheTtl => const Duration(hours: _geminiCacheTtlHours);
 
   /// Check if we have a valid Gemini API key
   static bool get hasValidGeminiKey => _isValidApiKey(_geminiApiKey);
@@ -257,7 +257,7 @@ class ApiConfig {
   static bool get enableUsageMonitoring => _enableUsageMonitoring;
   static bool get enableCostAlerts => _enableCostAlerts;
   static bool get enableFallbackMode => _enableFallbackMode;
-  static Duration get apiTimeout => Duration(seconds: _apiTimeoutSeconds);
+  static Duration get apiTimeout => const Duration(seconds: _apiTimeoutSeconds);
 
   // ========================================
   // Alert Configuration
@@ -338,7 +338,7 @@ class ApiConfig {
     // Check rate limits
     if (googlePlacesMaxRequestsPerMinute > 100) {
       warnings.add(
-          'Google Places rate limit is very high (>${googlePlacesMaxRequestsPerMinute}/min)');
+          'Google Places rate limit is very high (>$googlePlacesMaxRequestsPerMinute/min)');
     }
 
     if (geminiDailyCostLimit > 10.0) {

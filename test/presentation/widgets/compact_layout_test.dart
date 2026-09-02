@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../lib/presentation/widgets/ux_investment_components.dart';
-import '../../../lib/presentation/widgets/maps_components.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/ux_investment_components.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/maps_components.dart';
 
 void main() {
   group('Compact Layout Components Tests', () {
@@ -13,7 +13,7 @@ void main() {
 
       // Test compact indicator
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXCompactInvestmentIndicator(
               currentSpent: testSpent,
@@ -76,7 +76,7 @@ void main() {
           home: Scaffold(
             body: Column(
               children: [
-                UXCompactInvestmentIndicator(
+                const UXCompactInvestmentIndicator(
                   currentSpent: 50.0,
                   weeklyCapacity: 200.0,
                   remainingCapacity: 150.0,
@@ -113,7 +113,7 @@ void main() {
             body: Column(
               children: [
                 // Compact investment indicator (48px)
-                UXCompactInvestmentIndicator(
+                const UXCompactInvestmentIndicator(
                   currentSpent: 50.0,
                   weeklyCapacity: 200.0,
                   remainingCapacity: 150.0,

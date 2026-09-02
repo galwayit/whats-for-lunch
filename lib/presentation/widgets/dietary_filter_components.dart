@@ -225,7 +225,7 @@ class _UXDietaryFilterPanelState extends State<UXDietaryFilterPanel> {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.warning,
               size: 16,
               color: Colors.orange,
@@ -270,7 +270,7 @@ class _UXDietaryFilterPanelState extends State<UXDietaryFilterPanel> {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.shield,
               size: 16,
               color: Colors.green,
@@ -328,16 +328,16 @@ class _UXDietaryFilterPanelState extends State<UXDietaryFilterPanel> {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.1),
+        color: Colors.orange.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+        border: Border.all(color: Colors.orange.withValues(alpha:0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.warning, color: Colors.orange, size: 20),
+              const Icon(Icons.warning, color: Colors.orange, size: 20),
               const SizedBox(width: UXComponents.paddingS),
               Text(
                 'Active Allergen Alerts',
@@ -364,39 +364,39 @@ class _UXDietaryFilterPanelState extends State<UXDietaryFilterPanel> {
 
   List<_QuickFilterPreset> _getQuickFilterPresets() {
     return [
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Vegetarian',
         description: 'No meat, poultry, or fish',
         dietaryRestrictions: ['vegetarian'],
         safetyLevel: AllergenSafetyLevel.mild,
       ),
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Vegan',
         description: 'No animal products',
         dietaryRestrictions: ['vegan'],
         safetyLevel: AllergenSafetyLevel.moderate,
       ),
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Gluten-Free',
         description: 'No wheat, barley, rye',
         dietaryRestrictions: ['gluten_free'],
         allergens: ['wheat'],
         safetyLevel: AllergenSafetyLevel.moderate,
       ),
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Nut-Free',
         description: 'No tree nuts or peanuts',
         allergens: ['peanuts', 'tree_nuts'],
         safetyLevel: AllergenSafetyLevel.severe,
       ),
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Dairy-Free',
         description: 'No milk or dairy products',
         dietaryRestrictions: ['dairy_free'],
         allergens: ['dairy'],
         safetyLevel: AllergenSafetyLevel.moderate,
       ),
-      _QuickFilterPreset(
+      const _QuickFilterPreset(
         name: 'Keto',
         description: 'High-fat, low-carb',
         dietaryRestrictions: ['keto'],
@@ -520,13 +520,13 @@ class UXDietaryFilterChip extends StatelessWidget {
     if (safetyLevel != null) {
       switch (safetyLevel!) {
         case AllergenSafetyLevel.mild:
-          borderColor = Colors.blue.withOpacity(0.3);
+          borderColor = Colors.blue.withValues(alpha:0.3);
           break;
         case AllergenSafetyLevel.moderate:
-          borderColor = Colors.orange.withOpacity(0.3);
+          borderColor = Colors.orange.withValues(alpha:0.3);
           break;
         case AllergenSafetyLevel.severe:
-          borderColor = Colors.red.withOpacity(0.3);
+          borderColor = Colors.red.withValues(alpha:0.3);
           break;
       }
     }
@@ -602,10 +602,10 @@ class UXAllergenSelector extends StatelessWidget {
       padding: const EdgeInsets.all(UXComponents.paddingS),
       decoration: BoxDecoration(
         border: Border.all(
-          color: isSelected ? safetyColor.withOpacity(0.5) : theme.colorScheme.outline.withOpacity(0.2),
+          color: isSelected ? safetyColor.withValues(alpha:0.5) : theme.colorScheme.outline.withValues(alpha:0.2),
         ),
         borderRadius: BorderRadius.circular(8),
-        color: isSelected ? safetyColor.withOpacity(0.05) : null,
+        color: isSelected ? safetyColor.withValues(alpha:0.05) : null,
       ),
       child: Column(
         children: [
@@ -616,9 +616,9 @@ class UXAllergenSelector extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: safetyColor.withOpacity(0.1),
+                  color: safetyColor.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: safetyColor.withOpacity(0.3)),
+                  border: Border.all(color: safetyColor.withValues(alpha:0.3)),
                 ),
                 child: Icon(safetyIcon, color: safetyColor, size: 16),
               ),
@@ -650,7 +650,7 @@ class UXAllergenSelector extends StatelessWidget {
               Switch(
                 value: isSelected,
                 onChanged: onToggled,
-                activeColor: safetyColor,
+                activeThumbColor: safetyColor,
               ),
             ],
           ),
@@ -779,7 +779,7 @@ class UXFilterSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+        color: theme.colorScheme.primaryContainer.withValues(alpha:0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

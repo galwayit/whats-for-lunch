@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mockito/mockito.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:what_we_have_for_lunch/main.dart' as app;
-import 'package:what_we_have_for_lunch/presentation/providers/ai_providers.dart';
 import 'package:what_we_have_for_lunch/data/repositories/ai_repository.dart';
 import 'package:what_we_have_for_lunch/domain/entities/ai_recommendation.dart';
 import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
@@ -32,7 +30,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -68,7 +66,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -96,7 +94,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -126,7 +124,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -173,7 +171,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -204,7 +202,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -222,13 +220,14 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
       await tester.pumpAndSettle();
 
       // Test semantic labels and accessibility
+      // ignore: deprecated_member_use
       final semantics = tester.binding.pipelineOwner.semanticsOwner?.rootSemanticsNode;
       expect(semantics, isNotNull);
 
@@ -240,7 +239,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -261,7 +260,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: app.MyApp(),
+          child: const app.MyApp(),
         ),
       );
 
@@ -295,7 +294,7 @@ void main() {
         await tester.pumpWidget(
           UncontrolledProviderScope(
             container: container,
-            child: app.MyApp(),
+            child: const app.MyApp(),
           ),
         );
 
@@ -308,7 +307,7 @@ void main() {
         await tester.pumpWidget(
           UncontrolledProviderScope(
             container: ProviderContainer(),
-            child: app.MyApp(),
+            child: const app.MyApp(),
           ),
         );
 

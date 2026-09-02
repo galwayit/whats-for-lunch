@@ -1,13 +1,13 @@
+// ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../../lib/domain/entities/ai_recommendation.dart';
-import '../../lib/domain/entities/restaurant.dart';
-import '../../lib/presentation/pages/ai_recommendations_page.dart';
-import '../../lib/presentation/providers/ai_providers.dart';
+import 'package:what_we_have_for_lunch/domain/entities/ai_recommendation.dart';
+import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/presentation/pages/ai_recommendations_page.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/ai_providers.dart';
 
 /// Comprehensive integration test for AI recommendation flow
 /// Tests the complete user journey from loading to recommendation generation
@@ -28,8 +28,9 @@ void main() {
     testWidgets('Complete AI recommendation flow with demo data', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
+          child: const MaterialApp(
             home: AIRecommendationsPage(),
           ),
         ),
@@ -42,7 +43,7 @@ void main() {
       expect(find.text('Start My Investment Journey'), findsOneWidget);
       
       // Test onboarding dialog appears for first-time users
-      await tester.pump(Duration(milliseconds: 600)); // Wait for onboarding delay
+      await tester.pump(const Duration(milliseconds: 600)); // Wait for onboarding delay
       
       if (find.text('Welcome to AI Dining Advisor').evaluate().isNotEmpty) {
         // Onboarding dialog is shown
@@ -76,7 +77,7 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       
       // Wait for demo recommendations to generate
-      await tester.pump(Duration(seconds: 2));
+      await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
 
       // Verify recommendations are displayed (demo mode should work)
@@ -104,6 +105,7 @@ void main() {
     testWidgets('AI availability and service states', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
           child: MaterialApp(
             home: Consumer(
@@ -137,8 +139,9 @@ void main() {
     testWidgets('Error handling and recovery', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
+          child: const MaterialApp(
             home: AIRecommendationsPage(),
           ),
         ),
@@ -167,8 +170,9 @@ void main() {
     testWidgets('Investment mindset messaging', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
+          child: const MaterialApp(
             home: AIRecommendationsPage(),
           ),
         ),
@@ -236,7 +240,7 @@ void main() {
   group('Performance and Quality Tests', () {
     testWidgets('Loading animation performance', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Center(
               child: Column(
@@ -248,6 +252,7 @@ void main() {
                 ],
               ),
             ),
+          ),
         ),
       );
 
@@ -256,9 +261,9 @@ void main() {
       expect(find.text('Test loading message'), findsOneWidget);
 
       // Test animation doesn't drop frames
-      await tester.pump(Duration(milliseconds: 100));
-      await tester.pump(Duration(milliseconds: 200));
-      await tester.pump(Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 300));
 
       print('Loading Animation Test: ✅ Complete');
     });
@@ -306,10 +311,10 @@ void main() {
       await tester.pump();
       
       // Scroll through recommendations to test performance
-      await tester.fling(find.byType(ListView), Offset(0, -500), 1000);
+      await tester.fling(find.byType(ListView), const Offset(0, -500), 1000);
       await tester.pumpAndSettle();
       
-      await tester.fling(find.byType(ListView), Offset(0, 500), 1000);
+      await tester.fling(find.byType(ListView), const Offset(0, 500), 1000);
       await tester.pumpAndSettle();
 
       print('Multiple Recommendations Performance Test: ✅ Complete');

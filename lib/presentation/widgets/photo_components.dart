@@ -340,7 +340,7 @@ class PhotoPreviewTile extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(UXComponents.borderRadius),
               border: Border.all(
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha:0.2),
               ),
             ),
             child: ClipRRect(
@@ -362,7 +362,7 @@ class PhotoPreviewTile extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.8),
+                    color: Colors.red.withValues(alpha:0.8),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -385,7 +385,7 @@ class PhotoPreviewTile extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.8),
+                  color: Colors.orange.withValues(alpha:0.8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -477,7 +477,7 @@ class _PhotoDetailDialogState extends State<PhotoDetailDialog> {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha:0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -498,7 +498,7 @@ class _PhotoDetailDialogState extends State<PhotoDetailDialog> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha:0.7),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(UXComponents.borderRadius),
                     bottomRight: Radius.circular(UXComponents.borderRadius),
@@ -648,7 +648,7 @@ class PhotoGalleryWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: UXComponents.paddingL),
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha:0.3),
           style: BorderStyle.solid,
         ),
         borderRadius: BorderRadius.circular(UXComponents.borderRadius),

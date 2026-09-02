@@ -174,7 +174,7 @@ class ConnectivityService {
       if (offlineResult != null) {
         return offlineResult;
       }
-      throw ConnectivityException('No internet connection');
+      throw const ConnectivityException('No internet connection');
     }
 
     int attempts = 0;
@@ -192,7 +192,7 @@ class ConnectivityService {
             if (offlineResult != null) {
               return offlineResult;
             }
-            throw ConnectivityException('Lost internet connection');
+            throw const ConnectivityException('Lost internet connection');
           }
           
           if (attempts < maxRetries) {
@@ -392,7 +392,7 @@ class SimpleOfflineStorage implements OfflineStorage {
     final expiredKeys = _storage.entries
         .where((entry) {
           final timestamp = entry.value['timestamp'] as int?;
-          return timestamp != null && (now - timestamp) > Duration(days: 1).inMilliseconds;
+          return timestamp != null && (now - timestamp) > const Duration(days: 1).inMilliseconds;
         })
         .map((entry) => entry.key)
         .toList();

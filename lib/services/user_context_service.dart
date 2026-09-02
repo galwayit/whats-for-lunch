@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 
 import '../domain/entities/ai_recommendation.dart' as entity;
-import '../domain/entities/meal.dart' as entity;
-import '../domain/entities/user_preferences.dart' as entity;
 import '../domain/entities/restaurant.dart' as entity;
 import '../data/database/database.dart';
 import '../data/mappers/entity_mappers.dart';
@@ -45,6 +43,24 @@ class UserContextService {
       // Generate preference scores
       final preferenceScores = await _generatePreferenceScores(userId);
 
+      // Add interaction history for personalization
+      final interactions = await getUserDiscoveryHistory(userId);
+      if (interactions.isNotEmpty) {
+        temporalContext['recentInteractions'] = interactions;
+      }
+
+      // Add feedback history for preference learning
+      final feedbackHistory = await getUserFeedbackHistory(userId);
+      if (feedbackHistory.isNotEmpty) {
+        temporalContext['feedbackHistory'] = feedbackHistory;
+      }
+
+      // Add restaurant visit frequency for familiarity scoring
+      final visitFrequency = await _database.getRestaurantVisitFrequency(userId);
+      if (visitFrequency.isNotEmpty) {
+        temporalContext['visitFrequency'] = visitFrequency;
+      }
+
       return entity.UserRecommendationContext(
         userId: userId,
         dietaryPreferences: dietaryPreferences,
@@ -78,18 +94,17 @@ class UserContextService {
       DateTime.now(),
     );
 
-    // Extract cuisine preferences from meal history
-    final Map<String, int> cuisineFrequency = {};
+    // Extract meal type preferences from meal history
     final Map<String, int> mealTypeFrequency = {};
 
     for (final meal in recentMeals) {
       mealTypeFrequency[meal.mealType] = (mealTypeFrequency[meal.mealType] ?? 0) + 1;
     }
 
-    preferences['preferredCuisines'] = cuisineFrequency.entries
-        .where((e) => e.value >= 2)
-        .map((e) => e.key)
-        .toList();
+    // TODO: Populate preferredCuisines by joining meal history with restaurant
+    // data to extract cuisine types. Meals don't carry cuisine info directly;
+    // it lives on the Restaurant entity (cuisineType / cuisineTypes fields).
+    preferences['preferredCuisines'] = <String>[];
     
     preferences['preferredMealTypes'] = mealTypeFrequency.entries
         .map((e) => {'type': e.key, 'frequency': e.value})
@@ -155,7 +170,7 @@ class UserContextService {
       'latitude': position.latitude,
       'longitude': position.longitude,
       'accuracy': position.accuracy,
-      'timestamp': position.timestamp?.toIso8601String(),
+      'timestamp': position.timestamp.toIso8601String(),
       'searchRadius': 5.0, // Default radius
       'preferredDistanceThreshold': 2.0, // Prefer restaurants within 2km
       'maxDistanceThreshold': 10.0, // Don't recommend beyond 10km
@@ -246,7 +261,6 @@ class UserContextService {
     // Analyze spending patterns for price sensitivity
     final costs = mealHistory.map((m) => m.cost).toList()..sort();
     final avgCost = costs.fold(0.0, (sum, cost) => sum + cost) / costs.length;
-    final medianCost = costs[costs.length ~/ 2];
     final maxCost = costs.last;
 
     preferences['price_sensitivity'] = (maxCost - avgCost) / maxCost; // High if user avoids expensive options

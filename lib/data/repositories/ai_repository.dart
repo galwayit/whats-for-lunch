@@ -82,10 +82,8 @@ class AIRepositoryImpl implements AIRepository {
         return cachedRecommendation;
       }
 
-      // Generate AI recommendation with performance tracking
-      final startTime = DateTime.now();
+      // Generate AI recommendation
       final aiResponse = await _aiService.generateRecommendations(request);
-      final endTime = DateTime.now();
 
       final recommendation = aiResponse.data;
 

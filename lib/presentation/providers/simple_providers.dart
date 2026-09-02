@@ -1,131 +1,30 @@
+// Non-preferences providers for home search, recommendations, and meal entry.
+// User-preferences state has been unified into user_preferences_provider.dart;
+// the symbols are re-exported here so that existing `import ... as simple`
+// references continue to compile.
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/user.dart' as domain;
-import '../../domain/entities/user_preferences.dart';
 import '../../domain/entities/restaurant.dart';
-import 'database_provider.dart';
+import '../../domain/entities/user_preferences.dart';
 import 'discovery_providers.dart';
 
-// Simple in-memory state management for Stage 1
-final currentUserIdProvider = StateProvider<int?>((ref) {
-  // Auto-set demo user for Stage 1 demo - will be validated by ensureDemoUserProvider
-  return 1;
-});
+// ---------------------------------------------------------------------------
+// Re-export unified preferences symbols so files importing this module
+// as `simple` can still use `simple.userPreferencesProvider`, etc.
+// ---------------------------------------------------------------------------
+export 'user_preferences_provider.dart'
+    show
+        userPreferencesProvider,
+        UserPreferencesNotifier,
+        currentUserIdProvider,
+        currentUserProvider,
+        createUserProvider,
+        ensureDemoUserProvider;
 
-// Provider that ensures demo user exists in database
-final ensureDemoUserProvider = FutureProvider<void>((ref) async {
-  final userRepository = ref.read(userRepositoryProvider);
-  final currentUserId = ref.read(currentUserIdProvider);
-  
-  if (currentUserId != null) {
-    // Check if the current user exists in database
-    final existingUser = await userRepository.getUserById(currentUserId);
-    
-    if (existingUser == null) {
-      // Create demo user if it doesn't exist
-      final demoUser = domain.UserEntity(
-        name: 'Demo User',
-        preferences: {},
-        createdAt: DateTime.now(),
-      );
-      
-      await userRepository.createUser(demoUser);
-    }
-  }
-});
-
-final simpleUserPreferencesProvider = StateNotifierProvider<SimpleUserPreferencesNotifier, UserPreferences?>((ref) {
-  final notifier = SimpleUserPreferencesNotifier();
-  // Auto-initialize with default preferences for Stage 1
-  notifier.loadUserPreferences(1);
-  return notifier;
-});
-
-class SimpleUserPreferencesNotifier extends StateNotifier<UserPreferences?> {
-  SimpleUserPreferencesNotifier() : super(null);
-
-  void loadUserPreferences(int userId) {
-    // For Stage 1, just load default preferences
-    state = const UserPreferences(
-      budgetLevel: 2,
-      maxTravelDistance: 5.0,
-      includeChains: true,
-    );
-  }
-
-  void updatePreferences(UserPreferences preferences) {
-    state = preferences;
-  }
-
-  void updateBudgetLevel(int budgetLevel) {
-    if (state != null) {
-      state = state!.copyWith(budgetLevel: budgetLevel);
-    }
-  }
-
-  void updateMaxTravelDistance(double distance) {
-    if (state != null) {
-      state = state!.copyWith(maxTravelDistance: distance);
-    }
-  }
-
-  void updateWeeklyBudget(double budget) {
-    if (state != null) {
-      state = state!.copyWith(weeklyBudget: budget);
-    }
-  }
-
-  void toggleIncludeChains() {
-    if (state != null) {
-      state = state!.copyWith(includeChains: !state!.includeChains);
-    }
-  }
-}
-
-// Simple user provider for Stage 1
-final currentUserProvider = Provider<Map<String, dynamic>?>((ref) {
-  final userId = ref.watch(currentUserIdProvider);
-  if (userId == null) return null;
-  
-  return {
-    'id': userId,
-    'name': 'Demo User',
-    'createdAt': DateTime.now().toIso8601String(),
-  };
-});
-
-// Create user function for Stage 1
-final createUserProvider = Provider<Future<int> Function(String name)>((ref) {
-  return (String name) async {
-    final userRepository = ref.read(userRepositoryProvider);
-    
-    // Check if user ID 1 already exists
-    final existingUser = await userRepository.getUserById(1);
-    
-    int userId;
-    if (existingUser == null) {
-      // Create the user in the database
-      final newUser = domain.UserEntity(
-        name: name,
-        preferences: {},
-        createdAt: DateTime.now(),
-      );
-      
-      userId = await userRepository.createUser(newUser);
-    } else {
-      // User already exists, use existing ID
-      userId = existingUser.id!;
-    }
-    
-    // Set as current user
-    ref.read(currentUserIdProvider.notifier).state = userId;
-    
-    // Load default preferences
-    ref.read(simpleUserPreferencesProvider.notifier).loadUserPreferences(userId);
-    
-    return userId;
-  };
-});
+// Re-import locally so we can reference them inside this file
+import 'user_preferences_provider.dart'
+    show userPreferencesProvider;
 
 /// Home page search state
 class HomeSearchState {
@@ -133,12 +32,14 @@ class HomeSearchState {
   final bool hasSearched;
   final Restaurant? recommendedRestaurant;
   final String? error;
+  final Set<String> rejectedPlaceIds;
 
   const HomeSearchState({
     this.isSearching = false,
     this.hasSearched = false,
     this.recommendedRestaurant,
     this.error,
+    this.rejectedPlaceIds = const {},
   });
 
   HomeSearchState copyWith({
@@ -146,12 +47,14 @@ class HomeSearchState {
     bool? hasSearched,
     Restaurant? recommendedRestaurant,
     String? error,
+    Set<String>? rejectedPlaceIds,
   }) {
     return HomeSearchState(
       isSearching: isSearching ?? this.isSearching,
       hasSearched: hasSearched ?? this.hasSearched,
       recommendedRestaurant: recommendedRestaurant ?? this.recommendedRestaurant,
       error: error ?? this.error,
+      rejectedPlaceIds: rejectedPlaceIds ?? this.rejectedPlaceIds,
     );
   }
 }
@@ -194,15 +97,36 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
 
   /// Perform the actual search and update state
   Future<void> _performSearch() async {
+    // Ensure location is available before searching
+    final discoveryNotifier = _ref.read(discoveryProvider.notifier);
+    final currentDiscoveryState = _ref.read(discoveryProvider);
+    if (currentDiscoveryState.userLocation == null) {
+      await discoveryNotifier.getCurrentLocation();
+    }
+
     // Trigger restaurant discovery with force refresh to ensure it runs
-    await _ref.read(discoveryProvider.notifier).searchRestaurants(forceRefresh: true);
+    await discoveryNotifier.searchRestaurants(forceRefresh: true);
 
     // Get discovered restaurants and user preferences
     final discoveryState = _ref.read(discoveryProvider);
-    final preferences = _ref.read(simpleUserPreferencesProvider);
+    final preferences = _ref.read(userPreferencesProvider);
 
     if (discoveryState.restaurants.isEmpty) {
       state = state.copyWith(recommendedRestaurant: null);
+      return;
+    }
+
+    // Filter out rejected restaurants from this session
+    final candidates = discoveryState.restaurants
+        .where((r) => !state.rejectedPlaceIds.contains(r.placeId))
+        .toList();
+
+    if (candidates.isEmpty) {
+      // All restaurants rejected — clear rejections and show "no more options"
+      state = state.copyWith(
+        recommendedRestaurant: null,
+        rejectedPlaceIds: {},
+      );
       return;
     }
 
@@ -210,7 +134,7 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
     Restaurant? bestMatch;
     double bestScore = -1;
 
-    for (final restaurant in discoveryState.restaurants) {
+    for (final restaurant in candidates) {
       double score = _calculateCompatibilityScore(restaurant, preferences);
 
       if (score > bestScore) {
@@ -233,7 +157,7 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
 
     if (preferences != null) {
       // Budget level matching (weight: 40%)
-      final userBudgetLevel = preferences.budgetLevel ?? 2;
+      final userBudgetLevel = preferences.budgetLevel;
       if (restaurant.priceLevel != null) {
         final priceDiff = (restaurant.priceLevel! - userBudgetLevel).abs();
         score += (4 - priceDiff) * 0.4; // Higher score for closer price match
@@ -242,7 +166,7 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
       }
 
       // Distance preference (weight: 30%)
-      final maxDistance = preferences.maxTravelDistance ?? 5.0;
+      final maxDistance = preferences.maxTravelDistance;
       if (restaurant.distanceFromUser != null) {
         if (restaurant.distanceFromUser! <= maxDistance) {
           // Prefer closer restaurants within the max distance
@@ -277,7 +201,39 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
     return score;
   }
 
-  /// Reset search state
+  /// Reject current recommendation and find the next best match
+  Future<void> rejectAndSearchAgain() async {
+    final rejected = state.recommendedRestaurant;
+    if (rejected == null) return;
+
+    final updatedRejections = {...state.rejectedPlaceIds, rejected.placeId};
+
+    state = state.copyWith(
+      isSearching: true,
+      hasSearched: false,
+      recommendedRestaurant: null,
+      rejectedPlaceIds: updatedRejections,
+    );
+
+    try {
+      final searchFuture = _performSearch();
+      final delayFuture = Future.delayed(const Duration(milliseconds: 800));
+      await Future.wait([searchFuture, delayFuture]);
+
+      state = state.copyWith(
+        isSearching: false,
+        hasSearched: true,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isSearching: false,
+        hasSearched: true,
+        error: e.toString(),
+      );
+    }
+  }
+
+  /// Reset search state (clears rejections too)
   void resetSearch() {
     state = const HomeSearchState();
   }
@@ -288,7 +244,7 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
 
     if (preferences != null) {
       // Budget match reason
-      final userBudgetLevel = preferences.budgetLevel ?? 2;
+      final userBudgetLevel = preferences.budgetLevel;
       if (restaurant.priceLevel != null) {
         if (restaurant.priceLevel == userBudgetLevel) {
           final dollarSigns = '\$' * userBudgetLevel;
@@ -299,7 +255,7 @@ class HomeSearchNotifier extends StateNotifier<HomeSearchState> {
       }
 
       // Distance reason
-      final maxDistance = preferences.maxTravelDistance ?? 5.0;
+      final maxDistance = preferences.maxTravelDistance;
       if (restaurant.distanceFromUser != null) {
         if (restaurant.distanceFromUser! <= maxDistance * 0.5) {
           reasons.add('Very close to you (${restaurant.distanceFromUser!.toStringAsFixed(1)}km)');

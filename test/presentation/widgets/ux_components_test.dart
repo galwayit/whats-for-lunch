@@ -378,7 +378,7 @@ void main() {
     group('UXBudgetImpactCard', () {
       testWidgets('should render budget impact with low impact', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: UXBudgetImpactCard(
                 currentCost: 10.0,
@@ -399,7 +399,7 @@ void main() {
 
       testWidgets('should render budget impact with high impact', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: UXBudgetImpactCard(
                 currentCost: 50.0,

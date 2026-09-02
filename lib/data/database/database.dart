@@ -21,6 +21,7 @@ class Meals extends Table {
   TextColumn get mealType => text()();
   RealColumn get cost => real()();
   DateTimeColumn get date => dateTime()();
+  TextColumn get restaurantName => text().nullable()();
   TextColumn get notes => text().nullable()();
   TextColumn get photoIds => text().withDefault(const Constant('[]'))(); // JSON array of photo IDs
 }
@@ -179,23 +180,78 @@ class Photos extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Users, Meals, BudgetTrackings, Restaurants, RestaurantCache, DietaryCompatibility, UserDiscoveryHistory, AIRecommendations, AIRecommendationFeedback, AIUsageMetrics, Photos])
+/// Tracks restaurants the user has viewed, selected, rejected, or favorited.
+/// Used by the AI recommendation system to learn user preferences over time.
+class UserRestaurantInteractions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId => integer()();
+  TextColumn get restaurantPlaceId => text()();
+  TextColumn get restaurantName => text().nullable()();
+  /// One of: 'viewed', 'selected', 'rejected', 'favorited'
+  TextColumn get interactionType => text()();
+  DateTimeColumn get interactionDate => dateTime()();
+  /// Optional JSON context (source screen, search query, filters, etc.)
+  TextColumn get context => text().nullable()();
+}
+
+/// Tracks meal outcomes for the AI learning loop.
+/// Extends existing Meals table data with subjective user feedback.
+class MealOutcomes extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get mealId => integer()();
+  IntColumn get userId => integer()();
+  TextColumn get restaurantPlaceId => text().nullable()();
+  /// User rating from 1 to 5
+  IntColumn get rating => integer().nullable()();
+  BoolColumn get wouldRevisit => boolean().withDefault(const Constant(false))();
+  /// Free-text feedback from the user
+  TextColumn get feedback => text().nullable()();
+  DateTimeColumn get recordedAt => dateTime()();
+}
+
+@DriftDatabase(tables: [Users, Meals, BudgetTrackings, Restaurants, RestaurantCache, DietaryCompatibility, UserDiscoveryHistory, AIRecommendations, AIRecommendationFeedback, AIUsageMetrics, Photos, UserRestaurantInteractions, MealOutcomes])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(createDatabaseConnection());
-  AppDatabase._(DatabaseConnection e) : super(e);
+  AppDatabase._(DatabaseConnection super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
-      // Add indexes for better query performance
-      await _createOptimizedIndexes(migrator);
+      if (from < 2) {
+        // v2: Added RestaurantCache, DietaryCompatibility, UserDiscoveryHistory
+        await migrator.createTable(restaurantCache);
+        await migrator.createTable(dietaryCompatibility);
+        await migrator.createTable(userDiscoveryHistory);
+      }
+      if (from < 3) {
+        // v3: Added AI tables and Photos
+        await migrator.createTable(aIRecommendations);
+        await migrator.createTable(aIRecommendationFeedback);
+        await migrator.createTable(aIUsageMetrics);
+        await migrator.createTable(photos);
+      }
+      if (from < 4) {
+        // v4: Performance indexes
+        await _createOptimizedIndexes(migrator);
+      }
+      if (from < 5) {
+        // v5: Add restaurant_name column to meals table for convenience denormalisation
+        await migrator.addColumn(meals, meals.restaurantName);
+      }
+      if (from < 6) {
+        // v6: Add AI learning signal tables for recommendation personalization
+        await migrator.createTable(userRestaurantInteractions);
+        await migrator.createTable(mealOutcomes);
+        await _createLearningSignalIndexes(migrator);
+      }
     },
     onCreate: (migrator) async {
       await migrator.createAll();
       await _createOptimizedIndexes(migrator);
+      await _createLearningSignalIndexes(migrator);
     },
   );
 
@@ -239,6 +295,27 @@ class AppDatabase extends _$AppDatabase {
     // Composite index for restaurant filtering
     await migrator.database.customStatement(
       'CREATE INDEX IF NOT EXISTS idx_restaurants_filter ON restaurants(is_open_now, has_verified_dietary_info, rating DESC)'
+    );
+  }
+
+  /// Create indexes for the AI learning signal tables
+  Future<void> _createLearningSignalIndexes(Migrator migrator) async {
+    // Index on user + interaction type for frequency queries
+    await migrator.database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_interactions_user_type '
+      'ON user_restaurant_interactions(user_id, interaction_type, interaction_date DESC)'
+    );
+
+    // Index on place ID for per-restaurant aggregation
+    await migrator.database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_interactions_place '
+      'ON user_restaurant_interactions(restaurant_place_id, interaction_date DESC)'
+    );
+
+    // Index on meal outcomes for user feedback lookup
+    await migrator.database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_meal_outcomes_user '
+      'ON meal_outcomes(user_id, recorded_at DESC)'
     );
   }
 
@@ -318,18 +395,24 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<Restaurant>> getRestaurantsByDietaryRestrictions(List<String> restrictions) async {
     if (restrictions.isEmpty) return getAllRestaurants();
-    
+
     // Optimized: Use database-level filtering with JSON queries instead of loading all data
     final query = select(restaurants);
-    
+
     for (final restriction in restrictions) {
-      query.where((tbl) => 
-        tbl.supportedDietaryRestrictions.like('%"$restriction"%') |
-        tbl.dietaryCompatibilityScores.like('%"$restriction"%')
+      final escaped = _escapeLikePattern(restriction);
+      query.where((tbl) =>
+        tbl.supportedDietaryRestrictions.like('%"$escaped"%') |
+        tbl.dietaryCompatibilityScores.like('%"$escaped"%')
       );
     }
-    
+
     return await query.get();
+  }
+
+  /// Escape LIKE wildcard characters in user input
+  String _escapeLikePattern(String input) {
+    return input.replaceAll('%', r'\%').replaceAll('_', r'\_');
   }
 
   // Cache operations for performance
@@ -503,7 +586,8 @@ class AppDatabase extends _$AppDatabase {
       query.where((tbl) {
         Expression<bool> condition = const Constant(false);
         for (final cuisine in cuisineTypes) {
-          condition = condition | tbl.cuisineTypes.like('%"$cuisine"%');
+          final escaped = _escapeLikePattern(cuisine);
+          condition = condition | tbl.cuisineTypes.like('%"$escaped"%');
         }
         return condition;
       });
@@ -634,6 +718,90 @@ class AppDatabase extends _$AppDatabase {
     final orphanedIds = orphanedMeals.map((meal) => meal.id).toList();
     return await (update(meals)..where((tbl) => tbl.id.isIn(orphanedIds)))
         .write(const MealsCompanion(restaurantId: Value(null)));
+  }
+
+  // ── AI Learning Signal Operations ──────────────────────────────────
+
+  /// Record a user interaction with a restaurant (view, select, reject, favorite)
+  Future<int> recordRestaurantInteraction({
+    required int userId,
+    required String placeId,
+    required String interactionType,
+    String? restaurantName,
+    String? context,
+  }) async {
+    return into(userRestaurantInteractions).insert(
+      UserRestaurantInteractionsCompanion.insert(
+        userId: userId,
+        restaurantPlaceId: placeId,
+        restaurantName: Value(restaurantName),
+        interactionType: interactionType,
+        interactionDate: DateTime.now(),
+        context: Value(context),
+      ),
+    );
+  }
+
+  /// Get interaction history for a user, ordered by most recent first
+  Future<List<UserRestaurantInteraction>> getUserRestaurantInteractions(
+    int userId, {
+    int limit = 50,
+  }) {
+    return (select(userRestaurantInteractions)
+          ..where((t) => t.userId.equals(userId))
+          ..orderBy([(t) => OrderingTerm.desc(t.interactionDate)])
+          ..limit(limit))
+        .get();
+  }
+
+  /// Get visit frequency per restaurant for a user (only 'selected' interactions)
+  Future<Map<String, int>> getRestaurantVisitFrequency(int userId) async {
+    final interactions = await (select(userRestaurantInteractions)
+          ..where((t) =>
+              t.userId.equals(userId) &
+              t.interactionType.equals('selected')))
+        .get();
+
+    final frequency = <String, int>{};
+    for (final interaction in interactions) {
+      frequency[interaction.restaurantPlaceId] =
+          (frequency[interaction.restaurantPlaceId] ?? 0) + 1;
+    }
+    return frequency;
+  }
+
+  /// Record a meal outcome (rating, revisit intent, free-text feedback)
+  Future<int> recordMealOutcome({
+    required int mealId,
+    required int userId,
+    String? restaurantPlaceId,
+    int? rating,
+    bool wouldRevisit = false,
+    String? feedback,
+  }) async {
+    return into(mealOutcomes).insert(
+      MealOutcomesCompanion.insert(
+        mealId: mealId,
+        userId: userId,
+        restaurantPlaceId: Value(restaurantPlaceId),
+        rating: Value(rating),
+        wouldRevisit: Value(wouldRevisit),
+        feedback: Value(feedback),
+        recordedAt: DateTime.now(),
+      ),
+    );
+  }
+
+  /// Get meal outcomes for a user, ordered by most recent first
+  Future<List<MealOutcome>> getUserMealOutcomes(
+    int userId, {
+    int limit = 50,
+  }) {
+    return (select(mealOutcomes)
+          ..where((t) => t.userId.equals(userId))
+          ..orderBy([(t) => OrderingTerm.desc(t.recordedAt)])
+          ..limit(limit))
+        .get();
   }
 
   /// Get referential integrity statistics

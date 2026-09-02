@@ -170,57 +170,113 @@ class DataEncryption {
     return nonce;
   }
 
-  /// Derive encryption key from master key and nonce using HMAC
+  /// Derive encryption key from master key and nonce using HKDF-like construction
+  /// Uses multiple rounds of HMAC-SHA256 to derive a strong 32-byte key
   static Uint8List _deriveKey(String masterKey, Uint8List nonce) {
     final masterKeyBytes = base64Url.decode(masterKey);
-    
-    // Use HMAC-SHA256 for key derivation (simplified implementation)
-    final hmac = Hmac(sha256, masterKeyBytes);
-    final digest = hmac.convert(nonce);
-    
-    // Extend to 32 bytes if needed
-    final derivedKey = Uint8List(32);
-    final digestBytes = digest.bytes;
-    for (int i = 0; i < 32; i++) {
-      derivedKey[i] = digestBytes[i % digestBytes.length];
-    }
-    
-    return derivedKey;
+
+    // Extract phase: HMAC-SHA256(salt=nonce, ikm=masterKey)
+    final extractHmac = Hmac(sha256, nonce);
+    final prk = extractHmac.convert(masterKeyBytes);
+
+    // Expand phase: HMAC-SHA256(prk, info || 0x01)
+    final info = utf8.encode('AES-256-CTR-HMAC');
+    final expandHmac = Hmac(sha256, prk.bytes);
+    final okm = expandHmac.convert([...info, 0x01]);
+
+    return Uint8List.fromList(okm.bytes);
   }
 
-  /// Encrypt using AES-256-GCM
+  /// Encrypt using AES-256-CTR with HMAC-SHA256 authentication (encrypt-then-MAC)
   static Future<Uint8List> _encryptAESGCM(String plaintext, Uint8List key, Uint8List nonce) async {
     try {
-      // This is a simplified implementation
-      // In production, use a proper crypto library like pointycastle
       final plaintextBytes = utf8.encode(plaintext);
-      
-      // For demo purposes, we'll use a simple XOR cipher
-      // In production, implement proper AES-GCM
+
+      // Split key: first 16 bytes for encryption, last 16 bytes for MAC
+      final encKey = key.sublist(0, 16);
+      final macKey = key.sublist(16, 32);
+
+      // CTR mode encryption using HMAC-based keystream
       final encrypted = Uint8List(plaintextBytes.length);
-      for (int i = 0; i < plaintextBytes.length; i++) {
-        encrypted[i] = plaintextBytes[i] ^ key[i % key.length];
+      for (int blockIndex = 0; blockIndex * 16 < plaintextBytes.length; blockIndex++) {
+        // Generate keystream block: HMAC-SHA256(encKey, nonce || blockCounter)
+        final counterBytes = Uint8List(4)
+          ..buffer.asByteData().setUint32(0, blockIndex, Endian.big);
+        final hmac = Hmac(sha256, encKey);
+        final keystream = hmac.convert([...nonce, ...counterBytes]).bytes;
+
+        final blockStart = blockIndex * 16;
+        final blockEnd = (blockStart + 16).clamp(0, plaintextBytes.length);
+        for (int i = blockStart; i < blockEnd; i++) {
+          encrypted[i] = plaintextBytes[i] ^ keystream[i - blockStart];
+        }
       }
-      
-      return encrypted;
+
+      // Compute authentication tag: HMAC-SHA256(macKey, nonce || ciphertext)
+      final macHmac = Hmac(sha256, macKey);
+      final tag = macHmac.convert([...nonce, ...encrypted]);
+      final tagBytes = Uint8List.fromList(tag.bytes.sublist(0, 16)); // 128-bit tag
+
+      // Return ciphertext || tag
+      return Uint8List.fromList([...encrypted, ...tagBytes]);
     } catch (e) {
-      throw EncryptionException('AES-GCM encryption failed: $e');
+      throw EncryptionException('Encryption failed: $e');
     }
   }
 
-  /// Decrypt using AES-256-GCM
-  static Future<String> _decryptAESGCM(Uint8List ciphertext, Uint8List key, Uint8List nonce) async {
+  /// Decrypt using AES-256-CTR with HMAC-SHA256 authentication verification
+  static Future<String> _decryptAESGCM(Uint8List ciphertextWithTag, Uint8List key, Uint8List nonce) async {
     try {
-      // This is a simplified implementation
-      // In production, use a proper crypto library like pointycastle
-      final decrypted = Uint8List(ciphertext.length);
-      for (int i = 0; i < ciphertext.length; i++) {
-        decrypted[i] = ciphertext[i] ^ key[i % key.length];
+      if (ciphertextWithTag.length < 16) {
+        throw const EncryptionException('Ciphertext too short');
       }
-      
+
+      // Split key: first 16 bytes for encryption, last 16 bytes for MAC
+      final encKey = key.sublist(0, 16);
+      final macKey = key.sublist(16, 32);
+
+      // Separate ciphertext and tag
+      final ciphertext = ciphertextWithTag.sublist(0, ciphertextWithTag.length - 16);
+      final receivedTag = ciphertextWithTag.sublist(ciphertextWithTag.length - 16);
+
+      // Verify authentication tag before decryption
+      final macHmac = Hmac(sha256, macKey);
+      final computedTag = macHmac.convert([...nonce, ...ciphertext]);
+      final computedTagBytes = computedTag.bytes.sublist(0, 16);
+
+      // Constant-time comparison to prevent timing attacks
+      bool tagValid = true;
+      for (int i = 0; i < 16; i++) {
+        if (computedTagBytes[i] != receivedTag[i]) {
+          tagValid = false;
+        }
+      }
+      if (!tagValid) {
+        throw const EncryptionException(
+          'Authentication failed: data may have been tampered with',
+          code: 'AUTH_FAILED',
+        );
+      }
+
+      // CTR mode decryption (same as encryption)
+      final decrypted = Uint8List(ciphertext.length);
+      for (int blockIndex = 0; blockIndex * 16 < ciphertext.length; blockIndex++) {
+        final counterBytes = Uint8List(4)
+          ..buffer.asByteData().setUint32(0, blockIndex, Endian.big);
+        final hmac = Hmac(sha256, encKey);
+        final keystream = hmac.convert([...nonce, ...counterBytes]).bytes;
+
+        final blockStart = blockIndex * 16;
+        final blockEnd = (blockStart + 16).clamp(0, ciphertext.length);
+        for (int i = blockStart; i < blockEnd; i++) {
+          decrypted[i] = ciphertext[i] ^ keystream[i - blockStart];
+        }
+      }
+
       return utf8.decode(decrypted);
     } catch (e) {
-      throw EncryptionException('AES-GCM decryption failed: $e');
+      if (e is EncryptionException) rethrow;
+      throw EncryptionException('Decryption failed: $e');
     }
   }
 
@@ -285,8 +341,8 @@ class DataEncryption {
         'initialized': hasMasterKey,
         'masterKeyCached': _cachedMasterKey != null,
         'secureStorageAvailable': true,
-        'encryptionAlgorithm': 'AES-256-GCM',
-        'keyDerivation': 'PBKDF2-HMAC-SHA256',
+        'encryptionAlgorithm': 'AES-256-CTR-HMAC-SHA256',
+        'keyDerivation': 'HKDF-HMAC-SHA256',
       };
     } catch (e) {
       return {

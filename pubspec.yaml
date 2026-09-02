@@ -68,6 +68,7 @@ dependencies:
   # UI Enhancement
   cupertino_icons: ^1.0.8
   fl_chart: ^0.66.2
+  google_fonts: ^6.1.0
 
   # AI Integration
   google_generative_ai: ^0.3.2

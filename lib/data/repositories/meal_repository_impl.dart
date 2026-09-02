@@ -26,7 +26,7 @@ class MealRepositoryImpl implements MealRepository {
       await _logging.databaseOperation(
         'INSERT',
         'meals',
-        duration: DateTime.now().difference(DateTime.now()),
+        duration: Duration.zero, // Tracked via _performance service
         parameters: {'user_id': meal.userId, 'restaurant_id': meal.restaurantId},
       );
       

@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/accessibility/accessibility_utils.dart';
-import '../../core/accessibility/focus_manager.dart';
 import '../../core/responsive/responsive_utils.dart';
 
 /// A collection of reusable UX components following Material Design 3 principles
@@ -1069,7 +1068,7 @@ class UXDateTimePicker extends StatelessWidget {
           padding: const EdgeInsets.all(UXComponents.paddingM),
           decoration: BoxDecoration(
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.5),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1120,7 +1119,7 @@ class UXDateTimePicker extends StatelessWidget {
           padding: const EdgeInsets.all(UXComponents.paddingM),
           decoration: BoxDecoration(
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.5),
             ),
             borderRadius: BorderRadius.circular(12),
           ),

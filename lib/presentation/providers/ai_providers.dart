@@ -188,7 +188,7 @@ class AIRecommendationNotifier extends StateNotifier<AIRecommendationState> {
       }
 
       final recommendation = await _repository.generateRecommendations(
-        _currentUserId!,
+        _currentUserId,
         restaurants,
         userPosition: userPosition,
         specificCravings: specificCravings,
@@ -222,7 +222,7 @@ class AIRecommendationNotifier extends StateNotifier<AIRecommendationState> {
     if (_repository == null || _currentUserId == null) return;
 
     try {
-      final recommendations = await _repository.getRecentRecommendations(_currentUserId!);
+      final recommendations = await _repository.getRecentRecommendations(_currentUserId);
       state = state.copyWith(recommendations: recommendations);
     } catch (e) {
       // Non-critical error - just log it
@@ -237,7 +237,7 @@ class AIRecommendationNotifier extends StateNotifier<AIRecommendationState> {
     if (_repository == null || _currentUserId == null) return;
 
     try {
-      final stats = await _repository.getUsageStatistics(_currentUserId!);
+      final stats = await _repository.getUsageStatistics(_currentUserId);
       state = state.copyWith(usageStats: stats);
     } catch (e) {
       if (kDebugMode) {
@@ -469,8 +469,12 @@ final generateRecommendationsProvider = Provider<Future<void> Function({
     String? specificCravings,
     Map<String, dynamic>? additionalFilters,
   }) async {
-    // Get available restaurants from discovery
-    final restaurants = discoveryState.restaurants;
+    // Use filtered restaurants so user-applied filters (dietary, distance, etc.)
+    // are respected by the AI recommendation engine. Fall back to the full
+    // unfiltered list only when no filters have been applied.
+    final restaurants = discoveryState.filteredRestaurants.isNotEmpty
+        ? discoveryState.filteredRestaurants
+        : discoveryState.restaurants;
     
     // Get user position
     final userPosition = userLocationAsync;
@@ -512,9 +516,9 @@ final submitRecommendationFeedbackProvider = Provider<Future<void> Function(
 
 /// Provider for AI usage summary
 final aiUsageSummaryProvider = Provider<Map<String, dynamic>>((ref) {
-  final notifier = ref.read(aiRecommendationProvider.notifier);
-  
-  return notifier.usageSummary;
+  final state = ref.watch(aiRecommendationProvider);
+
+  return state.usageStats ?? {};
 });
 
 /// Provider for investment-minded AI recommendation analysis
@@ -591,11 +595,10 @@ final aiRecommendationHistoryProvider = FutureProvider<List<AIRecommendation>>((
 /// Provider for periodic cleanup of expired recommendations
 final aiCleanupProvider = Provider<void>((ref) {
   final repository = ref.read(aiRepositoryProvider);
-  
+
   if (repository == null) return;
-  
-  // Schedule periodic cleanup (could be enhanced with background tasks)
-  Timer.periodic(const Duration(hours: 1), (_) async {
+
+  final timer = Timer.periodic(const Duration(hours: 1), (_) async {
     try {
       await repository.cleanupExpiredRecommendations();
     } catch (e) {
@@ -604,6 +607,8 @@ final aiCleanupProvider = Provider<void>((ref) {
       }
     }
   });
+
+  ref.onDispose(() => timer.cancel());
 });
 
 /// State for AI onboarding and feature introduction

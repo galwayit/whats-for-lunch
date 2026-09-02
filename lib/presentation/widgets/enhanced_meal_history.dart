@@ -1,8 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/meal.dart';
 import 'ux_components.dart';
@@ -177,7 +174,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
               Container(
                 padding: const EdgeInsets.all(UXComponents.paddingM),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -251,10 +248,10 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
         bottom: UXComponents.paddingS,
       ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.95),
+        color: theme.colorScheme.surface.withValues(alpha:0.95),
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha:0.2),
           ),
         ),
       ),
@@ -310,7 +307,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha:0.2),
         ),
       ),
       child: Column(
@@ -321,7 +318,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
               Container(
                 padding: const EdgeInsets.all(UXComponents.paddingXS),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -375,7 +372,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
           child: Opacity(
             opacity: animation.value,
             child: Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 left: UXComponents.paddingL,
                 right: UXComponents.paddingL,
                 bottom: UXComponents.paddingM,
@@ -410,7 +407,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                   Container(
                     width: 3,
                     height: 20,
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha:0.3),
                   ),
                   Container(
                     width: 16,
@@ -424,7 +421,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: _getMealTypeColor(meal.mealType).withOpacity(0.3),
+                          color: _getMealTypeColor(meal.mealType).withValues(alpha:0.3),
                           blurRadius: 8,
                           spreadRadius: 2,
                         ),
@@ -434,7 +431,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                   Container(
                     width: 3,
                     height: 20,
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha:0.3),
                   ),
                 ],
               ),
@@ -455,7 +452,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                       gradient: LinearGradient(
                         colors: [
                           theme.colorScheme.surface,
-                          _getMealTypeColor(meal.mealType).withOpacity(0.05),
+                          _getMealTypeColor(meal.mealType).withValues(alpha:0.05),
                         ],
                         begin: isEvenIndex ? Alignment.topLeft : Alignment.topRight,
                         end: isEvenIndex ? Alignment.bottomRight : Alignment.bottomLeft,
@@ -473,7 +470,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                               Container(
                                 padding: const EdgeInsets.all(UXComponents.paddingS),
                                 decoration: BoxDecoration(
-                                  color: _getMealTypeColor(meal.mealType).withOpacity(0.1),
+                                  color: _getMealTypeColor(meal.mealType).withValues(alpha:0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -519,7 +516,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                                       vertical: UXComponents.paddingXS,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
+                                      color: Colors.green.withValues(alpha:0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -582,7 +579,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
                               vertical: UXComponents.paddingXS,
                             ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                              color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -651,7 +648,7 @@ class _EnhancedMealHistoryState extends State<EnhancedMealHistory>
             Container(
               padding: const EdgeInsets.all(UXComponents.paddingXL),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(

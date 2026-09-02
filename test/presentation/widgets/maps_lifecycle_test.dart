@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../lib/presentation/widgets/maps_components.dart';
-import '../../../lib/domain/entities/restaurant.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/maps_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 
 /// Google Maps Controller Lifecycle and Disposal Tests
 /// These tests validate the fixes for proper controller disposal and memory management
@@ -24,7 +22,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -76,7 +74,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -147,7 +145,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -199,7 +197,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -262,7 +260,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -314,7 +312,7 @@ void main() {
     });
 
     testWidgets('Error state should not prevent proper disposal', (tester) async {
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -324,7 +322,7 @@ void main() {
       // Test disposal when map is in error state
       
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UXMapsView(
               restaurants: [], // Empty list might cause error state
@@ -362,7 +360,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -523,7 +521,7 @@ void main() {
   group('Memory Management Tests', () {
     testWidgets('Large restaurant datasets should not cause memory issues', (tester) async {
       final testUserLocation = _createTestPosition(37.7749, -122.4194);
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,
@@ -581,7 +579,7 @@ void main() {
           priceLevel: 2,
         ),
       ];
-      final testUserPreferences = const UserPreferences(
+      const testUserPreferences = UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
         maxTravelDistance: 5.0,

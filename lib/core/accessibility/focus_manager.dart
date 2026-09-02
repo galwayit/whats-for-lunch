@@ -249,7 +249,7 @@ class _AccessibleNavigationItemState extends State<AccessibleNavigationItem> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: widget.isSelected
-                  ? colorScheme.primaryContainer.withOpacity(0.3)
+                  ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                   : Colors.transparent,
               border: _isFocused
                   ? Border.all(
@@ -259,7 +259,7 @@ class _AccessibleNavigationItemState extends State<AccessibleNavigationItem> {
                   : null,
             ),
             transform: Matrix4.identity()
-              ..scale(_isPressed ? 0.95 : 1.0),
+              ..scaleByDouble(_isPressed ? 0.95 : 1.0, _isPressed ? 0.95 : 1.0, 1.0, 1.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

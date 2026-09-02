@@ -571,7 +571,6 @@ class _LazyImageState extends State<LazyImage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  final PerformanceMonitoringService _performance = PerformanceMonitoringService();
 
   @override
   void initState() {

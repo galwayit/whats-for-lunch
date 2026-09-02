@@ -77,6 +77,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.budgetSetup,
         builder: (context, state) => const BudgetSetupPage(),
       ),
+      GoRoute(
+        path: '/restaurant/:id',
+        redirect: (context, state) => AppRoutes.discover,
+      ),
     ],
   );
 });

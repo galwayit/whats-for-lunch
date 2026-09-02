@@ -96,7 +96,7 @@ class AIRecommendation {
     return sortedFactors.take(3).map((entry) {
       final factor = entry.key;
       final weight = (entry.value * 100).round();
-      return '$factor (${weight}%)';
+      return '$factor ($weight%)';
     }).toList();
   }
 

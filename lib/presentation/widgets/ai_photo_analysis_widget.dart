@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/ai_photo_analysis_service.dart';
 import '../../services/photo_service.dart';
-import '../providers/photo_providers.dart';
 import 'ux_components.dart';
 
 /// Widget that displays AI analysis results for photos
@@ -82,16 +81,16 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
                     vertical: UXComponents.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.green.withOpacity(0.3),
+                      color: Colors.green.withValues(alpha:0.3),
                     ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.check_circle,
                         color: Colors.green,
                         size: 16,
@@ -186,15 +185,15 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(UXComponents.borderRadius),
         border: Border.all(
-          color: Colors.red.withOpacity(0.3),
+          color: Colors.red.withValues(alpha:0.3),
         ),
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.red,
             size: 20,
@@ -215,7 +214,7 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
               });
               _analyzePhotos();
             },
-            child: Text(
+            child: const Text(
               'Retry',
               style: TextStyle(color: Colors.red),
             ),
@@ -227,7 +226,6 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
 
   Widget _buildAnalysisResults() {
     final analysis = _analysisResult!;
-    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,10 +335,10 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(UXComponents.borderRadius),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha:0.3),
         ),
       ),
       child: Row(
@@ -377,10 +375,10 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
         vertical: UXComponents.paddingS,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha:0.3),
         ),
       ),
       child: Row(
@@ -410,10 +408,10 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(UXComponents.borderRadius),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha:0.3),
         ),
       ),
       child: Column(
@@ -449,7 +447,7 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
     return Container(
       padding: const EdgeInsets.all(UXComponents.paddingM),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
         borderRadius: BorderRadius.circular(UXComponents.borderRadius),
       ),
       child: Column(
@@ -512,7 +510,7 @@ class _AIPhotoAnalysisWidgetState extends ConsumerState<AIPhotoAnalysisWidget> {
               ingredient,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha:0.3),
           )).toList(),
         ),
       ],

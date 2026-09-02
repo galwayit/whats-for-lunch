@@ -1,11 +1,23 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
-/// Creates a SQLite database connection for mobile platforms
+/// Creates a persistent SQLite database connection for mobile platforms.
+///
+/// Uses [LazyDatabase] to handle the async directory lookup required by
+/// [getApplicationDocumentsDirectory]. The database file is stored at
+/// `<app-documents>/diet_buddy.sqlite` so data survives app restarts.
 DatabaseConnection createPlatformDatabaseConnection() {
-  // Use in-memory database for now to resolve build issues
-  // This can be switched to persistent storage once build issues are resolved
-  return DatabaseConnection(NativeDatabase.memory());
+  return DatabaseConnection(
+    LazyDatabase(() async {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, 'diet_buddy.sqlite'));
+      return NativeDatabase.createInBackground(file);
+    }),
+  );
 }
 
 /// Creates an in-memory database connection for testing on mobile platforms

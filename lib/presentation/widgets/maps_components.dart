@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -10,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManage
 // import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart' as cluster_manager;
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 
 import '../../domain/entities/restaurant.dart';
 import '../../domain/entities/user_preferences.dart';
@@ -77,26 +74,23 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
   Set<Polyline> _polylines = {};
-  bool _isLoading = true;
   String? _errorMessage;
   bool _isDisposed = false;
   StreamSubscription<Position>? _locationSubscription;
-  
+
   // Clustering (temporarily disabled)
   // cluster_manager.ClusterManager? _clusterManager;
-  List<RestaurantPlace> _restaurantPlaces = [];
-  
+  final List<RestaurantPlace> _restaurantPlaces = [];
+
   // Custom marker icons
   BitmapDescriptor? _userMarkerIcon;
-  Map<String, BitmapDescriptor> _customMarkerIcons = {};
-  
+  final Map<String, BitmapDescriptor> _customMarkerIcons = {};
+
   // Animation controller for smooth transitions
   late AnimationController _animationController;
-  
+
   // Favorites and directions
-  Set<String> _favoriteRestaurantIds = {};
-  Restaurant? _selectedRestaurant;
-  bool _showDirections = false;
+  final Set<String> _favoriteRestaurantIds = {};
 
   @override
   void initState() {
@@ -197,7 +191,7 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     final image = await picture.toImage(size, size);
     final bytes = await image.toByteData(format: ImageByteFormat.png);
     
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
   }
 
   /// Create cluster marker for grouped restaurants (temporarily disabled)
@@ -259,7 +253,7 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     final image = await picture.toImage(size, size);
     final bytes = await image.toByteData(format: ImageByteFormat.png);
     
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
   }
 
   /// Zoom to cluster bounds
@@ -282,7 +276,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     if (_isDisposed || !mounted) return;
     
     setState(() {
-      _isLoading = true;
       _errorMessage = null;
     });
 
@@ -302,7 +295,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
       if (mounted && !_isDisposed) {
         setState(() {
           _errorMessage = 'Failed to load map markers: ${e.toString()}';
-          _isLoading = false;
         });
       }
     }
@@ -329,7 +321,9 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     if (!widget.showUserLocation || 
         widget.userLocation == null || 
         _isDisposed || 
-        !mounted) return;
+        !mounted) {
+      return;
+    }
 
     final markers = Set<Marker>.from(_markers);
     
@@ -363,7 +357,9 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     if (!widget.showUserLocation || 
         widget.userLocation == null || 
         _isDisposed || 
-        !mounted) return;
+        !mounted) {
+      return;
+    }
 
     final circles = Set<Circle>.from(_circles);
     
@@ -379,8 +375,8 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
           widget.userLocation!.longitude,
         ),
         radius: widget.userPreferences.maxTravelDistance * 1000, // Convert to meters
-        fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        strokeColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        fillColor: Theme.of(context).colorScheme.primary.withValues(alpha:0.1),
+        strokeColor: Theme.of(context).colorScheme.primary.withValues(alpha:0.3),
         strokeWidth: 2,
       ),
     );
@@ -430,37 +426,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
 
     setState(() {
       _markers = markers;
-      _isLoading = false;
-    });
-  }
-
-  /// Callback for cluster manager updates
-  void _updateMarkers(Set<Marker> markers) {
-    if (_isDisposed || !mounted) return;
-    
-    // Add user location marker to clustered markers
-    final allMarkers = Set<Marker>.from(markers);
-    if (widget.showUserLocation && widget.userLocation != null) {
-      allMarkers.add(
-        Marker(
-          markerId: const MarkerId('user_location'),
-          position: LatLng(
-            widget.userLocation!.latitude,
-            widget.userLocation!.longitude,
-          ),
-          icon: _userMarkerIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          infoWindow: const InfoWindow(
-            title: 'Your Location',
-            snippet: 'Current position',
-          ),
-          zIndex: 1000,
-        ),
-      );
-    }
-
-    setState(() {
-      _markers = allMarkers;
-      _isLoading = false;
     });
   }
 
@@ -481,25 +446,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
       case SafetyLevel.warning:
         return _customMarkerIcons['warning'] ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
     }
-  }
-
-  /// Legacy marker icon method for fallback
-  BitmapDescriptor _getMarkerIcon(SafetyLevel safetyLevel, double dietaryScore) {
-    double hue;
-    
-    if (safetyLevel == SafetyLevel.warning) {
-      hue = BitmapDescriptor.hueRed;
-    } else if (safetyLevel == SafetyLevel.caution) {
-      hue = BitmapDescriptor.hueOrange;
-    } else if (dietaryScore >= 0.8) {
-      hue = BitmapDescriptor.hueGreen;
-    } else if (dietaryScore >= 0.5) {
-      hue = BitmapDescriptor.hueYellow;
-    } else {
-      hue = BitmapDescriptor.hueRed;
-    }
-
-    return BitmapDescriptor.defaultMarkerWithHue(hue);
   }
 
   /// Enhanced marker snippet with more information
@@ -538,10 +484,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
 
   /// Select restaurant and show details
   void _selectRestaurant(Restaurant restaurant) {
-    setState(() {
-      _selectedRestaurant = restaurant;
-    });
-    
     widget.onRestaurantSelected?.call(restaurant);
     
     // Animate to restaurant with smooth transition
@@ -600,10 +542,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
   Future<void> _getDirections(Restaurant restaurant) async {
     if (widget.userLocation == null || restaurant.latitude == null || restaurant.longitude == null) return;
     
-    setState(() {
-      _showDirections = true;
-    });
-    
     widget.onDirectionsRequested?.call(restaurant);
     
     try {
@@ -648,95 +586,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
     }
   }
 
-  String _getMarkerSnippet(Restaurant restaurant) {
-    final rating = restaurant.rating != null ? '⭐ ${restaurant.rating!.toStringAsFixed(1)}' : '';
-    final price = restaurant.priceLevel != null ? ' • ${r'$' * restaurant.priceLevel!}' : '';
-    final distance = restaurant.distanceFromUser != null 
-        ? ' • ${restaurant.distanceFromUser!.toStringAsFixed(1)}km'
-        : '';
-    
-    return '$rating$price$distance';
-  }
-
-  void _onMapCreated(GoogleMapController controller) async {
-    // Don't proceed if widget is disposed
-    if (_isDisposed || !mounted) {
-      controller.dispose();
-      return;
-    }
-    
-    _controller = controller;
-    
-    // Set up cluster manager with map controller (clustering temporarily disabled)
-    // if (widget.enableClustering && _clusterManager != null) {
-    //   _clusterManager!.setMapId(controller.mapId);
-    // }
-    
-    try {
-      // Move camera to user location or first restaurant with safety checks
-      if (!_isDisposed && mounted && widget.userLocation != null) {
-        await _controller!.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(
-                widget.userLocation!.latitude,
-                widget.userLocation!.longitude,
-              ),
-              zoom: widget.initialZoom,
-            ),
-          ),
-        );
-      } else if (!_isDisposed && mounted && 
-                 widget.restaurants.isNotEmpty && 
-                 widget.restaurants.first.latitude != null &&
-                 widget.restaurants.first.longitude != null) {
-        await _controller!.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(
-                widget.restaurants.first.latitude!,
-                widget.restaurants.first.longitude!,
-              ),
-              zoom: widget.initialZoom,
-            ),
-          ),
-        );
-      }
-      
-      // Start real-time location tracking if enabled
-      if (widget.enableRealTimeTracking) {
-        _startLocationTracking();
-      }
-    } catch (e) {
-      // Handle camera animation errors gracefully
-      if (mounted && !_isDisposed) {
-        setState(() {
-          _errorMessage = 'Failed to initialize map camera: ${e.toString()}';
-        });
-      }
-    }
-  }
-
-  /// Start real-time location tracking
-  void _startLocationTracking() {
-    _locationSubscription?.cancel();
-    
-    _locationSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // Update every 10 meters
-      ),
-    ).listen((Position position) {
-      if (_isDisposed || !mounted) return;
-      
-      // Update user location marker
-      _updateUserLocationMarker();
-      
-      // Update radius circle
-      _updateRadiusCircle();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_errorMessage != null) {
@@ -744,7 +593,7 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(_errorMessage!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
@@ -786,34 +635,6 @@ class _UXMapsViewState extends State<UXMapsView> with TickerProviderStateMixin {
       mapToolbarEnabled: false,
     );
   }
-
-  /// Handle map tap events
-  void _onMapTap(LatLng position) {
-    // Clear directions if showing
-    if (_showDirections) {
-      setState(() {
-        _showDirections = false;
-        _polylines.clear();
-      });
-    }
-    
-    widget.onMapTap?.call(position);
-  }
-
-  /// Handle camera movement for clustering (temporarily disabled)
-  void _onCameraMove(CameraPosition position) {
-    // if (widget.enableClustering && _clusterManager != null) {
-    //   _clusterManager!.onCameraMove(position);
-    // }
-  }
-
-  /// Handle camera idle for clustering (temporarily disabled)
-  void _onCameraIdle() {
-    // if (widget.enableClustering && _clusterManager != null) {
-    //   _clusterManager!.updateMap();
-    // }
-  }
-
 
   @override
   void dispose() {
@@ -876,7 +697,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha:0.1),
                 blurRadius: 10,
                 spreadRadius: 0,
                 offset: const Offset(0, -5),
@@ -891,7 +712,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -947,7 +768,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                       Row(
                         children: [
                           if (restaurant.rating != null) ...[
-                            Icon(Icons.star, color: Colors.amber, size: 20),
+                            const Icon(Icons.star, color: Colors.amber, size: 20),
                             const SizedBox(width: 4),
                             Text(
                               restaurant.rating!.toStringAsFixed(1),
@@ -977,7 +798,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                           ],
                           
                           if (restaurant.distanceFromUser != null) ...[
-                            Icon(Icons.location_on, size: 16),
+                            const Icon(Icons.location_on, size: 16),
                             const SizedBox(width: 4),
                             Text(
                               '${restaurant.distanceFromUser!.toStringAsFixed(1)}km',
@@ -1069,9 +890,9 @@ class _RestaurantBottomSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardColor.withOpacity(0.1),
+        color: cardColor.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cardColor.withOpacity(0.3)),
+        border: Border.all(color: cardColor.withValues(alpha:0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1191,9 +1012,9 @@ class UXRestaurantMarker extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: safetyColor.withOpacity(0.1),
+                    color: safetyColor.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: safetyColor.withOpacity(0.3)),
+                    border: Border.all(color: safetyColor.withValues(alpha:0.3)),
                   ),
                   child: Icon(safetyIcon, color: safetyColor, size: 20),
                 ),
@@ -1221,7 +1042,7 @@ class UXRestaurantMarker extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.star, size: 16, color: Colors.amber),
+                                const Icon(Icons.star, size: 16, color: Colors.amber),
                                 const SizedBox(width: 2),
                                 Text(
                                   restaurant.rating!.toStringAsFixed(1),
@@ -1418,12 +1239,12 @@ class UXMapControls extends StatelessWidget {
                   child: IconButton(
                     onPressed: isLocationLoading ? null : onLocationPressed,
                     icon: isLocationLoading
-                        ? SizedBox(
+                        ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Icon(Icons.my_location),
+                        : const Icon(Icons.my_location),
                     style: IconButton.styleFrom(
                       backgroundColor: theme.colorScheme.primaryContainer,
                       foregroundColor: theme.colorScheme.onPrimaryContainer,
@@ -1492,7 +1313,7 @@ class UXCompactMapControls extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha:0.2),
           width: 1,
         ),
       ),
@@ -1587,7 +1408,7 @@ class UXCompactMapControls extends StatelessWidget {
                         border: Border.all(
                           color: currentRadius == radius 
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.outline.withOpacity(0.5),
+                            : theme.colorScheme.outline.withValues(alpha:0.5),
                           width: 1,
                         ),
                       ),
@@ -1675,25 +1496,25 @@ class UXMapLegend extends StatelessWidget {
             
             // Safety levels
             ...[
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.green,
                 icon: Icons.verified,
                 title: 'Community Verified',
                 description: 'Dietary info verified by community',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.blue,
                 icon: Icons.check_circle,
                 title: 'Safe',
                 description: 'No known allergens or dietary conflicts',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.orange,
                 icon: Icons.warning,
                 title: 'Caution',
                 description: 'Some dietary considerations needed',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.red,
                 icon: Icons.dangerous,
                 title: 'Warning',
@@ -1732,9 +1553,9 @@ class _LegendItem extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: color.withOpacity(0.3)),
+              border: Border.all(color: color.withValues(alpha:0.3)),
             ),
             child: Icon(icon, color: color, size: 14),
           ),

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/budget_providers.dart';
 import '../providers/meal_providers.dart';
-import '../providers/photo_providers.dart';
 import '../providers/simple_providers.dart';
 import 'ux_components.dart';
 import 'ux_investment_components.dart';
@@ -39,7 +38,6 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
   Timer? _autoSaveTimer;
   bool _isSubmitting = false;
   List<PhotoResult> _selectedPhotos = [];
-  MealAnalysisResult? _aiAnalysisResult;
 
   @override
   void initState() {
@@ -408,7 +406,7 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
         vertical: UXComponents.paddingS,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha:0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Theme.of(context).colorScheme.primaryContainer,
@@ -500,10 +498,10 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
                     vertical: UXComponents.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: previewColor.withOpacity(0.1),
+                    color: previewColor.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: previewColor.withOpacity(0.3),
+                      color: previewColor.withValues(alpha:0.3),
                     ),
                   ),
                   child: Text(
@@ -612,7 +610,7 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha:0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -699,7 +697,7 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
         action: 'Reduce to \$${impact.projectedRemaining.toStringAsFixed(2)}',
       ));
       
-      suggestions.add(OptimizationSuggestion(
+      suggestions.add(const OptimizationSuggestion(
         icon: Icons.schedule,
         title: 'Plan for Next Week',
         description: 'Save this investment for next week when you have more capacity',
@@ -707,14 +705,14 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
       ));
     }
     
-    suggestions.add(OptimizationSuggestion(
+    suggestions.add(const OptimizationSuggestion(
       icon: Icons.group,
       title: 'Share the Experience',
       description: 'Split the cost with friends or family',
       action: 'Split cost in half',
     ));
     
-    suggestions.add(OptimizationSuggestion(
+    suggestions.add(const OptimizationSuggestion(
       icon: Icons.restaurant_menu,
       title: 'Choose Different Option',
       description: 'Look for menu items that offer better value',
@@ -763,10 +761,6 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
   }
 
   void _onAIAnalysisComplete(MealAnalysisResult result) {
-    setState(() {
-      _aiAnalysisResult = result;
-    });
-
     // Auto-fill form fields based on AI analysis
     if (result.confidence > 0.6) {
       // Only auto-fill if confidence is decent
@@ -839,7 +833,7 @@ class _MealEntryFormState extends ConsumerState<MealEntryForm> {
         leading: Container(
           padding: const EdgeInsets.all(UXComponents.paddingS),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+            color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(

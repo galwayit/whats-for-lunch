@@ -72,6 +72,7 @@ class MealFormState {
     return Meal(
       userId: userId,
       restaurantId: null, // Will be populated by restaurant lookup later
+      restaurantName: restaurantName.trim().isNotEmpty ? restaurantName.trim() : null,
       mealType: mealType,
       cost: cost!,
       date: date,
@@ -356,6 +357,9 @@ final budgetImpactProvider = Provider<BudgetImpact>((ref) {
   }
 
   final weeklyBudget = userPreferences.weeklyBudget;
+  if (weeklyBudget <= 0) {
+    return const BudgetImpact();
+  }
   final currentCost = formState.cost!;
   final percentageOfBudget = (currentCost / weeklyBudget) * 100;
   

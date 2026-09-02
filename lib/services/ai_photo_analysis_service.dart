@@ -26,10 +26,10 @@ class AIPhotoAnalysisService {
     try {
       final imageBytes = await _loadImageBytes(photo.localPath);
       if (imageBytes == null) {
-        throw AIPhotoAnalysisException('Could not load image file');
+        throw const AIPhotoAnalysisException('Could not load image file');
       }
 
-      final prompt = '''
+      const prompt = '''
       Please analyze this meal photo and provide the following information in JSON format:
 
       {
@@ -60,7 +60,7 @@ class AIPhotoAnalysisService {
       // Extract JSON from the response
       final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
       if (jsonMatch == null) {
-        throw AIPhotoAnalysisException('Could not parse AI response');
+        throw const AIPhotoAnalysisException('Could not parse AI response');
       }
 
       final jsonData = json.decode(jsonMatch.group(0)!);
@@ -76,10 +76,10 @@ class AIPhotoAnalysisService {
     try {
       final imageBytes = await _loadImageBytes(photo.localPath);
       if (imageBytes == null) {
-        throw AIPhotoAnalysisException('Could not load image file');
+        throw const AIPhotoAnalysisException('Could not load image file');
       }
 
-      final prompt = '''
+      const prompt = '''
       Please analyze this restaurant photo and provide the following information in JSON format:
 
       {
@@ -112,7 +112,7 @@ class AIPhotoAnalysisService {
       // Extract JSON from the response
       final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
       if (jsonMatch == null) {
-        throw AIPhotoAnalysisException('Could not parse AI response');
+        throw const AIPhotoAnalysisException('Could not parse AI response');
       }
 
       final jsonData = json.decode(jsonMatch.group(0)!);
@@ -127,7 +127,7 @@ class AIPhotoAnalysisService {
   Future<MealRecommendations> generateMealRecommendations(List<PhotoResult> mealPhotos) async {
     try {
       if (mealPhotos.isEmpty) {
-        throw AIPhotoAnalysisException('No photos provided for analysis');
+        throw const AIPhotoAnalysisException('No photos provided for analysis');
       }
 
       // Analyze multiple photos if provided
@@ -143,7 +143,7 @@ class AIPhotoAnalysisService {
       }
 
       if (analyses.isEmpty) {
-        throw AIPhotoAnalysisException('Could not analyze any of the provided photos');
+        throw const AIPhotoAnalysisException('Could not analyze any of the provided photos');
       }
 
       final prompt = '''
@@ -188,7 +188,7 @@ class AIPhotoAnalysisService {
       // Extract JSON from the response
       final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
       if (jsonMatch == null) {
-        throw AIPhotoAnalysisException('Could not parse AI response');
+        throw const AIPhotoAnalysisException('Could not parse AI response');
       }
 
       final jsonData = json.decode(jsonMatch.group(0)!);
@@ -248,7 +248,7 @@ class AIPhotoAnalysisService {
       // Extract JSON from the response
       final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
       if (jsonMatch == null) {
-        throw AIPhotoAnalysisException('Could not parse AI response');
+        throw const AIPhotoAnalysisException('Could not parse AI response');
       }
 
       final jsonData = json.decode(jsonMatch.group(0)!);

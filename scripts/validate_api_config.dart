@@ -1,6 +1,8 @@
 #!/usr/bin/env dart
+// ignore_for_file: avoid_print
 
 /// API Configuration Validation Script
+library;
 /// 
 /// This script validates the API configuration before deployment.
 /// It checks for proper API keys, security settings, and environment-specific
@@ -15,7 +17,6 @@
 ///   dart scripts/validate_api_config.dart production
 
 import 'dart:io';
-import 'dart:convert';
 
 /// Exit codes
 const int exitSuccess = 0;
@@ -51,8 +52,8 @@ class ValidationResult {
 Future<void> main(List<String> arguments) async {
   final environment = arguments.isNotEmpty ? arguments[0] : 'development';
   
-  print('${colorBold}API Configuration Validation${colorReset}');
-  print('Environment: ${colorBlue}$environment${colorReset}');
+  print('${colorBold}API Configuration Validation$colorReset');
+  print('Environment: $colorBlue$environment$colorReset');
   print('');
 
   try {
@@ -63,14 +64,14 @@ Future<void> main(List<String> arguments) async {
     
     // Exit with appropriate code
     if (result.isValid) {
-      print('${colorGreen}✓ API configuration validation passed${colorReset}');
+      print('$colorGreen✓ API configuration validation passed$colorReset');
       exit(exitSuccess);
     } else {
-      print('${colorRed}✗ API configuration validation failed${colorReset}');
+      print('$colorRed✗ API configuration validation failed$colorReset');
       exit(_getExitCode(result.errors));
     }
   } catch (e) {
-    print('${colorRed}Fatal error during validation: $e${colorReset}');
+    print('${colorRed}Fatal error during validation: $e$colorReset');
     exit(exitConfigError);
   }
 }
@@ -195,7 +196,7 @@ Map<String, dynamic> _validateGooglePlacesConfig(
 
   // Validate rate limits
   if (maxRequestsPerMinute > 100) {
-    warnings.add('Google Places rate limit is very high (${maxRequestsPerMinute}/min)');
+    warnings.add('Google Places rate limit is very high ($maxRequestsPerMinute/min)');
   }
 
   if (environment == 'production' && dailyQuotaLimit < 1000) {
@@ -566,29 +567,29 @@ String _calculateSecurityLevel(Map<String, String> config, String environment) {
 
 /// Print validation results with colors
 void _printValidationResults(ValidationResult result) {
-  print('${colorBold}Validation Results:${colorReset}');
+  print('${colorBold}Validation Results:$colorReset');
   print('');
 
   // Print errors
   if (result.errors.isNotEmpty) {
-    print('${colorRed}${colorBold}Errors (${result.errors.length}):${colorReset}');
+    print('$colorRed${colorBold}Errors (${result.errors.length}):$colorReset');
     for (final error in result.errors) {
-      print('  ${colorRed}✗ $error${colorReset}');
+      print('  $colorRed✗ $error$colorReset');
     }
     print('');
   }
 
   // Print warnings
   if (result.warnings.isNotEmpty) {
-    print('${colorYellow}${colorBold}Warnings (${result.warnings.length}):${colorReset}');
+    print('$colorYellow${colorBold}Warnings (${result.warnings.length}):$colorReset');
     for (final warning in result.warnings) {
-      print('  ${colorYellow}⚠ $warning${colorReset}');
+      print('  $colorYellow⚠ $warning$colorReset');
     }
     print('');
   }
 
   // Print summary
-  print('${colorBold}Configuration Summary:${colorReset}');
+  print('${colorBold}Configuration Summary:$colorReset');
   
   final googlePlaces = result.details['googlePlaces'] as Map<String, dynamic>? ?? {};
   final gemini = result.details['gemini'] as Map<String, dynamic>? ?? {};
@@ -602,27 +603,27 @@ void _printValidationResults(ValidationResult result) {
   
   if (result.errors.isEmpty && result.warnings.isEmpty) {
     print('');
-    print('${colorGreen}All checks passed!${colorReset}');
+    print('${colorGreen}All checks passed!$colorReset');
   }
 }
 
 /// Format status with colors
 String _formatStatus(bool isValid) {
   return isValid 
-      ? '${colorGreen}✓ Configured${colorReset}'
-      : '${colorRed}✗ Not configured${colorReset}';
+      ? '$colorGreen✓ Configured$colorReset'
+      : '$colorRed✗ Not configured$colorReset';
 }
 
 /// Format security level with colors
 String _formatSecurityLevel(String level) {
   switch (level) {
     case 'high':
-      return '${colorGreen}$level${colorReset}';
+      return '$colorGreen$level$colorReset';
     case 'medium':
-      return '${colorYellow}$level${colorReset}';
+      return '$colorYellow$level$colorReset';
     case 'basic':
     case 'low':
-      return '${colorRed}$level${colorReset}';
+      return '$colorRed$level$colorReset';
     default:
       return level;
   }

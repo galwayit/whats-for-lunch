@@ -35,7 +35,7 @@ void main() {
 
     group('AIRecommendationNotifier', () {
       test('should initialize with empty state', () {
-        final notifier = container.read(aiRecommendationProvider.notifier);
+        container.read(aiRecommendationProvider.notifier);
         final state = container.read(aiRecommendationProvider);
 
         expect(state.recommendations, isEmpty);
@@ -189,8 +189,8 @@ void main() {
 
       test('should provide investment analysis when recommendations exist', () {
         // Mock state with recommendations
-        final testRecommendation = createTestAIRecommendation();
-        
+        createTestAIRecommendation();
+
         // This would require setting up the state properly in the provider
         // For now, we'll test the logic separately
       });

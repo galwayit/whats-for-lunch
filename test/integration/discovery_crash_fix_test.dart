@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mockito/mockito.dart';
-import 'package:geolocator/geolocator.dart';
 
-import '../../lib/presentation/pages/discover_page.dart';
-import '../../lib/presentation/providers/discovery_providers.dart';
-import '../../lib/presentation/providers/simple_providers.dart' as simple;
-import '../../lib/domain/entities/restaurant.dart';
-import '../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/pages/discover_page.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/discovery_providers.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/user_preferences_provider.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/domain/repositories/user_repository.dart';
+
+/// Mock user repository for testing -- no-op DB layer
+class _TestUserRepository implements UserRepository {
+  @override
+  Future<int> createUser(UserEntity user) async => 1;
+  @override
+  Future<UserEntity?> getUserById(int id) async => null;
+  @override
+  Future<List<UserEntity>> getAllUsers() async => [];
+  @override
+  Future<bool> updateUser(UserEntity user) async => true;
+  @override
+  Future<bool> deleteUser(int id) async => true;
+}
 
 /// Critical crash fix test for List -> Map -> Refresh scenario
 /// This test validates the comprehensive fix implemented by flutter-maps-expert
@@ -16,32 +29,9 @@ import '../../lib/domain/entities/user_preferences.dart';
 void main() {
   group('Discovery Crash Fix Tests - Critical Scenario', () {
     late ProviderContainer container;
-    late List<Restaurant> testRestaurants;
     late UserPreferences testUserPreferences;
-    late Position testUserLocation;
 
     setUp(() {
-      testUserLocation = _createTestPosition(37.7749, -122.4194);
-      
-      testRestaurants = [
-        _createTestRestaurant(
-          'safe_restaurant',
-          'Safe Restaurant',
-          latitude: 37.7849,
-          longitude: -122.4194,
-          rating: 4.5,
-          priceLevel: 2,
-        ),
-        _createTestRestaurant(
-          'test_restaurant',
-          'Test Restaurant',
-          latitude: 37.7749,
-          longitude: -122.4094,
-          rating: 4.0,
-          priceLevel: 1,
-        ),
-      ];
-
       testUserPreferences = const UserPreferences(
         dietaryRestrictions: [],
         allergens: [],
@@ -51,9 +41,11 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
-          // Mock user preferences provider to avoid database dependencies
-          simple.simpleUserPreferencesProvider.overrideWith((ref) {
-            return simple.SimpleUserPreferencesNotifier()..updatePreferences(testUserPreferences);
+          // Mock user preferences using the unified provider
+          userPreferencesProvider.overrideWith((ref) {
+            final notifier = UserPreferencesNotifier(_TestUserRepository());
+            notifier.state = testUserPreferences;
+            return notifier;
           }),
         ],
       );
@@ -66,9 +58,10 @@ void main() {
     testWidgets('CRITICAL: List -> Map -> Refresh should not crash', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
-            home: const DiscoverPage(),
+          child: const MaterialApp(
+            home: DiscoverPage(),
           ),
         ),
       );
@@ -110,7 +103,7 @@ void main() {
 
       // Step 4: Verify no crash occurred and app is still responsive
       expect(tester.takeException(), isNull);
-      
+
       // Verify UI is still functional
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('List'), findsOneWidget);
@@ -129,9 +122,10 @@ void main() {
     testWidgets('Multiple rapid view switches should not crash', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
-            home: const DiscoverPage(),
+          child: const MaterialApp(
+            home: DiscoverPage(),
           ),
         ),
       );
@@ -163,9 +157,10 @@ void main() {
     testWidgets('Refresh during view transition should not crash', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
-            home: const DiscoverPage(),
+          child: const MaterialApp(
+            home: DiscoverPage(),
           ),
         ),
       );
@@ -174,7 +169,7 @@ void main() {
 
       // Start view transition
       await tester.tap(find.text('Map'));
-      
+
       // Immediately try to refresh during transition
       final refreshButton = find.byType(FloatingActionButton);
       if (refreshButton.evaluate().isNotEmpty) {
@@ -191,9 +186,10 @@ void main() {
     testWidgets('Map controller disposal should not cause crashes', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
-            home: const DiscoverPage(),
+          child: const MaterialApp(
+            home: DiscoverPage(),
           ),
         ),
       );
@@ -217,9 +213,10 @@ void main() {
     testWidgets('Error recovery should work correctly', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          // ignore: deprecated_member_use
           parent: container,
-          child: MaterialApp(
-            home: const DiscoverPage(),
+          child: const MaterialApp(
+            home: DiscoverPage(),
           ),
         ),
       );
@@ -258,7 +255,7 @@ void main() {
 
     test('setMapView should handle disposal correctly', () {
       final notifier = container.read(discoveryProvider.notifier);
-      
+
       // Switch to map view
       notifier.setMapView(true);
       expect(container.read(discoveryProvider).showMapView, true);
@@ -273,43 +270,43 @@ void main() {
 
     test('refresh during view switch should handle race conditions', () async {
       final notifier = container.read(discoveryProvider.notifier);
-      
+
       // Start a refresh
       final refreshFuture = notifier.refresh();
-      
+
       // Immediately switch views
       notifier.setMapView(true);
       notifier.setMapView(false);
-      
+
       // Wait for refresh to complete
       await refreshFuture;
-      
+
       // Should complete without errors
       expect(container.read(discoveryProvider).error, isNull);
     });
 
     test('multiple concurrent operations should not cause race conditions', () async {
       final notifier = container.read(discoveryProvider.notifier);
-      
+
       // Start multiple operations concurrently
       final futures = <Future>[];
-      
+
       // Multiple refreshes
       futures.add(notifier.refresh());
       futures.add(notifier.refresh());
-      
+
       // View switches
       notifier.setMapView(true);
       notifier.setMapView(false);
       notifier.setMapView(true);
-      
+
       // Search updates
       notifier.updateSearchQuery('test');
       notifier.updateSearchQuery('restaurant');
-      
+
       // Wait for all operations
       await Future.wait(futures);
-      
+
       // Should not throw or cause inconsistent state
       final state = container.read(discoveryProvider);
       expect(state, isNotNull);
@@ -320,21 +317,20 @@ void main() {
     testWidgets('GoogleMap widget should handle lifecycle correctly', (tester) async {
       // This test simulates the map controller lifecycle without actually
       // creating a GoogleMap (which requires API keys in tests)
-      
-      bool disposed = false;
+
       bool created = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: StatefulBuilder(
               builder: (context, setState) {
                 return Container(
-                  child: created ? 
+                  child: created ?
                     Container(
                       key: const Key('mock_map'),
                       child: const Text('Mock Map'),
-                    ) : 
+                    ) :
                     const Text('No Map'),
                 );
               },
@@ -350,7 +346,6 @@ void main() {
       expect(find.text('Mock Map'), findsOneWidget);
 
       // Simulate disposal
-      disposed = true;
       created = false;
       await tester.pump();
 
@@ -363,13 +358,13 @@ void main() {
     test('operations should handle disposal state correctly', () async {
       final container = ProviderContainer();
       final notifier = container.read(discoveryProvider.notifier);
-      
+
       // Start an async operation
       final future = notifier.getCurrentLocation();
-      
+
       // Immediately dispose
       container.dispose();
-      
+
       // Operation should complete without throwing
       await expectLater(future, completes);
     });
@@ -377,60 +372,14 @@ void main() {
     test('state updates should be safe after disposal', () async {
       final container = ProviderContainer();
       final notifier = container.read(discoveryProvider.notifier);
-      
+
       // Dispose container
       container.dispose();
-      
+
       // These should not throw even after disposal
       expect(() => notifier.setMapView(true), returnsNormally);
       expect(() => notifier.updateSearchQuery('test'), returnsNormally);
       expect(() => notifier.updateSearchRadius(10.0), returnsNormally);
     });
   });
-}
-
-// Helper functions
-Position _createTestPosition(double latitude, double longitude) {
-  return Position(
-    latitude: latitude,
-    longitude: longitude,
-    timestamp: DateTime.now(),
-    accuracy: 10.0,
-    altitude: 0.0,
-    heading: 0.0,
-    speed: 0.0,
-    speedAccuracy: 0.0,
-    altitudeAccuracy: 0.0,
-    headingAccuracy: 0.0,
-  );
-}
-
-Restaurant _createTestRestaurant(
-  String placeId,
-  String name, {
-  double? latitude,
-  double? longitude,
-  double? rating,
-  int? priceLevel,
-  String? cuisineType,
-  List<String>? dietaryRestrictions,
-  List<String>? allergenInfo,
-  bool hasVerifiedDietaryInfo = false,
-  double? distanceFromUser,
-}) {
-  return Restaurant(
-    placeId: placeId,
-    name: name,
-    location: 'Test Location',
-    latitude: latitude,
-    longitude: longitude,
-    rating: rating,
-    priceLevel: priceLevel,
-    cuisineType: cuisineType,
-    supportedDietaryRestrictions: dietaryRestrictions ?? [],
-    allergenInfo: allergenInfo ?? [],
-    hasVerifiedDietaryInfo: hasVerifiedDietaryInfo,
-    distanceFromUser: distanceFromUser,
-    cachedAt: DateTime.now(),
-  );
 }

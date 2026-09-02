@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../../lib/main.dart' as app;
-import '../../lib/presentation/pages/discover_page.dart';
-import '../../lib/presentation/widgets/dietary_filter_components.dart';
-import '../../lib/presentation/widgets/maps_components.dart';
-import '../../lib/domain/entities/user_preferences.dart';
-import '../../lib/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/main.dart' as app;
+import 'package:what_we_have_for_lunch/presentation/pages/discover_page.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/maps_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 
 /// Stage 3 Restaurant Discovery Integration Tests
 /// 
@@ -285,7 +282,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Test semantic labeling
-        final semanticsNodes = tester.binding.pipelineOwner.semanticsOwner?.rootSemanticsNode?.debugDescribeChildren() ?? [];
+        // ignore: deprecated_member_use
+        tester.binding.pipelineOwner.semanticsOwner?.rootSemanticsNode?.debugDescribeChildren();
         
         // Find interactive elements using semantics finder
         final buttonFinder = find.byType(ElevatedButton).hitTestable();

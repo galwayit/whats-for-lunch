@@ -85,7 +85,7 @@ void main() {
       });
 
       test('should sanitize HTML entities correctly', () {
-        final htmlInput = '<div>Hello & "World" \'test\'</div>';
+        const htmlInput = '<div>Hello & "World" \'test\'</div>';
         final sanitized = InputValidator.encodeHtmlEntities(htmlInput);
 
         expect(sanitized, contains('&lt;'));
@@ -212,7 +212,7 @@ void main() {
         for (final url in maliciousUrls) {
           // Test would validate URL through request interceptor
           expect(
-              url, contains(RegExp(r'[<>"\' ']|javascript:|data:|vbscript:')));
+              url, contains(RegExp(r"""[<>"' ]|javascript:|data:|vbscript:""")));
         }
       });
 

@@ -21,7 +21,7 @@ void main() {
   group('UserRepository', () {
     test('should create user successfully', () async {
       // Arrange
-      final preferences = const UserPreferences(
+      const preferences = UserPreferences(
         budgetLevel: 2,
         maxTravelDistance: 8.0,
         includeChains: true,
@@ -43,7 +43,7 @@ void main() {
 
     test('should retrieve user by id', () async {
       // Arrange
-      final preferences = const UserPreferences(
+      const preferences = UserPreferences(
         budgetLevel: 3,
         maxTravelDistance: 12.0,
         includeChains: false,
@@ -106,7 +106,7 @@ void main() {
 
     test('should update user successfully', () async {
       // Arrange
-      final initialPreferences = const UserPreferences(budgetLevel: 1);
+      const initialPreferences = UserPreferences(budgetLevel: 1);
       final user = entity.UserEntity(
         name: 'Charlie Brown',
         preferences: initialPreferences.toJson(),
@@ -117,7 +117,7 @@ void main() {
       final createdUser = await userRepository.getUserById(userId);
 
       // Act
-      final updatedPreferences = const UserPreferences(budgetLevel: 4);
+      const updatedPreferences = UserPreferences(budgetLevel: 4);
       final updatedUser = createdUser!.copyWith(
         preferences: updatedPreferences.toJson(),
       );

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../lib/presentation/widgets/dietary_filter_components.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/dietary_filter_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 
 void main() {
   group('Stage 3 Dietary Filter Components Tests', () {
@@ -22,19 +21,15 @@ void main() {
     });
 
     group('UXDietaryFilterPanel', () {
-      testWidgets('should render with correct initial state', (tester) async {
-        bool preferencesChanged = false;
-        UserPreferences? changedPreferences;
+      bool preferencesChanged = false;
 
+      testWidgets('should render with correct initial state', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: UXDietaryFilterPanel(
                 userPreferences: testUserPreferences,
-                onPreferencesChanged: (prefs) {
-                  preferencesChanged = true;
-                  changedPreferences = prefs;
-                },
+                onPreferencesChanged: (prefs) {},
               ),
             ),
           ),
@@ -144,18 +139,12 @@ void main() {
       });
 
       testWidgets('should handle minimum rating slider correctly', (tester) async {
-        bool preferencesChanged = false;
-        UserPreferences? changedPreferences;
-
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: UXDietaryFilterPanel(
                 userPreferences: testUserPreferences,
-                onPreferencesChanged: (prefs) {
-                  preferencesChanged = true;
-                  changedPreferences = prefs;
-                },
+                onPreferencesChanged: (prefs) {},
               ),
             ),
           ),
@@ -263,9 +252,7 @@ void main() {
 
     group('UXAllergenSelector', () {
       testWidgets('should render allergen with correct safety indicators', (tester) async {
-        final allergenInfo = AllergenInfo('peanuts', 'Peanuts', AllergenSafetyLevel.severe);
-        bool toggleCalled = false;
-        bool safetyLevelChanged = false;
+        const allergenInfo = AllergenInfo('peanuts', 'Peanuts', AllergenSafetyLevel.severe);
 
         await tester.pumpWidget(
           MaterialApp(
@@ -274,8 +261,8 @@ void main() {
                 allergen: allergenInfo,
                 isSelected: false,
                 currentSafetyLevel: AllergenSafetyLevel.severe,
-                onToggled: (selected) => toggleCalled = true,
-                onSafetyLevelChanged: (level) => safetyLevelChanged = true,
+                onToggled: (selected) {},
+                onSafetyLevelChanged: (level) {},
               ),
             ),
           ),
@@ -293,7 +280,7 @@ void main() {
       });
 
       testWidgets('should show safety level selector when selected', (tester) async {
-        final allergenInfo = AllergenInfo('dairy', 'Dairy', AllergenSafetyLevel.moderate);
+        const allergenInfo = AllergenInfo('dairy', 'Dairy', AllergenSafetyLevel.moderate);
 
         await tester.pumpWidget(
           MaterialApp(
@@ -320,7 +307,7 @@ void main() {
       });
 
       testWidgets('should not show safety level selector when not selected', (tester) async {
-        final allergenInfo = AllergenInfo('dairy', 'Dairy', AllergenSafetyLevel.moderate);
+        const allergenInfo = AllergenInfo('dairy', 'Dairy', AllergenSafetyLevel.moderate);
 
         await tester.pumpWidget(
           MaterialApp(
@@ -376,7 +363,7 @@ void main() {
 
     group('UXFilterSummary', () {
       testWidgets('should show no filters message when no filters applied', (tester) async {
-        final emptyPrefs = UserPreferences();
+        const emptyPrefs = UserPreferences();
 
         await tester.pumpWidget(
           MaterialApp(
@@ -522,7 +509,7 @@ void main() {
 
         final filterChips = find.byType(FilterChip);
         for (int i = 0; i < filterChips.evaluate().length; i++) {
-          final chipWidget = tester.widget<FilterChip>(filterChips.at(i));
+          tester.widget<FilterChip>(filterChips.at(i));
           final renderBox = tester.renderObject<RenderBox>(filterChips.at(i));
           
           // Verify minimum touch target size (44x44 logical pixels)
@@ -566,7 +553,7 @@ void main() {
       testWidgets('should handle null preferences gracefully', (tester) async {
         // This would test null safety, but our component requires non-null preferences
         // Instead, test with minimal preferences
-        final minimalPrefs = UserPreferences();
+        const minimalPrefs = UserPreferences();
 
         await tester.pumpWidget(
           MaterialApp(

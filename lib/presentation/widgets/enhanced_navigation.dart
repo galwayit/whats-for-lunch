@@ -1,21 +1,21 @@
-import 'dart:math';
+import 'dart:math' show pi;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../core/accessibility/accessibility_utils.dart';
-import '../../core/accessibility/focus_manager.dart';
 import '../../core/constants/app_routes.dart';
-import '../../core/responsive/responsive_utils.dart';
-import '../providers/budget_providers.dart';
-import '../providers/simple_providers.dart';
 import 'ux_components.dart';
 
-/// Enhanced bottom navigation bar with contextual badges and smooth animations
-/// Follows UX advisor requirements for thumb-friendly design and engagement
-class EnhancedBottomNavigation extends ConsumerStatefulWidget {
+/// Bottom navigation bar with frosted glass styling and clean tab design.
+///
+/// Matches the template design: white/80 backdrop-blur container with a subtle
+/// top border. Active tabs use a green-tinted rounded container with filled
+/// icons; inactive tabs use outlined icons at reduced opacity.
+class EnhancedBottomNavigation extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int>? onTap;
 
@@ -25,288 +25,167 @@ class EnhancedBottomNavigation extends ConsumerStatefulWidget {
     this.onTap,
   });
 
-  @override
-  ConsumerState<EnhancedBottomNavigation> createState() => _EnhancedBottomNavigationState();
-}
+  // Design tokens
+  static const Color _primaryGreen = Color(0xFF2F7F3F);
+  static const Color _brownText = Color(0xFF6B4E3D);
 
-class _EnhancedBottomNavigationState extends ConsumerState<EnhancedBottomNavigation>
-    with TickerProviderStateMixin {
-  late AnimationController _badgeAnimationController;
-  late AnimationController _selectionAnimationController;
-  late List<AnimationController> _iconAnimationControllers;
-  
+  /// Navigation items configuration.
+  static const List<_NavItemData> _items = [
+    _NavItemData(
+      outlinedIcon: Icons.home_outlined,
+      filledIcon: Icons.home,
+      label: 'Home',
+      route: AppRoutes.home,
+    ),
+    _NavItemData(
+      outlinedIcon: Icons.explore_outlined,
+      filledIcon: Icons.explore,
+      label: 'Discover',
+      route: AppRoutes.discover,
+    ),
+    _NavItemData(
+      outlinedIcon: Icons.analytics_outlined,
+      filledIcon: Icons.analytics,
+      label: 'Track',
+      route: AppRoutes.track,
+    ),
+    _NavItemData(
+      outlinedIcon: Icons.person_outline,
+      filledIcon: Icons.person,
+      label: 'Profile',
+      route: AppRoutes.profile,
+    ),
+  ];
+
   @override
-  void initState() {
-    super.initState();
-    
-    _badgeAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    
-    _selectionAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    
-    // Create individual animation controllers for each navigation item
-    _iconAnimationControllers = List.generate(
-      4,
-      (index) => AnimationController(
-        duration: const Duration(milliseconds: 200),
-        vsync: this,
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.8),
+            border: Border(
+              top: BorderSide(
+                color: _brownText.withValues(alpha: 0.05),
+                width: 1,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 16,
+                bottom: 8,
+              ),
+              child: Row(
+                children: List.generate(_items.length, (index) {
+                  return Expanded(
+                    child: _NavItem(
+                      data: _items[index],
+                      isSelected: currentIndex == index,
+                      onTap: () => _navigateToPage(context, index),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
       ),
     );
-    
-    // Start badge animation
-    _badgeAnimationController.repeat(reverse: true);
   }
 
-  @override
-  void didUpdateWidget(EnhancedBottomNavigation oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentIndex != widget.currentIndex) {
-      _selectionAnimationController.forward().then((_) {
-        _selectionAnimationController.reverse();
-      });
+  void _navigateToPage(BuildContext context, int index) {
+    if (currentIndex != index) {
+      onTap?.call(index);
+      context.go(_items[index].route);
     }
   }
+}
 
-  @override
-  void dispose() {
-    _badgeAnimationController.dispose();
-    _selectionAnimationController.dispose();
-    for (final controller in _iconAnimationControllers) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
+/// Data class for a single navigation item.
+class _NavItemData {
+  final IconData outlinedIcon;
+  final IconData filledIcon;
+  final String label;
+  final String route;
+
+  const _NavItemData({
+    required this.outlinedIcon,
+    required this.filledIcon,
+    required this.label,
+    required this.route,
+  });
+}
+
+/// A single tab item inside the bottom navigation bar.
+///
+/// Active state: green bg at 10% opacity, rounded-2xl container, filled icon,
+/// green text. Inactive state: outlined icon, brown text at 50% opacity.
+class _NavItem extends StatelessWidget {
+  final _NavItemData data;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.data,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final weeklyInvestment = ref.watch(weeklyInvestmentProvider);
-    final achievementState = ref.watch(achievementProvider);
-    
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
+    const activeColor = EnhancedBottomNavigation._primaryGreen;
+    final inactiveColor =
+        EnhancedBottomNavigation._brownText.withValues(alpha: 0.5);
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '${data.label} navigation item',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? activeColor.withValues(alpha: 0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildNavItem(
-                context,
-                0,
-                Icons.home_outlined,
-                Icons.home_rounded,
-                'Home',
-                badgeCount: null,
-                onTap: () => _navigateToPage(context, AppRoutes.home, 0),
+              Icon(
+                isSelected ? data.filledIcon : data.outlinedIcon,
+                size: 24,
+                color: isSelected ? activeColor : inactiveColor,
               ),
-              _buildNavItem(
-                context,
-                1,
-                Icons.explore_outlined,
-                Icons.explore,
-                'Discover',
-                badgeCount: null,
-                onTap: () => _navigateToPage(context, AppRoutes.discover, 1),
-              ),
-              _buildNavItem(
-                context,
-                2,
-                Icons.add_circle_outline,
-                Icons.add_circle,
-                'Track',
-                badgeCount: weeklyInvestment.remainingCapacity > 0 ? null : 0,
-                badgeColor: weeklyInvestment.remainingCapacity <= 0 ? Colors.red : null,
-                showPulseBadge: weeklyInvestment.remainingCapacity <= 20,
-                onTap: () => _navigateToPage(context, AppRoutes.track, 2),
-              ),
-              _buildNavItem(
-                context,
-                3,
-                Icons.person_outline,
-                Icons.person,
-                'Profile',
-                badgeCount: achievementState.unlockedAchievements.isNotEmpty && 
-                          achievementState.latestAchievement != null ? 1 : null,
-                badgeColor: Colors.amber,
-                onTap: () => _navigateToPage(context, AppRoutes.profile, 3),
+              const SizedBox(height: 4),
+              Text(
+                data.label.toUpperCase(),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.6,
+                  color: isSelected ? activeColor : inactiveColor,
+                ),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildNavItem(
-    BuildContext context,
-    int index,
-    IconData outlinedIcon,
-    IconData filledIcon,
-    String label,
-    {
-    int? badgeCount,
-    Color? badgeColor,
-    bool showPulseBadge = false,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-    final isSelected = widget.currentIndex == index;
-    
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: '$label navigation item',
-      child: GestureDetector(
-        onTapDown: (_) {
-          _iconAnimationControllers[index].forward();
-          HapticFeedback.lightImpact();
-        },
-        onTapUp: (_) {
-          _iconAnimationControllers[index].reverse();
-          onTap();
-        },
-        onTapCancel: () {
-          _iconAnimationControllers[index].reverse();
-        },
-        child: AnimatedBuilder(
-          animation: Listenable.merge([
-            _iconAnimationControllers[index],
-            _selectionAnimationController,
-          ]),
-          builder: (context, child) {
-            final scaleValue = 1.0 - (_iconAnimationControllers[index].value * 0.1);
-            final selectionScale = isSelected ? 1.0 + (_selectionAnimationController.value * 0.1) : 1.0;
-            
-            return Transform.scale(
-              scale: scaleValue * selectionScale,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: isSelected
-                      ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-                      : Colors.transparent,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          isSelected ? filledIcon : outlinedIcon,
-                          size: 28,
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurfaceVariant,
-                        ),
-                        
-                        // Badge
-                        if (badgeCount != null)
-                          Positioned(
-                            right: -6,
-                            top: -6,
-                            child: _buildBadge(
-                              badgeCount,
-                              badgeColor ?? theme.colorScheme.error,
-                              showPulseBadge,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      label,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(int count, Color color, bool shouldPulse) {
-    return AnimatedBuilder(
-      animation: _badgeAnimationController,
-      builder: (context, child) {
-        final pulseScale = shouldPulse 
-            ? 1.0 + (_badgeAnimationController.value * 0.2)
-            : 1.0;
-            
-        return Transform.scale(
-          scale: pulseScale,
-          child: Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: shouldPulse
-                  ? [
-                      BoxShadow(
-                        color: color.withOpacity(0.6),
-                        blurRadius: 4,
-                        spreadRadius: _badgeAnimationController.value * 2,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: count > 0
-                ? Center(
-                    child: Text(
-                      count > 99 ? '99+' : count.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                : Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _navigateToPage(BuildContext context, String route, int index) {
-    if (widget.currentIndex != index) {
-      widget.onTap?.call(index);
-      context.go(route);
-    }
   }
 }
 
@@ -401,7 +280,7 @@ class _EnhancedFloatingActionButtonState extends State<EnhancedFloatingActionBut
                 return GestureDetector(
                   onTap: _toggleMenu,
                   child: Container(
-                    color: Colors.black.withOpacity(0.3 * _menuAnimation.value),
+                    color: Colors.black.withValues(alpha:0.3 * _menuAnimation.value),
                   ),
                 );
               },
@@ -511,7 +390,7 @@ class _EnhancedFloatingActionButtonState extends State<EnhancedFloatingActionBut
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha:0.1),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -540,7 +419,7 @@ class _EnhancedFloatingActionButtonState extends State<EnhancedFloatingActionBut
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: item.color.withOpacity(0.3),
+                                color: item.color.withValues(alpha:0.3),
                                 blurRadius: 8,
                                 spreadRadius: 2,
                               ),
@@ -643,7 +522,7 @@ class EnhancedAppBar extends StatelessWidget implements PreferredSizeWidget {
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 child: CircularProgressIndicator(
                   value: investmentProgress,
-                  backgroundColor: theme.colorScheme.outline.withOpacity(0.2),
+                  backgroundColor: theme.colorScheme.outline.withValues(alpha:0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(
                     _getProgressColor(investmentProgress!),
                   ),
@@ -722,7 +601,7 @@ class QuickActionShortcuts extends StatelessWidget {
             color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: action.color.withOpacity(0.2),
+              color: action.color.withValues(alpha:0.2),
             ),
           ),
           child: Column(
@@ -731,7 +610,7 @@ class QuickActionShortcuts extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: action.color.withOpacity(0.1),
+                  color: action.color.withValues(alpha:0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

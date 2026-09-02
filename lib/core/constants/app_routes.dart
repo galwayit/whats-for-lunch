@@ -10,4 +10,5 @@ class AppRoutes {
   static const String aiRecommendations = '/ai-recommendations';
   static const String mealHistory = '/meal-history';
   static const String editMeal = '/edit-meal';
+  static const String restaurantDetail = '/restaurant';
 }

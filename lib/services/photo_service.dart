@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
@@ -52,7 +50,7 @@ class PhotoService {
     try {
       // Check camera permission
       if (!await requestCameraPermission()) {
-        throw PhotoException('Camera permission denied');
+        throw const PhotoException('Camera permission denied');
       }
 
       // Capture image
@@ -88,7 +86,7 @@ class PhotoService {
     try {
       // Check photo permission
       if (!await requestPhotoPermission()) {
-        throw PhotoException('Photo library permission denied');
+        throw const PhotoException('Photo library permission denied');
       }
 
       // Select image
@@ -124,7 +122,7 @@ class PhotoService {
     try {
       // Check photo permission
       if (!await requestPhotoPermission()) {
-        throw PhotoException('Photo library permission denied');
+        throw const PhotoException('Photo library permission denied');
       }
 
       // Select multiple images
@@ -169,13 +167,13 @@ class PhotoService {
       
       // Check file size
       if (imageBytes.length > _maxFileSizeBytes) {
-        throw PhotoException('Image file is too large (max 5MB)');
+        throw const PhotoException('Image file is too large (max 5MB)');
       }
 
       // Decode and process image
       final img.Image? originalImage = img.decodeImage(imageBytes);
       if (originalImage == null) {
-        throw PhotoException('Invalid image format');
+        throw const PhotoException('Invalid image format');
       }
 
       // Resize if necessary
@@ -190,7 +188,7 @@ class PhotoService {
 
       // Generate unique filename
       final String photoId = _generatePhotoId();
-      final String fileName = '${photoId}_${photoType}.jpg';
+      final String fileName = '${photoId}_$photoType.jpg';
 
       // Get app documents directory
       final Directory appDir = await getApplicationDocumentsDirectory();

@@ -208,7 +208,6 @@ You are a food recommendation AI that helps users make investment-minded dining 
 Your task is to recommend the best restaurants from the available options based on user context.
 
 USER CONTEXT:
-- User ID: ${request.userId}
 - Current meal type: ${context.currentMealType}
 - Budget range: ${context.budgetRange}
 - Dietary preferences: ${json.encode(context.dietaryPreferences)}
@@ -291,9 +290,15 @@ Focus on providing clear reasoning that builds trust and explains the value prop
       for (final rec in recommendations) {
         final placeId = rec['placeId'] as String;
         final restaurant = request.availableRestaurants
-            .firstWhere((r) => r.placeId == placeId);
+            .cast<Restaurant?>()
+            .firstWhere((r) => r!.placeId == placeId, orElse: () => null);
+
+        if (restaurant == null) {
+          // Skip restaurants that the AI hallucinated or that are no longer available
+          continue;
+        }
         recommendedRestaurants.add(restaurant);
-        
+
         // Extract factor weights from first recommendation
         if (factorWeights.isEmpty && rec['factorScores'] != null) {
           final factors = rec['factorScores'] as Map<String, dynamic>;
@@ -506,7 +511,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
     if (_monitoringService == null || !ApiConfig.enableUsageMonitoring) return;
 
     try {
-      await _monitoringService!.recordRequest(
+      await _monitoringService.recordRequest(
         service: 'gemini',
         endpoint: 'generateContent',
         requestData: {
@@ -520,7 +525,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
       );
     } catch (e) {
       if (ApiConfig.enableDebugLogging) {
-        print('Failed to record AI request: $e');
+        debugPrint('Failed to record AI request: $e');
       }
     }
   }
@@ -534,7 +539,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
     if (_monitoringService == null || !ApiConfig.enableUsageMonitoring) return;
 
     try {
-      await _monitoringService!.recordResponse(
+      await _monitoringService.recordResponse(
         service: 'gemini',
         endpoint: 'generateContent',
         success: true,
@@ -547,7 +552,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
       );
     } catch (e) {
       if (ApiConfig.enableDebugLogging) {
-        print('Failed to record AI success response: $e');
+        debugPrint('Failed to record AI success response: $e');
       }
     }
   }
@@ -561,7 +566,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
     if (_monitoringService == null || !ApiConfig.enableUsageMonitoring) return;
 
     try {
-      await _monitoringService!.recordError(
+      await _monitoringService.recordError(
         service: 'gemini',
         endpoint: 'generateContent',
         error: error,
@@ -574,7 +579,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
       );
     } catch (e) {
       if (ApiConfig.enableDebugLogging) {
-        print('Failed to record AI error: $e');
+        debugPrint('Failed to record AI error: $e');
       }
     }
   }
@@ -584,7 +589,7 @@ Focus on providing clear reasoning that builds trust and explains the value prop
     if (_monitoringService == null || !ApiConfig.enableUsageMonitoring) return;
 
     try {
-      await _monitoringService!.recordResponse(
+      await _monitoringService.recordResponse(
         service: 'gemini',
         endpoint: 'generateContent',
         success: true,
@@ -597,25 +602,9 @@ Focus on providing clear reasoning that builds trust and explains the value prop
       );
     } catch (e) {
       if (ApiConfig.enableDebugLogging) {
-        print('Failed to record AI cache hit: $e');
+        debugPrint('Failed to record AI cache hit: $e');
       }
     }
   }
 
-  /// Record rate limit hit
-  Future<void> _recordRateLimitHit(String reason, Duration? retryAfter) async {
-    if (_monitoringService == null || !ApiConfig.enableUsageMonitoring) return;
-
-    try {
-      await _monitoringService!.recordRateLimitHit(
-        service: 'gemini',
-        reason: reason,
-        retryAfter: retryAfter,
-      );
-    } catch (e) {
-      if (ApiConfig.enableDebugLogging) {
-        print('Failed to record AI rate limit: $e');
-      }
-    }
-  }
 }

@@ -61,8 +61,6 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(UXComponents.paddingL),
@@ -99,7 +97,7 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
         Container(
           padding: const EdgeInsets.all(UXComponents.paddingS),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+            color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
@@ -179,8 +177,8 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  Theme.of(context).colorScheme.primary.withValues(alpha:0.3),
+                  Theme.of(context).colorScheme.primary.withValues(alpha:0.1),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -192,7 +190,7 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
             LineChartBarData(
               spots: List.generate(7, (index) => FlSpot(index.toDouble(), widget.weeklyBudget / 7)),
               isCurved: false,
-              color: Colors.red.withOpacity(0.7),
+              color: Colors.red.withValues(alpha:0.7),
               barWidth: 2,
               isStrokeCapRound: true,
               dashArray: [5, 3],
@@ -246,7 +244,7 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
           horizontalInterval: _getMaxYValue(weeklyData) / 5,
           getDrawingHorizontalLine: (value) {
             return FlLine(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
               strokeWidth: 1,
             );
           },
@@ -361,7 +359,7 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
           horizontalInterval: _getMaxYValue(monthlyData) / 5,
           getDrawingHorizontalLine: (value) {
             return FlLine(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
               strokeWidth: 1,
             );
           },
@@ -416,7 +414,7 @@ class _InvestmentSpendingChartState extends State<InvestmentSpendingChart>
         if (widget.weeklyBudget > 0 && widget.timeframe == 'week')
           _buildLegendItem(
             context,
-            Colors.red.withOpacity(0.7),
+            Colors.red.withValues(alpha:0.7),
             'Budget Line',
           ),
       ],
@@ -548,7 +546,7 @@ class _MealCategoryChartState extends State<MealCategoryChart>
                 Container(
                   padding: const EdgeInsets.all(UXComponents.paddingS),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withOpacity(0.3),
+                    color: theme.colorScheme.secondaryContainer.withValues(alpha:0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -854,7 +852,7 @@ class _InvestmentROIChartState extends State<InvestmentROIChart>
                 Container(
                   padding: const EdgeInsets.all(UXComponents.paddingS),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -924,8 +922,8 @@ class _InvestmentROIChartState extends State<InvestmentROIChart>
                             show: true,
                             gradient: LinearGradient(
                               colors: [
-                                Colors.green.withOpacity(0.3),
-                                Colors.green.withOpacity(0.1),
+                                Colors.green.withValues(alpha:0.3),
+                                Colors.green.withValues(alpha:0.1),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -978,7 +976,7 @@ class _InvestmentROIChartState extends State<InvestmentROIChart>
                         horizontalInterval: _getMaxROI(roiData) / 5,
                         getDrawingHorizontalLine: (value) {
                           return FlLine(
-                            color: theme.colorScheme.outline.withOpacity(0.2),
+                            color: theme.colorScheme.outline.withValues(alpha:0.2),
                             strokeWidth: 1,
                           );
                         },
@@ -1019,7 +1017,7 @@ class _InvestmentROIChartState extends State<InvestmentROIChart>
             Container(
               padding: const EdgeInsets.all(UXComponents.paddingM),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(

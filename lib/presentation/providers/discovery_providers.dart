@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -8,7 +7,6 @@ import '../../domain/entities/restaurant.dart';
 import '../../domain/entities/user_preferences.dart';
 import '../../data/repositories/restaurant_repository_impl.dart';
 import '../../data/mappers/entity_mappers.dart';
-import '../../core/services/logging_service.dart';
 import 'database_provider.dart';
 import 'simple_providers.dart' as simple;
 
@@ -150,12 +148,12 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
       );
 
       // Update user preferences with location
-      final userPrefs = _ref.read(simple.simpleUserPreferencesProvider);
+      final userPrefs = _ref.read(simple.userPreferencesProvider);
       if (userPrefs != null) {
         final updatedPrefs = userPrefs.copyWith(
           lastKnownLocation: [position.latitude, position.longitude],
         );
-        _ref.read(simple.simpleUserPreferencesProvider.notifier).updatePreferences(updatedPrefs);
+        _ref.read(simple.userPreferencesProvider.notifier).updatePreferences(updatedPrefs);
       }
 
     } catch (e) {
@@ -193,7 +191,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
 
     try {
       final database = _ref.read(databaseProvider);
-      final userPrefs = _ref.read(simple.simpleUserPreferencesProvider);
+      final userPrefs = _ref.read(simple.userPreferencesProvider);
       
       List<Restaurant> restaurants;
 
@@ -396,7 +394,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
 
   /// Apply quick dietary filter
   void applyQuickFilter(String filterName) {
-    final userPrefs = _ref.read(simple.simpleUserPreferencesProvider);
+    final userPrefs = _ref.read(simple.userPreferencesProvider);
     if (userPrefs == null) return;
 
     UserPreferences updatedPrefs;
@@ -425,7 +423,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
         return;
     }
 
-    _ref.read(simple.simpleUserPreferencesProvider.notifier).updatePreferences(updatedPrefs);
+    _ref.read(simple.userPreferencesProvider.notifier).updatePreferences(updatedPrefs);
     
     // Re-filter restaurants with new preferences
     final filteredRestaurants = _applyUserPreferenceFilters(state.restaurants, updatedPrefs);
@@ -434,7 +432,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
 
   /// Clear all filters
   void clearAllFilters() {
-    final userPrefs = _ref.read(simple.simpleUserPreferencesProvider);
+    final userPrefs = _ref.read(simple.userPreferencesProvider);
     if (userPrefs == null) return;
 
     final clearedPrefs = userPrefs.copyWith(
@@ -444,22 +442,33 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
       minimumRating: 1.0,
     );
 
-    _ref.read(simple.simpleUserPreferencesProvider.notifier).updatePreferences(clearedPrefs);
+    _ref.read(simple.userPreferencesProvider.notifier).updatePreferences(clearedPrefs);
     
     state = state.copyWith(filteredRestaurants: state.restaurants);
   }
 
-  /// Track user discovery history for personalization
+  /// Track user discovery history for personalization.
+  /// Records 'viewed' interactions for the top results so the AI
+  /// recommendation system can learn which restaurants appear frequently.
   Future<void> _trackDiscoveryHistory(String query, List<Restaurant> results) async {
     try {
-      final database = _ref.read(databaseProvider);
-      final userPrefs = _ref.read(simple.simpleUserPreferencesProvider);
-      
-      if (userPrefs == null) return;
+      final userId = _ref.read(simple.currentUserIdProvider);
+      if (userId == null) return;
 
-      // For now, just track the search - in production would track more detailed analytics
+      final db = _ref.read(databaseProvider);
+
+      // Track the top 5 viewed restaurants to avoid flooding the table
+      for (final restaurant in results.take(5)) {
+        await db.recordRestaurantInteraction(
+          userId: userId,
+          placeId: restaurant.placeId,
+          restaurantName: restaurant.name,
+          interactionType: 'viewed',
+          context: '{"query": "$query"}',
+        );
+      }
     } catch (e) {
-      // Failed to track discovery history, continue silently
+      // Non-critical -- don't block search results for tracking failures
     }
   }
 
@@ -536,7 +545,7 @@ class LocationService {
 
 /// Restaurant repository provider
 final restaurantRepositoryProvider = Provider<RestaurantRepositoryImpl>((ref) {
-  final database = ref.read(databaseProvider);
+  final database = ref.watch(databaseProvider);
   return RestaurantRepositoryImpl(database);
 });
 
@@ -621,9 +630,8 @@ class FavoriteRestaurantsNotifier extends StateNotifier<Set<String>> {
   /// Load favorites from storage
   Future<void> _loadFavorites() async {
     try {
-      final database = _ref.read(databaseProvider);
       final currentUserId = _ref.read(simple.currentUserIdProvider);
-      
+
       if (currentUserId == null) return;
 
       // In a real implementation, this would load from user favorites table
@@ -636,9 +644,8 @@ class FavoriteRestaurantsNotifier extends StateNotifier<Set<String>> {
   /// Add restaurant to favorites
   Future<void> addFavorite(String placeId) async {
     try {
-      final database = _ref.read(databaseProvider);
       final currentUserId = _ref.read(simple.currentUserIdProvider);
-      
+
       if (currentUserId == null) return;
 
       // Update in-memory state
@@ -654,9 +661,8 @@ class FavoriteRestaurantsNotifier extends StateNotifier<Set<String>> {
   /// Remove restaurant from favorites
   Future<void> removeFavorite(String placeId) async {
     try {
-      final database = _ref.read(databaseProvider);
       final currentUserId = _ref.read(simple.currentUserIdProvider);
-      
+
       if (currentUserId == null) return;
 
       // Update in-memory state

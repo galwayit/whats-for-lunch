@@ -1,9 +1,9 @@
+// ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:what_we_have_for_lunch/presentation/pages/budget_setup_page.dart';
-import 'package:what_we_have_for_lunch/presentation/providers/budget_providers.dart';
 
 void main() {
   group('Budget Setup Integration Tests', () {
@@ -15,9 +15,9 @@ void main() {
       final stopwatch = Stopwatch()..start();
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -78,9 +78,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -149,9 +149,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -185,9 +185,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -220,9 +220,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -269,9 +269,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -306,9 +306,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -356,9 +356,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );
@@ -400,9 +400,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
-            home: const BudgetSetupPage(),
+            home: BudgetSetupPage(),
           ),
         ),
       );

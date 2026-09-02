@@ -1,5 +1,3 @@
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:what_we_have_for_lunch/data/database/database.dart';
 import 'package:what_we_have_for_lunch/data/mappers/entity_mappers.dart';
@@ -24,7 +22,7 @@ void main() {
   group('User Operations', () {
     test('should create and retrieve user', () async {
       // Arrange
-      final preferences = const UserPreferences(
+      const preferences = UserPreferences(
         budgetLevel: 3,
         maxTravelDistance: 10.0,
         includeChains: false,
@@ -48,7 +46,7 @@ void main() {
 
     test('should update user preferences', () async {
       // Arrange
-      final initialPreferences = const UserPreferences(budgetLevel: 2);
+      const initialPreferences = UserPreferences(budgetLevel: 2);
       final user = entity.UserEntity(
         name: 'Jane Doe',
         preferences: initialPreferences.toJson(),
@@ -58,7 +56,7 @@ void main() {
       final userId = await database.insertUser(EntityMappers.userToCompanion(user));
 
       // Act
-      final updatedPreferences = const UserPreferences(budgetLevel: 4);
+      const updatedPreferences = UserPreferences(budgetLevel: 4);
       final updatedUser = entity.UserEntity(
         id: userId,
         name: 'Jane Doe',
@@ -278,7 +276,7 @@ void main() {
   group('Entity Conversion', () {
     test('should convert user entity to companion and back', () async {
       // Arrange
-      final preferences = const UserPreferences(
+      const preferences = UserPreferences(
         budgetLevel: 3,
         maxTravelDistance: 15.0,
         includeChains: true,
@@ -321,7 +319,7 @@ void main() {
 
       // Act
       final companion = EntityMappers.mealToCompanion(originalMeal);
-      final mealId = await database.insertMeal(companion);
+      await database.insertMeal(companion);
       final retrievedMeals = await database.getMealsByUserId(userId);
       final convertedMeal = EntityMappers.mealFromDatabase(retrievedMeals.first);
 

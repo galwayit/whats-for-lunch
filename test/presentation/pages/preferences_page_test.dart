@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../lib/domain/entities/user.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
-import '../../../lib/domain/repositories/user_repository.dart';
-import '../../../lib/presentation/pages/preferences_page.dart';
-import '../../../lib/presentation/providers/simple_providers.dart';
-import '../../../lib/presentation/providers/user_preferences_provider.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/domain/repositories/user_repository.dart';
+import 'package:what_we_have_for_lunch/presentation/pages/preferences_page.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/user_preferences_provider.dart';
 
 void main() {
   group('PreferencesPage Tests', () {
@@ -17,16 +16,18 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWith((ref) => 1),
-            simpleUserPreferencesProvider.overrideWith((ref) {
-              return SimpleUserPreferencesNotifier()..state = const UserPreferences(
+            userPreferencesProvider.overrideWith((ref) {
+              final notifier = UserPreferencesNotifier(TestUserRepository());
+              notifier.state = const UserPreferences(
                 budgetLevel: 2,
                 maxTravelDistance: 5.0,
                 includeChains: true,
               );
+              return notifier;
             }),
           ],
-          child: MaterialApp(
-            home: const PreferencesPage(),
+          child: const MaterialApp(
+            home: PreferencesPage(),
           ),
         ),
       );
@@ -36,22 +37,22 @@ void main() {
 
       // Verify that the page loads without showing loading indicator indefinitely
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      
+
       // Verify that the content is shown
       expect(find.text('Budget Preferences'), findsOneWidget);
       expect(find.text('Location Preferences'), findsOneWidget);
       expect(find.text('Restaurant Preferences'), findsOneWidget);
-      
+
       // Verify that budget level controls are present
       expect(find.text('\$\$'), findsOneWidget); // Budget level 2
-      
+
       // Verify that sliders are present
       expect(find.byType(Slider), findsAtLeast(2));
-      
+
       // Verify that the save button is enabled
       final saveButton = find.text('Save');
       expect(saveButton, findsOneWidget);
-      
+
       final saveWidget = tester.widget<TextButton>(
         find.ancestor(of: saveButton, matching: find.byType(TextButton))
       );
@@ -64,19 +65,21 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWith((ref) => null),
-            simpleUserPreferencesProvider.overrideWith((ref) {
-              return SimpleUserPreferencesNotifier()..state = null;
+            userPreferencesProvider.overrideWith((ref) {
+              final notifier = UserPreferencesNotifier(TestUserRepository());
+              // Leave state as null to test the fallback
+              return notifier;
             }),
           ],
-          child: MaterialApp(
-            home: const PreferencesPage(),
+          child: const MaterialApp(
+            home: PreferencesPage(),
           ),
         ),
       );
 
       // Show loading initially
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      
+
       // Allow async operations to complete
       await tester.pumpAndSettle();
 
@@ -90,8 +93,8 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWith((ref) => 1),
-            simpleUserPreferencesProvider.overrideWith((ref) {
-              final notifier = SimpleUserPreferencesNotifier();
+            userPreferencesProvider.overrideWith((ref) {
+              final notifier = UserPreferencesNotifier(TestUserRepository());
               notifier.state = const UserPreferences(
                 budgetLevel: 2,
                 maxTravelDistance: 5.0,
@@ -100,8 +103,8 @@ void main() {
               return notifier;
             }),
           ],
-          child: MaterialApp(
-            home: const PreferencesPage(),
+          child: const MaterialApp(
+            home: PreferencesPage(),
           ),
         ),
       );
@@ -111,7 +114,7 @@ void main() {
       // Verify that the save button is present and enabled
       final saveButton = find.text('Save');
       expect(saveButton, findsOneWidget);
-      
+
       final saveWidget = tester.widget<TextButton>(
         find.ancestor(of: saveButton, matching: find.byType(TextButton))
       );
@@ -123,7 +126,7 @@ void main() {
 // Test helper class
 class TestUserPreferencesNotifier extends UserPreferencesNotifier {
   final VoidCallback onUpdate;
-  
+
   TestUserPreferencesNotifier(this.onUpdate) : super(TestUserRepository());
 
   @override

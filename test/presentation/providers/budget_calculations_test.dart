@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:flutter_test/flutter_test.dart';
 import 'package:what_we_have_for_lunch/domain/entities/meal.dart';
 import 'package:what_we_have_for_lunch/presentation/providers/budget_providers.dart';
@@ -74,7 +75,7 @@ void main() {
       
       const projectedSpent = currentSpent + mealCost; // 45.0
       const projectedRemaining = weeklyCapacity - projectedSpent; // 155.0
-      const capacityAfterMeal = projectedSpent / weeklyCapacity; // 0.225
+      // capacityAfterMeal = projectedSpent / weeklyCapacity = 0.225
 
       // Act
       const impact = InvestmentImpact(
@@ -100,11 +101,10 @@ void main() {
       // Arrange
       const mealCost = 60.0;
       const currentSpent = 150.0;
-      const weeklyCapacity = 200.0;
       
       const projectedSpent = currentSpent + mealCost; // 210.0
       const projectedRemaining = 0.0; // Clamped to 0
-      const capacityAfterMeal = projectedSpent / weeklyCapacity; // 1.05
+      // capacityAfterMeal = projectedSpent / weeklyCapacity = 1.05
 
       // Act
       const impact = InvestmentImpact(

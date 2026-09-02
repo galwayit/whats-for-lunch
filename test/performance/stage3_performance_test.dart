@@ -1,15 +1,14 @@
+// ignore_for_file: avoid_print
 import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../lib/domain/entities/restaurant.dart';
-import '../../lib/domain/entities/user_preferences.dart';
-import '../../lib/presentation/providers/discovery_providers.dart';
-import '../../lib/presentation/widgets/dietary_filter_components.dart';
-import '../../lib/presentation/widgets/maps_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/dietary_filter_components.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/maps_components.dart';
 
 /// Stage 3 Performance Tests
 /// 
@@ -188,8 +187,8 @@ void main() {
         
         // Test distance sorting
         final distanceSortStopwatch = Stopwatch()..start();
-        final distanceSorted = List<Restaurant>.from(restaurants)
-          ..sort((a, b) {
+        List<Restaurant>.from(restaurants)
+          .sort((a, b) {
             final distanceA = a.distanceFromUser ?? double.infinity;
             final distanceB = b.distanceFromUser ?? double.infinity;
             return distanceA.compareTo(distanceB);
@@ -198,8 +197,8 @@ void main() {
 
         // Test rating sorting
         final ratingSortStopwatch = Stopwatch()..start();
-        final ratingSorted = List<Restaurant>.from(restaurants)
-          ..sort((a, b) {
+        List<Restaurant>.from(restaurants)
+          .sort((a, b) {
             final ratingA = a.rating ?? 0.0;
             final ratingB = b.rating ?? 0.0;
             return ratingB.compareTo(ratingA); // Descending
@@ -219,8 +218,8 @@ void main() {
     group('Filtering Performance', () {
       testWidgets('dietary filter response should be within 200ms target', (tester) async {
         final userPreferences = _createTestUserPreferences();
-        int changeCount = 0;
         final responseStopwatch = Stopwatch();
+        int changeCount = 0;
 
         await tester.pumpWidget(
           MaterialApp(
@@ -259,7 +258,7 @@ void main() {
           allergenInfo: ['nuts', 'soy'],
         );
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian', 'dairy_free', 'keto'],
           allergens: ['nuts', 'shellfish', 'dairy'],
         );
@@ -284,7 +283,7 @@ void main() {
 
       test('multi-criteria filtering should be optimized', () async {
         final restaurants = _generateTestRestaurants(2000);
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian'],
           allergens: ['peanuts'],
           minimumRating: 4.0,
@@ -425,8 +424,8 @@ void main() {
 
       test('should optimize API usage with request batching', () async {
         final requestQueue = <String>[];
-        final batchSize = 5;
-        final processingDelay = Duration(milliseconds: 500);
+        const batchSize = 5;
+        const processingDelay = Duration(milliseconds: 500);
         
         // Simulate rapid requests
         for (int i = 0; i < 12; i++) {

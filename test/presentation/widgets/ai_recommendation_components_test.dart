@@ -58,22 +58,13 @@ void main() {
 
     group('AIRecommendationCard', () {
       testWidgets('should display recommendation information correctly', (tester) async {
-        bool restaurantSelected = false;
-        int? submittedRating;
-        String? submittedFeedback;
-
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: AIRecommendationCard(
                 recommendation: testRecommendation,
-                onRestaurantSelected: (restaurant) {
-                  restaurantSelected = true;
-                },
-                onFeedbackSubmitted: (rating, feedback) {
-                  submittedRating = rating;
-                  submittedFeedback = feedback;
-                },
+                onRestaurantSelected: (restaurant) {},
+                onFeedbackSubmitted: (rating, feedback) {},
               ),
             ),
           ),

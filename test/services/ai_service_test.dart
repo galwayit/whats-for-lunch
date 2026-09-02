@@ -6,7 +6,6 @@ import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
 
 void main() {
   group('AIService', () {
-    late AIService aiService;
     late AIServiceConfig config;
 
     setUp(() {
@@ -18,7 +17,7 @@ void main() {
         costLimitPerDayDollars: 5.0,
         enableCaching: true,
       );
-      
+
       // Note: In a real test, we would mock the GenerativeModel
       // For now, we'll test the configuration and error handling
     });

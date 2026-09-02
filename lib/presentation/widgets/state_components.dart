@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/accessibility/accessibility_utils.dart';
 import 'ux_components.dart';
@@ -53,7 +51,7 @@ class AccessibleErrorState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(UXComponents.paddingL),
                 decoration: BoxDecoration(
-                  color: colorScheme.errorContainer.withOpacity(0.1),
+                  color: colorScheme.errorContainer.withValues(alpha:0.1),
                   shape: BoxShape.circle,
                   border: isHighContrast ? Border.all(
                     color: colorScheme.error,
@@ -281,8 +279,6 @@ class AccessibleEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isReducedMotion = AccessibilityUtils.shouldReduceMotions(context);
-
     return AccessibilityUtils.makeAccessible(
       label: 'Empty state: $title',
       hint: semanticMessage ?? message,

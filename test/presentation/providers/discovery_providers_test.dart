@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../lib/presentation/providers/discovery_providers.dart';
-import '../../../lib/domain/entities/restaurant.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/providers/discovery_providers.dart';
+import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 
 // Mock classes for testing
+// ignore: must_be_immutable
 class MockPosition extends Mock implements Position {}
 
 void main() {
@@ -76,7 +77,7 @@ void main() {
             cuisineType: 'vegan'),
         ];
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian'],
           requireDietaryVerification: false,
         );
@@ -110,7 +111,7 @@ void main() {
             allergenInfo: ['dairy']),
         ];
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           allergens: ['peanuts'],
           requireDietaryVerification: false,
         );
@@ -133,7 +134,7 @@ void main() {
           _createTestRestaurant('r3', 'Fine Dining', priceLevel: 4),
         ];
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           budgetLevel: 2,
         );
 
@@ -157,7 +158,7 @@ void main() {
           _createTestRestaurant('r3', 'Excellent Place', rating: 4.8),
         ];
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           minimumRating: 3.5,
         );
 
@@ -193,7 +194,7 @@ void main() {
             allergenInfo: []),
         ];
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian'],
           minimumRating: 4.0,
           budgetLevel: 2,
@@ -286,16 +287,15 @@ void main() {
     group('Discovery Analytics', () {
       test('should track restaurant selection', () {
         final analytics = container.read(discoveryProvider.notifier);
-        final restaurant = _createTestRestaurant('test_id', 'Test Restaurant');
-        
+        _createTestRestaurant('test_id', 'Test Restaurant');
+
         // Should not throw
         expect(analytics, isNotNull);
       });
 
       test('should track search performance', () {
         final analytics = container.read(discoveryProvider.notifier);
-        final startTime = DateTime.now().subtract(Duration(milliseconds: 150));
-        
+
         // Should not throw and should handle performance tracking
         expect(analytics, isNotNull);
       });
@@ -319,7 +319,7 @@ void main() {
           )
         );
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian'],
           minimumRating: 3.0,
           budgetLevel: 2,
@@ -368,7 +368,7 @@ void main() {
           allergenInfo: ['dairy', 'nuts'],
         );
 
-        final userPreferences = UserPreferences(
+        const userPreferences = UserPreferences(
           dietaryRestrictions: ['vegetarian', 'dairy_free', 'nut_free'],
           allergens: ['dairy', 'nuts', 'shellfish'],
         );

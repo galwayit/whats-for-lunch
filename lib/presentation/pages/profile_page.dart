@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_routes.dart';
+import '../../core/theme/app_theme.dart';
 import '../../domain/entities/user_preferences.dart';
 import '../providers/simple_providers.dart' as simple;
-import '../providers/user_preferences_provider.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -13,74 +14,98 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(simple.currentUserProvider);
-    // Use simple preferences provider for consistency
-    final preferences = ref.watch(simple.simpleUserPreferencesProvider);
+    final preferences = ref.watch(simple.userPreferencesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
+      backgroundColor: AppTheme.creamBg,
+      body: SafeArea(
+        child: currentUser != null
+            ? _buildContent(context, ref, currentUser['name'] ?? 'User', preferences)
+            : const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen)),
       ),
-      body: currentUser != null
-          ? _buildContent(context, ref, currentUser['name'] ?? 'User', preferences)
-          : const Center(child: CircularProgressIndicator()),
     );
   }
 
   Widget _buildContent(BuildContext context, WidgetRef ref, String userName, UserPreferences? preferences) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       children: [
         _buildProfileHeader(context, userName),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
         _buildPreferencesSection(context, preferences),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
         _buildSettingsSection(context, ref),
       ],
     );
   }
 
   Widget _buildProfileHeader(BuildContext context, String userName) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: Theme.of(context).colorScheme.primary,
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                width: 2,
+              ),
+            ),
+            child: Center(
               child: Text(
                 userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primaryGreen,
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userName,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.brownText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(9999),
+                    border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.2)),
+                  ),
+                  child: Text(
+                    'FOOD EXPLORER',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primaryGreen,
+                      letterSpacing: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Food Explorer',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -89,49 +114,51 @@ class ProfilePage extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Your Preferences',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'YOUR PREFERENCES',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.brownText.withValues(alpha: 0.6),
+              letterSpacing: 1.2,
+            ),
           ),
         ),
-        const SizedBox(height: 12),
-        Card(
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+          ),
           child: Column(
             children: [
-              ListTile(
-                leading: const Icon(Icons.attach_money),
-                title: const Text('Budget Level'),
-                subtitle: Text(
-                  preferences != null 
-                    ? '\$' * (preferences.budgetLevel ?? 2)
-                    : 'Not set',
-                ),
-                trailing: const Icon(Icons.chevron_right),
+              _buildPreferenceTile(
+                context,
+                icon: Icons.payments,
+                title: 'Budget Level',
+                value: preferences != null ? '\$' * preferences.budgetLevel : 'Not set',
                 onTap: () => context.go(AppRoutes.preferences),
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.location_on),
-                title: const Text('Max Distance'),
-                subtitle: Text(
-                  preferences != null 
-                    ? '${(preferences.maxTravelDistance ?? 5.0).toStringAsFixed(1)} km'
+              Divider(height: 1, color: AppTheme.brownText.withValues(alpha: 0.05), indent: 56),
+              _buildPreferenceTile(
+                context,
+                icon: Icons.near_me,
+                title: 'Max Distance',
+                value: preferences != null
+                    ? '${preferences.maxTravelDistance.toStringAsFixed(1)} km'
                     : 'Not set',
-                ),
-                trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.go(AppRoutes.preferences),
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.restaurant_menu),
-                title: const Text('Include Chains'),
-                subtitle: Text(
-                  preferences != null 
-                    ? (preferences.includeChains ?? true) ? 'Yes' : 'No'
+              Divider(height: 1, color: AppTheme.brownText.withValues(alpha: 0.05), indent: 56),
+              _buildPreferenceTile(
+                context,
+                icon: Icons.restaurant_menu,
+                title: 'Include Chains',
+                value: preferences != null
+                    ? preferences.includeChains ? 'Yes' : 'No'
                     : 'Not set',
-                ),
-                trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.go(AppRoutes.preferences),
               ),
             ],
@@ -141,55 +168,169 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
+  Widget _buildPreferenceTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: AppTheme.primaryGreen, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.brownText,
+                ),
+              ),
+            ),
+            Text(
+              value,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.brownTextLight,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right, color: AppTheme.brownText.withValues(alpha: 0.3), size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSettingsSection(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Settings',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'SETTINGS',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.brownText.withValues(alpha: 0.6),
+              letterSpacing: 1.2,
+            ),
           ),
         ),
-        const SizedBox(height: 12),
-        Card(
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+          ),
           child: Column(
             children: [
-              ListTile(
-                leading: const Icon(Icons.tune),
-                title: const Text('Edit Preferences'),
-                subtitle: const Text('Update your food preferences'),
-                trailing: const Icon(Icons.chevron_right),
+              _buildSettingsTile(
+                context,
+                icon: Icons.tune,
+                title: 'Edit Preferences',
+                subtitle: 'Update your food preferences',
                 onTap: () => context.go(AppRoutes.preferences),
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.notifications),
-                title: const Text('Notifications'),
-                subtitle: const Text('Manage app notifications'),
-                trailing: const Icon(Icons.chevron_right),
+              Divider(height: 1, color: AppTheme.brownText.withValues(alpha: 0.05), indent: 56),
+              _buildSettingsTile(
+                context,
+                icon: Icons.notifications_outlined,
+                title: 'Notifications',
+                subtitle: 'Manage app notifications',
                 onTap: () => _showNotificationSettings(context, ref),
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.privacy_tip),
-                title: const Text('Privacy'),
-                subtitle: const Text('Data and privacy settings'),
-                trailing: const Icon(Icons.chevron_right),
+              Divider(height: 1, color: AppTheme.brownText.withValues(alpha: 0.05), indent: 56),
+              _buildSettingsTile(
+                context,
+                icon: Icons.privacy_tip_outlined,
+                title: 'Privacy',
+                subtitle: 'Data and privacy settings',
                 onTap: () => _showPrivacySettings(context, ref),
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.help),
-                title: const Text('Help & Support'),
-                subtitle: const Text('Get help and report issues'),
-                trailing: const Icon(Icons.chevron_right),
+              Divider(height: 1, color: AppTheme.brownText.withValues(alpha: 0.05), indent: 56),
+              _buildSettingsTile(
+                context,
+                icon: Icons.help_outline,
+                title: 'Help & Support',
+                subtitle: 'Get help and report issues',
                 onTap: () => _showHelpAndSupport(context),
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSettingsTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: AppTheme.primaryGreen, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.brownText,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      color: AppTheme.brownTextLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppTheme.brownText.withValues(alpha: 0.3), size: 20),
+          ],
+        ),
+      ),
     );
   }
 
@@ -221,10 +362,10 @@ class ProfilePage extends ConsumerWidget {
   }
 }
 
-/// Notification Settings Bottom Sheet
+// Bottom sheet widgets - styled to match template patterns
+
 class _NotificationSettingsSheet extends ConsumerStatefulWidget {
   final WidgetRef ref;
-  
   const _NotificationSettingsSheet({required this.ref});
 
   @override
@@ -244,116 +385,53 @@ class _NotificationSettingsSheetState extends ConsumerState<_NotificationSetting
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: AppTheme.creamBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Notification Settings',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-          // Content
+          _buildSheetHandle(),
+          _buildSheetHeader(context, 'Notification Settings'),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 Text(
-                  'Smart notifications help you stay on track with your food investment goals.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                  'Smart notifications help you stay on track with your food goals.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    color: AppTheme.brownTextLight,
                   ),
                 ),
-                const SizedBox(height: 24),
-                _buildNotificationTile(
-                  'Meal Reminders',
-                  'Get reminded when it\'s time to invest in your next meal',
-                  Icons.restaurant,
-                  _mealReminders,
-                  (value) => setState(() => _mealReminders = value),
-                  isRecommended: true,
-                ),
-                _buildNotificationTile(
-                  'Budget Alerts',
-                  'Stay informed about your weekly food investment progress',
-                  Icons.account_balance_wallet,
-                  _budgetAlerts,
-                  (value) => setState(() => _budgetAlerts = value),
-                  isRecommended: true,
-                ),
-                _buildNotificationTile(
-                  'Weekly Insights',
-                  'Receive personalized reports on your food investment returns',
-                  Icons.analytics,
-                  _weeklyInsights,
-                  (value) => setState(() => _weeklyInsights = value),
-                  isRecommended: true,
-                ),
-                _buildNotificationTile(
-                  'Achievement Updates',
-                  'Celebrate milestones in your culinary investment journey',
-                  Icons.emoji_events,
-                  _achievementUpdates,
-                  (value) => setState(() => _achievementUpdates = value),
-                ),
-                _buildNotificationTile(
-                  'New Restaurants',
-                  'Discover fresh investment opportunities in your area',
-                  Icons.new_releases,
-                  _newRestaurants,
-                  (value) => setState(() => _newRestaurants = value),
-                ),
-                _buildNotificationTile(
-                  'Promotional Offers',
-                  'Special deals and limited-time investment opportunities',
-                  Icons.local_offer,
-                  _promotionalOffers,
-                  (value) => setState(() => _promotionalOffers = value),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    // Save settings logic would go here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notification preferences saved!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                const SizedBox(height: 20),
+                _buildToggleTile('Meal Reminders', 'Get reminded for your next meal',
+                    Icons.restaurant, _mealReminders, (v) => setState(() => _mealReminders = v)),
+                _buildToggleTile('Budget Alerts', 'Stay informed about spending',
+                    Icons.account_balance_wallet, _budgetAlerts, (v) => setState(() => _budgetAlerts = v)),
+                _buildToggleTile('Weekly Insights', 'Receive personalized reports',
+                    Icons.analytics, _weeklyInsights, (v) => setState(() => _weeklyInsights = v)),
+                _buildToggleTile('Achievement Updates', 'Celebrate milestones',
+                    Icons.emoji_events, _achievementUpdates, (v) => setState(() => _achievementUpdates = v)),
+                _buildToggleTile('New Restaurants', 'Discover new places nearby',
+                    Icons.new_releases, _newRestaurants, (v) => setState(() => _newRestaurants = v)),
+                _buildToggleTile('Promotional Offers', 'Special deals and offers',
+                    Icons.local_offer, _promotionalOffers, (v) => setState(() => _promotionalOffers = v)),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Notification preferences saved!',
+                              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500)),
+                          backgroundColor: AppTheme.primaryGreen,
+                        ),
+                      );
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Save Preferences'),
                   ),
-                  child: const Text('Save Preferences'),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -364,100 +442,45 @@ class _NotificationSettingsSheetState extends ConsumerState<_NotificationSetting
     );
   }
 
-  Widget _buildNotificationTile(
-    String title,
-    String subtitle,
-    IconData icon,
-    bool value,
-    ValueChanged<bool> onChanged,
-    {bool isRecommended = false}
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
+  Widget _buildToggleTile(String title, String subtitle, IconData icon, bool value, ValueChanged<bool> onChanged) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isRecommended) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.green.withOpacity(0.3)),
-                          ),
-                          child: Text(
-                            'Recommended',
-                            style: TextStyle(
-                              color: Colors.green[700],
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+            child: Icon(icon, color: AppTheme.primaryGreen, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.brownText)),
+                Text(subtitle, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppTheme.brownTextLight)),
+              ],
             ),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-              activeColor: Theme.of(context).colorScheme.primary,
-            ),
-          ],
-        ),
+          ),
+          Switch(value: value, onChanged: onChanged),
+        ],
       ),
     );
   }
 }
 
-/// Privacy Settings Bottom Sheet
 class _PrivacySettingsSheet extends ConsumerStatefulWidget {
   final WidgetRef ref;
-  
   const _PrivacySettingsSheet({required this.ref});
 
   @override
@@ -467,7 +490,6 @@ class _PrivacySettingsSheet extends ConsumerStatefulWidget {
 class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
   bool _locationSharing = true;
   bool _analyticsTracking = true;
-  bool _dataExportEnabled = true;
   bool _marketingCommunications = false;
 
   @override
@@ -475,122 +497,49 @@ class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: AppTheme.creamBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Privacy & Data',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-          // Content
+          _buildSheetHandle(),
+          _buildSheetHeader(context, 'Privacy & Data'),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 Text(
-                  'Your privacy matters. Control how your data is used to enhance your food investment experience.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                  'Your privacy matters. Control how your data is used.',
+                  style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppTheme.brownTextLight),
+                ),
+                const SizedBox(height: 20),
+                _buildSectionLabel('Data Collection'),
+                _buildPrivacyToggle('Location Services', 'Find restaurants near you', Icons.location_on,
+                    _locationSharing, (v) => setState(() => _locationSharing = v)),
+                _buildPrivacyToggle('Usage Analytics', 'Help us improve the app', Icons.analytics,
+                    _analyticsTracking, (v) => setState(() => _analyticsTracking = v)),
+                const SizedBox(height: 16),
+                _buildSectionLabel('Communications'),
+                _buildPrivacyToggle('Marketing', 'Personalized offers', Icons.email,
+                    _marketingCommunications, (v) => setState(() => _marketingCommunications = v)),
+                const SizedBox(height: 16),
+                _buildSectionLabel('Data Management'),
+                _buildActionTile('Export My Data', 'Download a copy of all your data', Icons.download, () => _exportData()),
+                _buildActionTile('Delete My Account', 'Permanently remove your account', Icons.delete_forever,
+                    () => _showDeleteAccountDialog(), isDestructive: true),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Privacy settings saved!', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500)),
+                            backgroundColor: AppTheme.primaryGreen),
+                      );
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Save Settings'),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _buildPrivacySection(
-                  'Data Collection',
-                  [
-                    _buildPrivacyTile(
-                      'Location Services',
-                      'Allow us to find restaurants near you and improve recommendations',
-                      Icons.location_on,
-                      _locationSharing,
-                      (value) => setState(() => _locationSharing = value),
-                    ),
-                    _buildPrivacyTile(
-                      'Usage Analytics',
-                      'Help us improve the app by sharing anonymous usage data',
-                      Icons.analytics,
-                      _analyticsTracking,
-                      (value) => setState(() => _analyticsTracking = value),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildPrivacySection(
-                  'Communications',
-                  [
-                    _buildPrivacyTile(
-                      'Marketing Communications',
-                      'Receive personalized offers and food investment insights',
-                      Icons.email,
-                      _marketingCommunications,
-                      (value) => setState(() => _marketingCommunications = value),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildPrivacySection(
-                  'Data Management',
-                  [
-                    _buildActionTile(
-                      'Export My Data',
-                      'Download a copy of all your data and meal investment history',
-                      Icons.download,
-                      () => _exportData(),
-                    ),
-                    _buildActionTile(
-                      'Delete My Account',
-                      'Permanently remove your account and all associated data',
-                      Icons.delete_forever,
-                      () => _showDeleteAccountDialog(),
-                      isDestructive: true,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    // Save privacy settings logic would go here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Privacy settings saved!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text('Save Settings'),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -601,110 +550,81 @@ class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
     );
   }
 
-  Widget _buildPrivacySection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(height: 12),
-        ...children,
-      ],
-    );
-  }
-
-  Widget _buildPrivacyTile(
-    String title,
-    String subtitle,
-    IconData icon,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 24,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-              activeColor: Theme.of(context).colorScheme.primary,
-            ),
-          ],
+  Widget _buildSectionLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        text.toUpperCase(),
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppTheme.brownText.withValues(alpha: 0.5),
+          letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _buildActionTile(
-    String title,
-    String subtitle,
-    IconData icon,
-    VoidCallback onTap,
-    {bool isDestructive = false}
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isDestructive ? Colors.red : Theme.of(context).colorScheme.primary,
-          size: 24,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: isDestructive ? Colors.red : null,
+  Widget _buildPrivacyToggle(String title, String subtitle, IconData icon, bool value, ValueChanged<bool> onChanged) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppTheme.primaryGreen, size: 22),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.brownText)),
+                Text(subtitle, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppTheme.brownTextLight)),
+              ],
+            ),
           ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: isDestructive ? Colors.red : null,
-        ),
+          Switch(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile(String title, String subtitle, IconData icon, VoidCallback onTap, {bool isDestructive = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: isDestructive ? Colors.red : AppTheme.primaryGreen, size: 22),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14, fontWeight: FontWeight.w600,
+                      color: isDestructive ? Colors.red : AppTheme.brownText)),
+                    Text(subtitle, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppTheme.brownTextLight)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: isDestructive ? Colors.red.withValues(alpha: 0.5) : AppTheme.brownText.withValues(alpha: 0.3), size: 20),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -713,23 +633,17 @@ class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Export Data'),
-        content: const Text(
-          'Your data export will be prepared and sent to your email address. This may take a few minutes to complete.',
-        ),
+        title: Text('Export Data', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+        content: Text('Your data export will be prepared and sent to your email.',
+            style: GoogleFonts.plusJakartaSans()),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Data export initiated. Check your email shortly.'),
-                  backgroundColor: Colors.green,
-                ),
+                SnackBar(content: Text('Data export initiated.', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500)),
+                    backgroundColor: AppTheme.primaryGreen),
               );
             },
             child: const Text('Export'),
@@ -743,30 +657,22 @@ class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your meal history and preferences.',
+        title: Text('Delete Account', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+        content: Text(
+          'Are you sure? This action cannot be undone and will permanently remove all your data.',
+          style: GoogleFonts.plusJakartaSans(),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // Delete account logic would go here
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Account deletion initiated. You will be logged out shortly.'),
-                  backgroundColor: Colors.red,
-                ),
+                SnackBar(content: Text('Account deletion initiated.', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500)),
+                    backgroundColor: Colors.red),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             child: const Text('Delete Account'),
           ),
         ],
@@ -775,7 +681,6 @@ class _PrivacySettingsSheetState extends ConsumerState<_PrivacySettingsSheet> {
   }
 }
 
-/// Help and Support Bottom Sheet
 class _HelpAndSupportSheet extends StatelessWidget {
   const _HelpAndSupportSheet();
 
@@ -784,106 +689,49 @@ class _HelpAndSupportSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: AppTheme.creamBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Help & Support',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-          // Content
+          _buildSheetHandle(),
+          _buildSheetHeader(context, 'Help & Support'),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 Text(
-                  'Get help with your food investment journey. We\'re here to support your success.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                  'Get help with your food journey. We\'re here to support you.',
+                  style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppTheme.brownTextLight),
+                ),
+                const SizedBox(height: 20),
+                _buildFAQItem('How do I track my meals?',
+                    'Use the Track tab to log meals and see your dining history.'),
+                _buildFAQItem('What does budget level mean?',
+                    'Budget levels (\$ to \$\$\$\$) help us recommend restaurants that match your budget.'),
+                _buildFAQItem('How are recommendations personalized?',
+                    'We analyze your preferences and meal history to suggest the best restaurants.'),
+                _buildFAQItem('Can I export my data?',
+                    'Yes! Go to Privacy Settings to export all your data.'),
+                const SizedBox(height: 20),
+                _buildContactItem(context, 'Send Feedback', Icons.feedback, () => _showDialog(context, 'Send Feedback', 'Opening feedback form...')),
+                _buildContactItem(context, 'Report an Issue', Icons.bug_report, () => _showDialog(context, 'Report Issue', 'Opening issue form...')),
+                _buildContactItem(context, 'Contact Support', Icons.support_agent, () => _showDialog(context, 'Contact Support', 'Connecting with support...')),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _buildHelpSection(
-                  'Frequently Asked Questions',
-                  [
-                    _buildFAQItem(
-                      'How do I track my food investment ROI?',
-                      'Use the Track tab to log meals and see how your food choices contribute to your health and happiness investment goals.',
-                    ),
-                    _buildFAQItem(
-                      'What does budget level mean?',
-                      'Budget levels (\$ to \$\$\$\$) help us recommend restaurants that align with your investment comfort zone.',
-                    ),
-                    _buildFAQItem(
-                      'How are restaurant recommendations personalized?',
-                      'We analyze your preferences, meal history, and investment patterns to suggest restaurants that maximize your satisfaction ROI.',
-                    ),
-                    _buildFAQItem(
-                      'Can I export my meal data?',
-                      'Yes! Go to Privacy Settings to export all your meal investment data and insights.',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildHelpSection(
-                  'Get in Touch',
-                  [
-                    _buildContactTile(
-                      'Send Feedback',
-                      'Share ideas to improve your food investment experience',
-                      Icons.feedback,
-                      () => _sendFeedback(context),
-                    ),
-                    _buildContactTile(
-                      'Report an Issue',
-                      'Let us know about bugs or problems you\'ve encountered',
-                      Icons.bug_report,
-                      () => _reportIssue(context),
-                    ),
-                    _buildContactTile(
-                      'Contact Support',
-                      'Get personalized help from our support team',
-                      Icons.support_agent,
-                      () => _contactSupport(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildHelpSection(
-                  'App Information',
-                  [
-                    _buildInfoTile('Version', '1.0.0'),
-                    _buildInfoTile('Last Updated', 'Today'),
-                    _buildInfoTile('Privacy Policy', 'View our commitment to your privacy', onTap: () => _viewPrivacyPolicy(context)),
-                    _buildInfoTile('Terms of Service', 'Read the terms of use', onTap: () => _viewTermsOfService(context)),
-                  ],
+                  child: Column(
+                    children: [
+                      _buildInfoRow('Version', '1.0.0'),
+                      const SizedBox(height: 8),
+                      _buildInfoRow('Last Updated', 'Today'),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -894,216 +742,116 @@ class _HelpAndSupportSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildFAQItem(String question, String answer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+      ),
+      child: ExpansionTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(question, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.brownText)),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Text(answer, style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppTheme.brownTextLight, height: 1.5)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactItem(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.brownText.withValues(alpha: 0.05)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: AppTheme.primaryGreen, size: 22),
+              const SizedBox(width: 14),
+              Expanded(child: Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.brownText))),
+              Icon(Icons.chevron_right, color: AppTheme.brownText.withValues(alpha: 0.3), size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppTheme.brownTextLight)),
+        Text(value, style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.brownText)),
+      ],
+    );
+  }
+
+  static void _showDialog(BuildContext context, String title, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500)),
+        backgroundColor: AppTheme.primaryGreen,
+      ),
+    );
+  }
+}
+
+// Shared sheet helpers
+Widget _buildSheetHandle() {
+  return Container(
+    width: 40,
+    height: 4,
+    margin: const EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      color: AppTheme.brownText.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(2),
+    ),
+  );
+}
+
+Widget _buildSheetHeader(BuildContext context, String title) {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.brownText,
           ),
         ),
-        const SizedBox(height: 12),
-        ...children,
-      ],
-    );
-  }
-
-  Widget _buildFAQItem(String question, String answer) {
-    return ExpansionTile(
-      title: Text(
-        question,
-        style: const TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-      ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Text(
-            answer,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-              height: 1.5,
-            ),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppTheme.brownText.withValues(alpha: 0.05),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close, size: 18),
+            color: AppTheme.brownText,
+            padding: EdgeInsets.zero,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildContactTile(
-    String title,
-    String subtitle,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: Colors.blue,
-          size: 24,
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  Widget _buildInfoTile(String title, String value, {VoidCallback? onTap}) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          value,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
-        ),
-        trailing: onTap != null ? const Icon(Icons.chevron_right) : null,
-        onTap: onTap,
-      ),
-    );
-  }
-
-  static void _sendFeedback(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Send Feedback'),
-        content: const Text(
-          'Your feedback helps us improve your food investment experience. You will be redirected to our feedback form.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Launch feedback form/email
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Opening feedback form...'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static void _reportIssue(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Report Issue'),
-        content: const Text(
-          'Help us fix problems quickly by reporting issues. Include details about what you were doing when the problem occurred.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Launch issue reporting form
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Opening issue report form...'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-            },
-            child: const Text('Report'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static void _contactSupport(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Contact Support'),
-        content: const Text(
-          'Our support team is here to help you maximize your food investment success. Typical response time is within 24 hours.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Launch support contact
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Connecting you with support...'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: const Text('Contact'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static void _viewPrivacyPolicy(BuildContext context) {
-    // In a real app, this would open a web view or navigate to privacy policy
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Opening privacy policy...'),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
-
-  static void _viewTermsOfService(BuildContext context) {
-    // In a real app, this would open a web view or navigate to terms
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Opening terms of service...'),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
+    ),
+  );
 }

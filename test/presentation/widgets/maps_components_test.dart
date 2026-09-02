@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../lib/presentation/widgets/maps_components.dart';
-import '../../../lib/domain/entities/restaurant.dart';
-import '../../../lib/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/presentation/widgets/maps_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/restaurant.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
 
 void main() {
   group('Stage 3 Maps Components Tests', () {
@@ -64,7 +64,7 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: UXMapsView(
-                restaurants: [],
+                restaurants: const [],
                 userPreferences: testUserPreferences,
               ),
             ),
@@ -717,7 +717,7 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: UXMapsView(
-                restaurants: [],
+                restaurants: const [],
                 userPreferences: testUserPreferences,
               ),
             ),

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:what_we_have_for_lunch/main.dart' as app;

@@ -1,7 +1,16 @@
+// @file ai_recommendations_page.dart
+// @description AI Recommendations page with investment mindset messaging and
+//   trust indicators. Styled using the template design pattern (cream background,
+//   custom header row, semi-transparent white cards, GoogleFonts.plusJakartaSans
+//   typography, AppTheme design tokens).
+// @modified 2026-03-11
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../providers/ai_providers.dart';
 import '../widgets/ai_recommendation_components.dart';
 import '../widgets/ux_investment_components.dart';
@@ -27,12 +36,12 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
   @override
   void initState() {
     super.initState();
-    
+
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _slideAnimationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -56,7 +65,7 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
 
     _fadeAnimationController.forward();
     _slideAnimationController.forward();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForFirstTimeUser();
     });
@@ -70,52 +79,154 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     super.dispose();
   }
 
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     final aiState = ref.watch(aiRecommendationProvider);
     final aiAvailable = ref.watch(aiAvailabilityProvider);
     final usageSummary = ref.watch(aiUsageSummaryProvider);
     final investmentAnalysis = ref.watch(aiInvestmentAnalysisProvider);
-    // final shouldTriggerRecommendations = ref.watch(smartRecommendationTriggerProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text(
-          'AI Investment Advisor',
-          style: TextStyle(fontWeight: FontWeight.w600),
+      backgroundColor: AppTheme.creamBg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Custom header row (replaces AppBar)
+            _buildCustomHeader(),
+
+            // Body content
+            Expanded(
+              child: !aiAvailable
+                  ? _buildAIUnavailableView()
+                  : FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: _buildMainContent(
+                            aiState, usageSummary, investmentAnalysis),
+                      ),
+                    ),
+            ),
+          ],
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
+      ),
+      floatingActionButton: aiAvailable && !aiState.isLoading
+          ? FloatingActionButton.extended(
+              onPressed: () => _generateRecommendations(context),
+              icon: const Icon(Icons.smart_toy_outlined, color: Colors.white),
+              label: Text(
+                aiState.hasRecommendations
+                    ? 'New Recommendations'
+                    : 'Get AI Recommendations',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: AppTheme.primaryGreen,
+            )
+          : null,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Custom header (back arrow + centered title + info/menu actions)
+  // ---------------------------------------------------------------------------
+
+  Widget _buildCustomHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
+      child: Row(
+        children: [
+          // Back button
           IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => _showAIInfoDialog(context),
+            icon: const Icon(Icons.arrow_back, color: AppTheme.brownText),
+            onPressed: () => context.pop(),
+            tooltip: 'Go back',
           ),
+
+          // Centered title
+          Expanded(
+            child: Center(
+              child: Text(
+                'AI Investment Advisor',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.brownText,
+                ),
+              ),
+            ),
+          ),
+
+          // Info button
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: AppTheme.brownText),
+            onPressed: () => _showAIInfoDialog(context),
+            tooltip: 'About AI Advisor',
+          ),
+
+          // Menu button
           PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: AppTheme.brownText),
+            color: AppTheme.creamBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             onSelected: _handleMenuAction,
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'usage',
                 child: ListTile(
-                  leading: Icon(Icons.analytics_outlined),
-                  title: Text('Usage Statistics'),
+                  leading: const Icon(
+                    Icons.analytics_outlined,
+                    color: AppTheme.primaryGreen,
+                  ),
+                  title: Text(
+                    'Usage Statistics',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppTheme.brownText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'history',
                 child: ListTile(
-                  leading: Icon(Icons.history),
-                  title: Text('Recommendation History'),
+                  leading: const Icon(
+                    Icons.history,
+                    color: AppTheme.primaryGreen,
+                  ),
+                  title: Text(
+                    'Recommendation History',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppTheme.brownText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'settings',
                 child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('AI Preferences'),
+                  leading: const Icon(
+                    Icons.settings,
+                    color: AppTheme.primaryGreen,
+                  ),
+                  title: Text(
+                    'AI Preferences',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppTheme.brownText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
@@ -123,28 +234,14 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
           ),
         ],
       ),
-      body: !aiAvailable
-          ? _buildAIUnavailableView(context)
-          : FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: _buildMainContent(context, aiState, usageSummary, investmentAnalysis),
-              ),
-            ),
-      floatingActionButton: aiAvailable && !aiState.isLoading
-          ? FloatingActionButton.extended(
-              onPressed: () => _generateRecommendations(context),
-              icon: const Icon(Icons.smart_toy_outlined),
-              label: Text(aiState.hasRecommendations ? 'New Recommendations' : 'Get AI Recommendations'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            )
-          : null,
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Main content (CustomScrollView)
+  // ---------------------------------------------------------------------------
+
   Widget _buildMainContent(
-    BuildContext context,
     AIRecommendationState aiState,
     Map<String, dynamic> usageSummary,
     Map<String, dynamic> investmentAnalysis,
@@ -153,32 +250,32 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
       slivers: [
         // Usage and status header
         SliverToBoxAdapter(
-          child: _buildStatusHeader(context, usageSummary),
+          child: _buildStatusHeader(usageSummary),
         ),
 
         // Investment analysis
         if (investmentAnalysis['hasAnalysis'] == true)
           SliverToBoxAdapter(
-            child: _buildInvestmentAnalysis(context, investmentAnalysis),
+            child: _buildInvestmentAnalysis(investmentAnalysis),
           ),
 
         // Craving input section
         SliverToBoxAdapter(
-          child: _buildCravingInput(context),
+          child: _buildCravingInput(),
         ),
 
         // Loading state
         if (aiState.isLoading)
           SliverToBoxAdapter(
             child: AIRecommendationLoading(
-              message: _getLoadingMessage(context),
+              message: _getLoadingMessage(),
             ),
           ),
 
         // Error state
         if (aiState.hasError)
           SliverToBoxAdapter(
-            child: _buildErrorState(context, aiState.errorMessage!),
+            child: _buildErrorState(aiState.errorMessage!),
           ),
 
         // Recommendations list
@@ -193,8 +290,11 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
                     padding: const EdgeInsets.only(bottom: 16),
                     child: AIRecommendationCard(
                       recommendation: recommendation,
-                      onRestaurantSelected: (restaurant) => _selectRestaurant(context, recommendation.id, restaurant.placeId),
-                      onFeedbackSubmitted: (rating, feedback) => _submitFeedback(recommendation.id, rating, feedback),
+                      onRestaurantSelected: (restaurant) =>
+                          _selectRestaurant(context, recommendation.id,
+                              restaurant.placeId),
+                      onFeedbackSubmitted: (rating, feedback) =>
+                          _submitFeedback(recommendation.id, rating, feedback),
                     ),
                   );
                 },
@@ -206,10 +306,10 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
         // Empty state
         if (!aiState.hasRecommendations && !aiState.isLoading && !aiState.hasError)
           SliverFillRemaining(
-            child: _buildEmptyState(context),
+            child: _buildEmptyState(),
           ),
 
-        // Bottom spacing
+        // Bottom spacing for FAB
         const SliverToBoxAdapter(
           child: SizedBox(height: 100),
         ),
@@ -217,7 +317,29 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     );
   }
 
-  Widget _buildStatusHeader(BuildContext context, Map<String, dynamic> usageSummary) {
+  // ---------------------------------------------------------------------------
+  // Template card helper
+  // ---------------------------------------------------------------------------
+
+  Widget _buildCard({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.brownText.withValues(alpha: 0.05),
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Status header
+  // ---------------------------------------------------------------------------
+
+  Widget _buildStatusHeader(Map<String, dynamic> usageSummary) {
     final todayCost = usageSummary['todayCost'] ?? 0.0;
     final remainingBudget = usageSummary['remainingBudget'] ?? 5.0;
     final todayRequests = usageSummary['todayRequests'] ?? 0;
@@ -246,7 +368,7 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
               ),
             ],
             actionLabel: remainingBudget < 1.0 ? 'Budget Alert' : 'Ready',
-            onActionPressed: remainingBudget < 1.0 
+            onActionPressed: remainingBudget < 1.0
                 ? () => _showBudgetAlert(context)
                 : null,
           ),
@@ -261,169 +383,245 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     );
   }
 
-  Widget _buildInvestmentAnalysis(BuildContext context, Map<String, dynamic> analysis) {
+  // ---------------------------------------------------------------------------
+  // Investment analysis card
+  // ---------------------------------------------------------------------------
+
+  Widget _buildInvestmentAnalysis(Map<String, dynamic> analysis) {
     final topRec = analysis['topRecommendation'] as Map<String, dynamic>;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
+      child: _buildCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
                     Icons.trending_up,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: AppTheme.primaryGreen,
+                    size: 20,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Investment Analysis',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                topRec['name'],
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildAnalysisChip(
-                    context,
-                    'Investment: \$${topRec['investmentCost'].toStringAsFixed(2)}',
-                    Colors.blue,
+                const SizedBox(width: 12),
+                Text(
+                  'Investment Analysis',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.brownText,
                   ),
-                  const SizedBox(width: 8),
-                  _buildAnalysisChip(
-                    context,
-                    'Value: ${topRec['valueScore']}%',
-                    _getValueColor(topRec['valueScore']),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildAnalysisChip(
-                    context,
-                    'Confidence: ${topRec['confidence']}%',
-                    _getConfidenceColor(topRec['confidence']),
-                  ),
-                ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              topRec['name'],
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.brownText,
               ),
-              const SizedBox(height: 12),
-              Text(
-                analysis['summary'],
-                style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                _buildAnalysisChip(
+                  'Investment: \$${topRec['investmentCost'].toStringAsFixed(2)}',
+                  AppTheme.infoColor,
+                ),
+                _buildAnalysisChip(
+                  'Value: ${topRec['valueScore']}%',
+                  _getValueColor(topRec['valueScore']),
+                ),
+                _buildAnalysisChip(
+                  'Confidence: ${topRec['confidence']}%',
+                  _getConfidenceColor(topRec['confidence']),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              analysis['summary'],
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.brownTextLight,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildAnalysisChip(BuildContext context, String label, Color color) {
+  Widget _buildAnalysisChip(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 12,
           color: color,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 
-  Widget _buildCravingInput(BuildContext context) {
+  // ---------------------------------------------------------------------------
+  // Craving input section
+  // ---------------------------------------------------------------------------
+
+  Widget _buildCravingInput() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'What are you craving?',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+      child: _buildCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'What are you craving?',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.brownText,
               ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _cravingsController,
-                decoration: InputDecoration(
-                  hintText: 'e.g., "spicy Asian food" or "comfort food"',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: const Icon(Icons.restaurant_menu),
-                  suffixIcon: _cravingsController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _cravingsController.clear();
-                            });
-                          },
-                        )
-                      : null,
-                ),
-                onChanged: (value) => setState(() {}),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _cravingsController,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.brownText,
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _showAdvancedOptions = !_showAdvancedOptions;
-                      });
-                    },
-                    icon: Icon(_showAdvancedOptions ? Icons.expand_less : Icons.expand_more),
-                    label: const Text('Advanced Options'),
+              decoration: InputDecoration(
+                hintText: 'e.g., "spicy Asian food" or "comfort food"',
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  color: AppTheme.brownTextLight.withValues(alpha: 0.6),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: AppTheme.brownText.withValues(alpha: 0.1),
                   ),
-                  const Spacer(),
-                  if (_cravingsController.text.isNotEmpty)
-                    ElevatedButton.icon(
-                      onPressed: () => _generateRecommendations(context),
-                      icon: const Icon(Icons.smart_toy, size: 18),
-                      label: const Text('Get Suggestions'),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: AppTheme.brownText.withValues(alpha: 0.1),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppTheme.primaryGreen,
+                    width: 2,
+                  ),
+                ),
+                prefixIcon: const Icon(
+                  Icons.restaurant_menu,
+                  color: AppTheme.primaryGreen,
+                ),
+                suffixIcon: _cravingsController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppTheme.brownTextLight,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _cravingsController.clear();
+                          });
+                        },
+                      )
+                    : null,
+              ),
+              onChanged: (value) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _showAdvancedOptions = !_showAdvancedOptions;
+                    });
+                  },
+                  icon: Icon(
+                    _showAdvancedOptions
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    color: AppTheme.primaryGreen,
+                  ),
+                  label: Text(
+                    'Advanced Options',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primaryGreen,
                     ),
-                ],
-              ),
-              if (_showAdvancedOptions) ...[
-                const SizedBox(height: 16),
-                _buildAdvancedOptions(context),
+                  ),
+                ),
+                const Spacer(),
+                if (_cravingsController.text.isNotEmpty)
+                  ElevatedButton.icon(
+                    onPressed: () => _generateRecommendations(context),
+                    icon: const Icon(Icons.smart_toy, size: 18, color: Colors.white),
+                    label: Text(
+                      'Get Suggestions',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
               ],
+            ),
+            if (_showAdvancedOptions) ...[
+              const SizedBox(height: 16),
+              _buildAdvancedOptions(),
             ],
-          ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildAdvancedOptions(BuildContext context) {
+  Widget _buildAdvancedOptions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Preferences',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w500,
+          'PREFERENCES',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.brownTextLight,
+            letterSpacing: 1.2,
           ),
         ),
         const SizedBox(height: 8),
@@ -431,23 +629,23 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
           spacing: 8,
           runSpacing: 4,
           children: [
-            FilterChip(
-              label: const Text('Budget-Friendly'),
+            _buildTemplateFilterChip(
+              label: 'Budget-Friendly',
               selected: false,
               onSelected: (selected) {},
             ),
-            FilterChip(
-              label: const Text('Quick Service'),
+            _buildTemplateFilterChip(
+              label: 'Quick Service',
               selected: false,
               onSelected: (selected) {},
             ),
-            FilterChip(
-              label: const Text('High Rated'),
+            _buildTemplateFilterChip(
+              label: 'High Rated',
               selected: false,
               onSelected: (selected) {},
             ),
-            FilterChip(
-              label: const Text('New Experience'),
+            _buildTemplateFilterChip(
+              label: 'New Experience',
               selected: false,
               onSelected: (selected) {},
             ),
@@ -457,12 +655,44 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     );
   }
 
-  String _getLoadingMessage(BuildContext context) {
+  Widget _buildTemplateFilterChip({
+    required String label,
+    required bool selected,
+    required ValueChanged<bool> onSelected,
+  }) {
+    return FilterChip(
+      label: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: selected ? Colors.white : AppTheme.brownText,
+        ),
+      ),
+      selected: selected,
+      selectedColor: AppTheme.primaryGreen,
+      backgroundColor: Colors.white,
+      side: BorderSide(
+        color: selected ? AppTheme.primaryGreen : Colors.grey.shade300,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(9999),
+      ),
+      checkmarkColor: Colors.white,
+      onSelected: onSelected,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Loading message
+  // ---------------------------------------------------------------------------
+
+  String _getLoadingMessage() {
     final cravings = _cravingsController.text.trim();
     if (cravings.isNotEmpty) {
       return 'Finding the perfect "$cravings" investment opportunities...';
     }
-    
+
     final hour = DateTime.now().hour;
     if (hour >= 6 && hour < 11) {
       return 'Discovering breakfast investment opportunities...';
@@ -471,136 +701,191 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     } else if (hour >= 17 && hour < 22) {
       return 'Evaluating dinner investment potential...';
     }
-    
+
     return 'Finding your next great dining investment...';
   }
 
-  Widget _buildErrorState(BuildContext context, String error) {
+  // ---------------------------------------------------------------------------
+  // Error state
+  // ---------------------------------------------------------------------------
+
+  Widget _buildErrorState(String error) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Card(
-        color: Theme.of(context).colorScheme.errorContainer,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(
-                _getErrorIcon(error),
-                size: 48,
-                color: Theme.of(context).colorScheme.onErrorContainer,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.errorColor.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.errorColor.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              _getErrorIcon(error),
+              size: 48,
+              color: AppTheme.errorColor,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _getErrorTitle(error),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.errorColor,
               ),
-              const SizedBox(height: 12),
-              Text(
-                _getErrorTitle(error),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _getErrorDescription(error),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.brownText,
               ),
-              const SizedBox(height: 8),
-              Text(
-                _getErrorDescription(error),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _showErrorDetails(context, error),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _showErrorDetails(context, error),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.brownText,
+                      side: const BorderSide(color: AppTheme.brownText),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text('Details'),
+                    ),
+                    child: Text(
+                      'Details',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _generateRecommendations(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.onErrorContainer,
-                        foregroundColor: Theme.of(context).colorScheme.errorContainer,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _generateRecommendations(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text('Try Again'),
                     ),
-                  ),
-                ],
-              ),
-              if (_isNetworkError(error)) ...[
-                const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: () => context.go('/discover'),
-                  icon: const Icon(Icons.explore),
-                  label: const Text('Browse Restaurants Instead'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+                    child: Text(
+                      'Try Again',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
+            ),
+            if (_isNetworkError(error)) ...[
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: () => context.go('/discover'),
+                icon: const Icon(
+                  Icons.explore,
+                  color: AppTheme.primaryGreen,
+                ),
+                label: Text(
+                  'Browse Restaurants Instead',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryGreen,
+                  ),
+                ),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  // ---------------------------------------------------------------------------
+  // Empty state
+  // ---------------------------------------------------------------------------
+
+  Widget _buildEmptyState() {
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.smart_toy_outlined,
-            size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.smart_toy_outlined,
+              size: 64,
+              color: AppTheme.primaryGreen.withValues(alpha: 0.7),
+            ),
           ),
           const SizedBox(height: 24),
           Text(
             'AI Investment Advisor Ready',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.primaryGreen,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
             'Discover intelligent dining investments tailored to your budget, preferences, and culinary aspirations. Our AI analyzes value propositions to maximize your satisfaction per dollar.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 15,
+              color: AppTheme.brownTextLight,
+              height: 1.5,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.15),
               ),
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.lightbulb_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.lightbulb_outline,
+                    color: AppTheme.primaryGreen,
+                    size: 20,
+                  ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Think of every meal as an investment in your happiness and well-being.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      color: AppTheme.brownText,
                       fontStyle: FontStyle.italic,
                     ),
                     textAlign: TextAlign.center,
@@ -612,10 +897,22 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _generateRecommendations(context),
-            icon: const Icon(Icons.auto_awesome),
-            label: const Text('Start My Investment Journey'),
+            icon: const Icon(Icons.auto_awesome, color: Colors.white),
+            label: Text(
+              'Start My Investment Journey',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              backgroundColor: AppTheme.primaryGreen,
+              foregroundColor: Colors.white,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -623,43 +920,75 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     );
   }
 
-  Widget _buildAIUnavailableView(BuildContext context) {
+  // ---------------------------------------------------------------------------
+  // AI unavailable view
+  // ---------------------------------------------------------------------------
+
+  Widget _buildAIUnavailableView() {
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.cloud_off,
-            size: 80,
-            color: Theme.of(context).colorScheme.error.withOpacity(0.5),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.errorColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.cloud_off,
+              size: 64,
+              color: AppTheme.errorColor.withValues(alpha: 0.7),
+            ),
           ),
           const SizedBox(height: 24),
           Text(
             'AI Service Unavailable',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.error,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.errorColor,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
             'The AI recommendation service is currently unavailable. Please check your API configuration.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 15,
+              color: AppTheme.brownTextLight,
+              height: 1.5,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () => context.go('/discover'),
-            child: const Text('Browse Restaurants Instead'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryGreen,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Browse Restaurants Instead',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
+  // ---------------------------------------------------------------------------
   // Actions and helpers
+  // ---------------------------------------------------------------------------
+
   void _handleMenuAction(String action) {
     switch (action) {
       case 'usage':
@@ -676,15 +1005,16 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
 
   Future<void> _generateRecommendations(BuildContext context) async {
     final generateFunction = ref.read(generateRecommendationsProvider);
-    
+
     await generateFunction(
-      specificCravings: _cravingsController.text.trim().isEmpty 
-          ? null 
+      specificCravings: _cravingsController.text.trim().isEmpty
+          ? null
           : _cravingsController.text.trim(),
     );
   }
 
-  void _selectRestaurant(BuildContext context, String recommendationId, String placeId) {
+  void _selectRestaurant(
+      BuildContext context, String recommendationId, String placeId) {
     // Submit feedback that this restaurant was selected
     ref.read(submitRecommendationFeedbackProvider)(
       recommendationId,
@@ -692,7 +1022,7 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
       'Selected this recommendation',
       wasSelected: true,
     );
-    
+
     // Navigate to restaurant details
     context.go('/restaurant/$placeId');
   }
@@ -703,82 +1033,179 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
       rating,
       feedback,
     );
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Thank you for your feedback!'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        content: Text(
+          'Thank you for your feedback!',
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        backgroundColor: AppTheme.primaryGreen,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }
 
   Color _getValueColor(int valueScore) {
-    if (valueScore >= 80) return Colors.green;
-    if (valueScore >= 60) return Colors.orange;
-    return Colors.red;
+    if (valueScore >= 80) return AppTheme.successGreen;
+    if (valueScore >= 60) return AppTheme.ctaOrange;
+    return AppTheme.errorColor;
   }
 
   Color _getConfidenceColor(int confidence) {
-    if (confidence >= 80) return Colors.green;
-    if (confidence >= 60) return Colors.orange;
-    return Colors.red;
+    if (confidence >= 80) return AppTheme.successGreen;
+    if (confidence >= 60) return AppTheme.ctaOrange;
+    return AppTheme.errorColor;
   }
+
+  // ---------------------------------------------------------------------------
+  // AI info dialog
+  // ---------------------------------------------------------------------------
 
   void _showAIInfoDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('AI Investment Advisor'),
-        content: const SingleChildScrollView(
+        backgroundColor: AppTheme.creamBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        title: Text(
+          'AI Investment Advisor',
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.brownText,
+          ),
+        ),
+        content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'How it works:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'HOW IT WORKS',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.brownTextLight,
+                  letterSpacing: 1.2,
+                ),
               ),
-              SizedBox(height: 8),
-              Text('• Analyzes your dining history and preferences'),
-              Text('• Considers your budget and location'),
-              Text('• Evaluates restaurant quality and value'),
-              Text('• Provides investment-minded recommendations'),
-              SizedBox(height: 16),
+              const SizedBox(height: 8),
+              _buildInfoBullet('Analyzes your dining history and preferences'),
+              _buildInfoBullet('Considers your budget and location'),
+              _buildInfoBullet('Evaluates restaurant quality and value'),
+              _buildInfoBullet('Provides investment-minded recommendations'),
+              const SizedBox(height: 16),
               Text(
-                'Privacy & Trust:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'PRIVACY & TRUST',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.brownTextLight,
+                  letterSpacing: 1.2,
+                ),
               ),
-              SizedBox(height: 8),
-              Text('• Your data stays private and secure'),
-              Text('• AI recommendations improve with feedback'),
-              Text('• Cost tracking helps manage spending'),
-              Text('• Always provides reasoning for transparency'),
+              const SizedBox(height: 8),
+              _buildInfoBullet('Your data stays private and secure'),
+              _buildInfoBullet('AI recommendations improve with feedback'),
+              _buildInfoBullet('Cost tracking helps manage spending'),
+              _buildInfoBullet('Always provides reasoning for transparency'),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.primaryGreen,
+            ),
+            child: Text(
+              'Got it',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildInfoBullet(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Icon(
+              Icons.check_circle_outline,
+              size: 14,
+              color: AppTheme.successGreen,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.brownText,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Budget alert dialog
+  // ---------------------------------------------------------------------------
+
   void _showBudgetAlert(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Budget Alert'),
-        content: const Text(
+        backgroundColor: AppTheme.creamBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        title: Text(
+          'Budget Alert',
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.brownText,
+          ),
+        ),
+        content: Text(
           'You\'re approaching your daily AI recommendation budget. '
           'Consider reviewing your usage or adjusting your daily limits.',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 14,
+            color: AppTheme.brownTextLight,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.primaryGreen,
+            ),
+            child: Text(
+              'OK',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
@@ -797,7 +1224,10 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     // Implementation for AI settings modal
   }
 
+  // ---------------------------------------------------------------------------
   // Enhanced error handling methods
+  // ---------------------------------------------------------------------------
+
   IconData _getErrorIcon(String error) {
     if (_isNetworkError(error)) return Icons.wifi_off;
     if (_isRateLimitError(error)) return Icons.hourglass_empty;
@@ -826,61 +1256,114 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
   }
 
   bool _isNetworkError(String error) {
-    final networkKeywords = ['network', 'connection', 'timeout', 'internet', 'offline'];
+    final networkKeywords = [
+      'network',
+      'connection',
+      'timeout',
+      'internet',
+      'offline'
+    ];
     final errorLower = error.toLowerCase();
     return networkKeywords.any((keyword) => errorLower.contains(keyword));
   }
 
   bool _isRateLimitError(String error) {
-    final rateLimitKeywords = ['rate limit', 'too many requests', 'quota', 'throttle'];
+    final rateLimitKeywords = [
+      'rate limit',
+      'too many requests',
+      'quota',
+      'throttle'
+    ];
     final errorLower = error.toLowerCase();
     return rateLimitKeywords.any((keyword) => errorLower.contains(keyword));
   }
 
   bool _isBudgetError(String error) {
-    final budgetKeywords = ['budget', 'limit exceeded', 'daily cost', 'daily limit'];
+    final budgetKeywords = [
+      'budget',
+      'limit exceeded',
+      'daily cost',
+      'daily limit'
+    ];
     final errorLower = error.toLowerCase();
     return budgetKeywords.any((keyword) => errorLower.contains(keyword));
   }
+
+  // ---------------------------------------------------------------------------
+  // Error details dialog
+  // ---------------------------------------------------------------------------
 
   void _showErrorDetails(BuildContext context, String error) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Error Details'),
+        backgroundColor: AppTheme.creamBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        title: Text(
+          'Error Details',
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.brownText,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Technical Details:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                'TECHNICAL DETAILS',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.brownTextLight,
+                  letterSpacing: 1.2,
+                ),
               ),
               const SizedBox(height: 8),
-              Text(error),
+              Text(
+                error,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: AppTheme.brownText,
+                ),
+              ),
               const SizedBox(height: 16),
-              const Text(
-                'Troubleshooting:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                'TROUBLESHOOTING',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.brownTextLight,
+                  letterSpacing: 1.2,
+                ),
               ),
               const SizedBox(height: 8),
               if (_isNetworkError(error)) ...[
-                const Text('• Check your internet connection'),
-                const Text('• Try switching between Wi-Fi and mobile data'),
-                const Text('• Wait a few moments and try again'),
+                _buildInfoBullet('Check your internet connection'),
+                _buildInfoBullet(
+                    'Try switching between Wi-Fi and mobile data'),
+                _buildInfoBullet('Wait a few moments and try again'),
               ] else if (_isRateLimitError(error)) ...[
-                const Text('• Wait 1-2 minutes before trying again'),
-                const Text('• Consider using the browse feature instead'),
-                const Text('• The service will resume normal operation shortly'),
+                _buildInfoBullet(
+                    'Wait 1-2 minutes before trying again'),
+                _buildInfoBullet(
+                    'Consider using the browse feature instead'),
+                _buildInfoBullet(
+                    'The service will resume normal operation shortly'),
               ] else if (_isBudgetError(error)) ...[
-                const Text('• More recommendations available tomorrow'),
-                const Text('• Use the restaurant browser to explore options'),
-                const Text('• Review your recent recommendations'),
+                _buildInfoBullet(
+                    'More recommendations available tomorrow'),
+                _buildInfoBullet(
+                    'Use the restaurant browser to explore options'),
+                _buildInfoBullet('Review your recent recommendations'),
               ] else ...[
-                const Text('• Try restarting the app'),
-                const Text('• Check for app updates'),
-                const Text('• Contact support if the issue persists'),
+                _buildInfoBullet('Try restarting the app'),
+                _buildInfoBullet('Check for app updates'),
+                _buildInfoBullet(
+                    'Contact support if the issue persists'),
               ],
             ],
           ),
@@ -888,7 +1371,15 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.brownText,
+            ),
+            child: Text(
+              'Close',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           if (!_isBudgetError(error))
             ElevatedButton(
@@ -896,7 +1387,20 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
                 Navigator.of(context).pop();
                 _generateRecommendations(context);
               },
-              child: const Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryGreen,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Try Again',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
             ),
         ],
       ),
@@ -910,7 +1414,10 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
     return 'high';
   }
 
+  // ---------------------------------------------------------------------------
   // AI Onboarding methods
+  // ---------------------------------------------------------------------------
+
   Future<void> _checkForFirstTimeUser() async {
     // Check if this is the user's first time using AI recommendations
     // In a real app, this would use SharedPreferences or similar
@@ -933,48 +1440,76 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
 
   Widget _buildOnboardingDialog() {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      backgroundColor: AppTheme.creamBg,
       child: Container(
         padding: const EdgeInsets.all(24),
         constraints: const BoxConstraints(maxWidth: 400),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 32,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome,
+                        size: 32,
+                        color: AppTheme.primaryGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Welcome to AI Dining Advisor',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.brownText,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Transform every meal into a smart investment decision. Our AI analyzes your preferences, budget, and dining patterns to recommend experiences that maximize your satisfaction and value.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15,
+                        color: AppTheme.brownTextLight,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    _buildFeatureList(),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Welcome to AI Dining Advisor',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Transform every meal into a smart investment decision. Our AI analyzes your preferences, budget, and dining patterns to recommend experiences that maximize your satisfaction and value.',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            _buildFeatureList(),
             const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Maybe Later'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.brownText,
+                      side: const BorderSide(color: AppTheme.brownText),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Maybe Later',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -984,7 +1519,20 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
                       Navigator.of(context).pop();
                       _generateRecommendations(context);
                     },
-                    child: const Text('Get Started'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Get Started',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1000,7 +1548,8 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
       {
         'icon': Icons.psychology,
         'title': 'Smart Analysis',
-        'description': 'AI evaluates value, quality, and your personal preferences',
+        'description':
+            'AI evaluates value, quality, and your personal preferences',
       },
       {
         'icon': Icons.trending_up,
@@ -1010,55 +1559,65 @@ class _AIRecommendationsPageState extends ConsumerState<AIRecommendationsPage>
       {
         'icon': Icons.schedule,
         'title': 'Contextual Timing',
-        'description': 'Perfect suggestions based on time, location, and mood',
+        'description':
+            'Perfect suggestions based on time, location, and mood',
       },
     ];
 
     return Column(
-      children: features.map((feature) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                feature['icon'] as IconData,
-                size: 20,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    feature['title'] as String,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+      children: features
+          .map((feature) => Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.brownText.withValues(alpha: 0.05),
                   ),
-                  Text(
-                    feature['description'] as String,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color:
+                            AppTheme.primaryGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        feature['icon'] as IconData,
+                        size: 20,
+                        color: AppTheme.primaryGreen,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      )).toList(),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            feature['title'] as String,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.brownText,
+                            ),
+                          ),
+                          Text(
+                            feature['description'] as String,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppTheme.brownTextLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ))
+          .toList(),
     );
   }
 }

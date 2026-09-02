@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>What We Have For Lunch - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FF6B35", // Orange for the main button
+                        "secondary": "#2E7D3E", // Green for accents
+                        "neutral-text": "#6B4E3D", // Brown for text
+                        "background-light": "#FFF8E7", // Cream background
+                        "background-dark": "#141e16",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        /* Pulse-like visual effect without actual animation as per instructions to avoid animations */
+        .tactile-shadow {
+            box-shadow: 0 10px 25px -5px rgba(255, 107, 53, 0.4), 0 8px 10px -6px rgba(255, 107, 53, 0.4);
+        }
+        .inner-glow {
+            box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-neutral-text font-display">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<div class="flex items-center justify-between px-6 pt-8 pb-4">
+<div class="flex size-12 shrink-0 items-center justify-center bg-secondary/10 rounded-full border-2 border-secondary/20">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile avatar icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDc9pRjMwC_dJ76Td4EdAuZQrsLZ4WWgkezGbBl5bpMb3noEIgIOY1v3OTQyyzJHlYUPD31pn9jkJ0ODohZbBvNMYlJJW6PBu-hsvqOLwUuVDGCeCyoqt5lJ_NMZwvE4hz-ZiwQ6fpn5A2SBd7m_cv-Rgp03BEIlPLWoorUBj99w7joyBAp9RHAxIIUiGSVCbkiQOmOq6oM4jkE6ILhERRXU3Omg1K95_dct-73JeQyR1_ISEJeL5Egsg_AQF5vspsdelJPO_XtORI");'></div>
+</div>
+<div class="flex-1 px-4">
+<h2 class="text-secondary text-sm font-bold uppercase tracking-widest">Lunch Planner</h2>
+</div>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center rounded-xl h-12 w-12 bg-white/50 border border-neutral-text/10 text-neutral-text hover:bg-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+<!-- Greeting Section -->
+<div class="px-8 pt-10 pb-6 text-center">
+<h1 class="text-neutral-text tracking-tight text-4xl font-extrabold leading-tight">Hi, [User Name]!</h1>
+<p class="text-neutral-text/70 text-lg font-medium mt-2">Ready for your next meal?</p>
+</div>
+<!-- Main Content Area / Centerpiece -->
+<div class="flex-1 flex flex-col items-center justify-center px-6">
+<!-- Outer Ring decoration to simulate pulse visually -->
+<div class="relative flex items-center justify-center">
+<div class="absolute w-72 h-72 rounded-full border-2 border-primary/20"></div>
+<div class="absolute w-64 h-64 rounded-full border-4 border-primary/10"></div>
+<!-- Main Hungry Button -->
+<button class="relative z-10 flex flex-col items-center justify-center w-56 h-56 rounded-full bg-primary text-white tactile-shadow inner-glow transition-transform active:scale-95 border-8 border-background-light">
+<span class="material-symbols-outlined text-5xl mb-2">restaurant</span>
+<span class="text-xl font-bold tracking-wide uppercase">I am hungry</span>
+</button>
+</div>
+<div class="mt-12 bg-secondary/10 px-6 py-3 rounded-full border border-secondary/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">local_fire_department</span>
+<p class="text-secondary text-sm font-bold uppercase tracking-wider">3 Daily Suggestions Ready</p>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="bg-white/80 backdrop-blur-md border-t border-neutral-text/5 px-6 pb-8 pt-4">
+<div class="flex items-center justify-between gap-2">
+<!-- Home (Active) -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 py-2 rounded-2xl bg-secondary/10 text-secondary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined fill-1">home</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-widest">Home</p>
+</a>
+<!-- Discover -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-neutral-text/50 hover:text-secondary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">explore</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-widest">Discover</p>
+</a>
+<!-- Track -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-neutral-text/50 hover:text-secondary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-widest">Track</p>
+</a>
+<!-- Profile -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-neutral-text/50 hover:text-secondary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-widest">Profile</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

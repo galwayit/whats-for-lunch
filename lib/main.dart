@@ -35,12 +35,12 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: Colors.white,
+    systemNavigationBarColor: Color(0xFFFFF8E7), // Match cream background
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: ErrorBoundaryWidget(
         child: MyApp(),
       ),

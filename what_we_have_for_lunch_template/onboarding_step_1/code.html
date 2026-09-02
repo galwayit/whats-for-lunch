@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - What We Have For Lunch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#2f7f3f",
+                "background-light": "#FFF8E7",
+                "background-dark": "#141e16",
+                "accent-brown": "#6B4E3D",
+              },
+              fontFamily: {
+                "display": ["Plus Jakarta Sans", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-accent-brown">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- TopAppBar with Progress -->
+<div class="flex flex-col w-full p-6 pb-2">
+<div class="flex items-center justify-between mb-4">
+<button class="p-2 rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-accent-brown">arrow_back</span>
+</button>
+<h2 class="text-accent-brown text-lg font-bold leading-tight tracking-tight">Onboarding</h2>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-end">
+<p class="text-accent-brown text-sm font-semibold uppercase tracking-wider">Step 1 of 5</p>
+<p class="text-accent-brown/70 text-xs font-medium">Getting Started</p>
+</div>
+<div class="w-full h-3 bg-primary/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 20%;"></div>
+</div>
+</div>
+</div>
+<!-- Hero Section -->
+<div class="flex-1 flex flex-col items-center justify-center px-6 py-8">
+<div class="w-full max-w-md bg-white/40 dark:bg-white/5 rounded-xl p-8 flex flex-col items-center shadow-sm border border-accent-brown/5">
+<!-- Friendly Food Icon -->
+<div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary text-6xl">restaurant_menu</span>
+</div>
+<!-- Main Content -->
+<div class="text-center space-y-4">
+<h1 class="text-accent-brown dark:text-slate-100 text-3xl font-extrabold leading-tight">
+                        Welcome to <br/>What We Have For Lunch
+                    </h1>
+<p class="text-accent-brown/80 dark:text-slate-300 text-lg font-medium leading-relaxed">
+                        Discover and plan your daily meals with ease and joy.
+                    </p>
+</div>
+<!-- Visual Element -->
+<div class="mt-10 w-full rounded-xl overflow-hidden aspect-video relative shadow-lg">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+<img alt="Delicious home cooked meal on a table" class="w-full h-full object-cover" data-alt="Delicious home cooked meal on a table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNWdvBfP2gsYrI-CAOd3K-lSOpMxxSoqDaH7b8V9cYHufpbyfX6_iDK_xowndZXcCHiqXbGkajTOtMEcvM5tPQAX0bVU0peWWE2H0_z1nS2WegdMoLsZ7gKqmqlK2xnwsEM2NB7BuoEy9WsJA3A_crzMyvn0JRaCq_KaJV7eOFgd7f2kpL9RHvr0becV8FmdvqWG2PGa9Tzx1DCRxeZ_tsUvHwjNKIA0hl3GZANS2UmYmnUAEFhJ9af3DD0-eT3_7cRblxgKCB0YQ"/>
+</div>
+</div>
+</div>
+<!-- Fixed Footer CTA -->
+<div class="p-6 w-full max-w-md mx-auto mb-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-5 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+<span class="text-xl">Get Started</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<p class="text-center text-accent-brown/60 text-sm mt-4 font-medium">
+                Already have an account? <span class="text-primary font-bold">Sign In</span>
+</p>
+</div>
+</div>
+</body></html>

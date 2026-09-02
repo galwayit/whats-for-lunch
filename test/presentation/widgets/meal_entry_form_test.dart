@@ -3,11 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:what_we_have_for_lunch/presentation/widgets/meal_entry_form.dart';
-import 'package:what_we_have_for_lunch/presentation/providers/meal_providers.dart';
-import 'package:what_we_have_for_lunch/presentation/providers/simple_providers.dart' as simple_providers;
-import 'package:what_we_have_for_lunch/presentation/providers/user_preferences_provider.dart' as prefs;
+import 'package:what_we_have_for_lunch/presentation/providers/user_preferences_provider.dart';
 import 'package:what_we_have_for_lunch/presentation/widgets/ux_components.dart';
+import 'package:what_we_have_for_lunch/domain/entities/user.dart';
 import 'package:what_we_have_for_lunch/domain/entities/user_preferences.dart';
+import 'package:what_we_have_for_lunch/domain/repositories/user_repository.dart';
+
+/// Mock user repository for testing -- no-op DB layer
+class _TestUserRepository implements UserRepository {
+  @override
+  Future<int> createUser(UserEntity user) async => 1;
+  @override
+  Future<UserEntity?> getUserById(int id) async => null;
+  @override
+  Future<List<UserEntity>> getAllUsers() async => [];
+  @override
+  Future<bool> updateUser(UserEntity user) async => true;
+  @override
+  Future<bool> deleteUser(int id) async => true;
+}
 
 void main() {
   group('MealEntryForm Widget Tests', () {
@@ -15,16 +29,18 @@ void main() {
       return ProviderScope(
         overrides: [
           // Mock current user ID
-          simple_providers.currentUserIdProvider.overrideWith((ref) => 1),
-          // Mock user preferences notifier - using simple provider for tests
-          simple_providers.simpleUserPreferencesProvider.overrideWith((ref) => 
-            simple_providers.SimpleUserPreferencesNotifier()..state = const UserPreferences(
+          currentUserIdProvider.overrideWith((ref) => 1),
+          // Mock user preferences using the unified provider
+          userPreferencesProvider.overrideWith((ref) {
+            final notifier = UserPreferencesNotifier(_TestUserRepository());
+            notifier.state = const UserPreferences(
               weeklyBudget: 200.0,
               cuisinePreferences: [],
               dietaryRestrictions: [],
               budgetLevel: 2,
-            )
-          ),
+            );
+            return notifier;
+          }),
         ],
         child: MaterialApp(
           home: Scaffold(
@@ -57,17 +73,17 @@ void main() {
 
       // Find the restaurant input field
       final restaurantField = find.byType(TextFormField).first;
-      
+
       // Leave field empty and trigger validation
       await tester.tap(restaurantField);
       await tester.enterText(restaurantField, '');
       await tester.pump();
-      
+
       // Trigger form submission to see validation
       final submitButton = find.text('Log Experience');
       await tester.tap(submitButton);
       await tester.pump();
-      
+
       // Should show validation error
       expect(find.text('Please tell us where you enjoyed this experience'), findsOneWidget);
     });
@@ -78,17 +94,17 @@ void main() {
 
       // Find the cost input field
       final costField = find.byType(TextFormField).at(1); // Second TextFormField
-      
+
       // Enter invalid cost
       await tester.tap(costField);
       await tester.enterText(costField, '0');
       await tester.pump();
-      
+
       // Trigger form submission
       final submitButton = find.text('Log Experience');
       await tester.tap(submitButton);
       await tester.pump();
-      
+
       // Should show validation error
       expect(find.text('Please enter a valid amount'), findsOneWidget);
     });
@@ -99,12 +115,12 @@ void main() {
 
       // Find the cost input field
       final costField = find.byType(TextFormField).at(1);
-      
+
       // Enter valid cost
       await tester.tap(costField);
       await tester.enterText(costField, '25.50');
       await tester.pump();
-      
+
       // Should not show validation error
       expect(find.text('Please enter a valid amount'), findsNothing);
     });
@@ -136,14 +152,14 @@ void main() {
       // Find category selector
       expect(find.byType(UXMealCategorySelector), findsOneWidget);
       expect(find.text('Experience Type'), findsOneWidget);
-      
+
       // Find and tap a category chip
       final deliveryChip = find.text('Delivery');
       expect(deliveryChip, findsOneWidget);
-      
+
       await tester.tap(deliveryChip);
       await tester.pump();
-      
+
       // Category should be selected (FilterChip should be selected)
       final filterChip = tester.widget<FilterChip>(
         find.ancestor(
@@ -160,7 +176,7 @@ void main() {
 
       // Check for positive messaging in the header
       expect(find.text('Every meal is an investment in your happiness and well-being. Let\'s capture this moment!'), findsOneWidget);
-      
+
       // Enter a cost to see budget impact messaging
       final costField = find.byType(TextFormField).at(1);
       await tester.tap(costField);
@@ -178,7 +194,7 @@ void main() {
       // Find date/time picker
       expect(find.byType(UXDateTimePicker), findsOneWidget);
       expect(find.text('Experience Date & Time'), findsOneWidget);
-      
+
       // Should show "Today" by default
       expect(find.text('Today'), findsOneWidget);
     });
@@ -246,7 +262,7 @@ void main() {
 
       // Find notes field (should be the last TextFormField)
       final notesField = find.byType(TextFormField).last;
-      
+
       // Enter notes
       await tester.tap(notesField);
       await tester.enterText(notesField, 'Great dining experience!');
@@ -269,7 +285,7 @@ void main() {
       // Auto-save indicator should appear after some time
       // Note: This test may need adjustment based on auto-save timing
       await tester.pump(const Duration(seconds: 1));
-      
+
       // Look for save indicator (cloud icon or save text)
       expect(find.byIcon(Icons.cloud_done), findsOneWidget);
     });
@@ -277,18 +293,12 @@ void main() {
 
   group('QuickActionButtons Widget Tests', () {
     testWidgets('should render quick action buttons', (WidgetTester tester) async {
-      bool actionCalled = false;
-      String? actionType;
-
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: QuickActionButtons(
-                onQuickAction: (type) {
-                  actionCalled = true;
-                  actionType = type;
-                },
+                onQuickAction: (type) {},
               ),
             ),
           ),

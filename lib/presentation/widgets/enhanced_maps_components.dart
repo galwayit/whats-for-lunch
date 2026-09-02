@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -62,14 +60,13 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
   
   // Custom marker icons
   BitmapDescriptor? _userMarkerIcon;
-  Map<String, BitmapDescriptor> _customMarkerIcons = {};
+  final Map<String, BitmapDescriptor> _customMarkerIcons = {};
   
   // Animation controller for smooth transitions
   late AnimationController _animationController;
   
   // Favorites and directions
-  Set<String> _favoriteRestaurantIds = {};
-  Restaurant? _selectedRestaurant;
+  final Set<String> _favoriteRestaurantIds = {};
   bool _showDirections = false;
 
   @override
@@ -154,7 +151,7 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
     final image = await picture.toImage(size, size);
     final bytes = await image.toByteData(format: ImageByteFormat.png);
     
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
   }
 
   void _initializeMarkers() {
@@ -186,7 +183,9 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
     if (!widget.showUserLocation || 
         widget.userLocation == null || 
         _isDisposed || 
-        !mounted) return;
+        !mounted) {
+      return;
+    }
 
     final markers = Set<Marker>.from(_markers);
     
@@ -220,7 +219,9 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
     if (!widget.showUserLocation || 
         widget.userLocation == null || 
         _isDisposed || 
-        !mounted) return;
+        !mounted) {
+      return;
+    }
 
     final circles = Set<Circle>.from(_circles);
     
@@ -236,8 +237,8 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
           widget.userLocation!.longitude,
         ),
         radius: widget.userPreferences.maxTravelDistance * 1000, // Convert to meters
-        fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        strokeColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        fillColor: Theme.of(context).colorScheme.primary.withValues(alpha:0.1),
+        strokeColor: Theme.of(context).colorScheme.primary.withValues(alpha:0.3),
         strokeWidth: 2,
       ),
     );
@@ -348,10 +349,6 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
 
   /// Select restaurant and show details
   void _selectRestaurant(Restaurant restaurant) {
-    setState(() {
-      _selectedRestaurant = restaurant;
-    });
-    
     widget.onRestaurantSelected?.call(restaurant);
     
     // Animate to restaurant with smooth transition
@@ -547,16 +544,16 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Container(
+      return const SizedBox(
         height: 400,
-        child: const Center(
+        child: Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
 
     if (_errorMessage != null) {
-      return Container(
+      return SizedBox(
         height: 400,
         child: Center(
           child: Column(
@@ -581,7 +578,7 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
 
     return Semantics(
       label: 'Restaurant map showing ${widget.restaurants.length} nearby restaurants',
-      child: Container(
+      child: SizedBox(
         height: 400,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -632,7 +629,7 @@ class _UXEnhancedMapsViewState extends State<UXEnhancedMapsView> with TickerProv
         _controller!.dispose();
       } catch (e) {
         // Ignore disposal errors - controller might already be disposed
-        print('Warning: Error disposing Google Maps controller: $e');
+        debugPrint('Warning: Error disposing Google Maps controller: $e');
       }
     }
     
@@ -681,7 +678,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha:0.1),
                 blurRadius: 10,
                 spreadRadius: 0,
                 offset: const Offset(0, -5),
@@ -696,7 +693,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -752,7 +749,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                       Row(
                         children: [
                           if (restaurant.rating != null) ...[
-                            Icon(Icons.star, color: Colors.amber, size: 20),
+                            const Icon(Icons.star, color: Colors.amber, size: 20),
                             const SizedBox(width: 4),
                             Text(
                               restaurant.rating!.toStringAsFixed(1),
@@ -782,7 +779,7 @@ class _RestaurantBottomSheet extends StatelessWidget {
                           ],
                           
                           if (restaurant.distanceFromUser != null) ...[
-                            Icon(Icons.location_on, size: 16),
+                            const Icon(Icons.location_on, size: 16),
                             const SizedBox(width: 4),
                             Text(
                               '${restaurant.distanceFromUser!.toStringAsFixed(1)}km',
@@ -874,9 +871,9 @@ class _RestaurantBottomSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardColor.withOpacity(0.1),
+        color: cardColor.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cardColor.withOpacity(0.3)),
+        border: Border.all(color: cardColor.withValues(alpha:0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -996,9 +993,9 @@ class UXRestaurantMarker extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: safetyColor.withOpacity(0.1),
+                    color: safetyColor.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: safetyColor.withOpacity(0.3)),
+                    border: Border.all(color: safetyColor.withValues(alpha:0.3)),
                   ),
                   child: Icon(safetyIcon, color: safetyColor, size: 20),
                 ),
@@ -1026,7 +1023,7 @@ class UXRestaurantMarker extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.star, size: 16, color: Colors.amber),
+                                const Icon(Icons.star, size: 16, color: Colors.amber),
                                 const SizedBox(width: 2),
                                 Text(
                                   restaurant.rating!.toStringAsFixed(1),
@@ -1157,7 +1154,7 @@ class UXCompactMapControls extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha:0.2),
           width: 1,
         ),
       ),
@@ -1252,7 +1249,7 @@ class UXCompactMapControls extends StatelessWidget {
                         border: Border.all(
                           color: currentRadius == radius 
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.outline.withOpacity(0.5),
+                            : theme.colorScheme.outline.withValues(alpha:0.5),
                           width: 1,
                         ),
                       ),
@@ -1340,25 +1337,25 @@ class UXMapLegend extends StatelessWidget {
             
             // Safety levels
             ...[
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.green,
                 icon: Icons.verified,
                 title: 'Community Verified',
                 description: 'Dietary info verified by community',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.blue,
                 icon: Icons.check_circle,
                 title: 'Safe',
                 description: 'No known allergens or dietary conflicts',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.orange,
                 icon: Icons.warning,
                 title: 'Caution',
                 description: 'Some dietary considerations needed',
               ),
-              _LegendItem(
+              const _LegendItem(
                 color: Colors.red,
                 icon: Icons.dangerous,
                 title: 'Warning',
@@ -1397,9 +1394,9 @@ class _LegendItem extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: color.withOpacity(0.3)),
+              border: Border.all(color: color.withValues(alpha:0.3)),
             ),
             child: Icon(icon, color: color, size: 14),
           ),

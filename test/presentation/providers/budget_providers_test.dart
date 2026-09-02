@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -10,15 +11,26 @@ import 'package:what_we_have_for_lunch/presentation/providers/budget_providers.d
 
 import 'budget_providers_test.mocks.dart';
 
+/// Manual mock for Ref since it cannot be auto-generated without build_runner.
+class MockRef extends Mock implements Ref {
+  @override
+  T read<T>(ProviderListenable<T> provider) => super.noSuchMethod(
+        Invocation.method(#read, [provider]),
+        returnValue: null as T,
+      ) as T;
+}
+
 @GenerateMocks([MealRepository])
 void main() {
   group('WeeklyInvestmentNotifier Tests', () {
     late MockMealRepository mockMealRepository;
+    late MockRef mockRef;
     late UserPreferences testUserPreferences;
     late ProviderContainer container;
 
     setUp(() {
       mockMealRepository = MockMealRepository();
+      mockRef = MockRef();
       testUserPreferences = const UserPreferences(
         weeklyBudget: 200.0,
         mealFrequencyPerDay: 2,
@@ -35,8 +47,7 @@ void main() {
       // Arrange
       const testUserId = 1;
       final weekStart = DateTime(2024, 1, 1); // Monday
-      final weekEnd = weekStart.add(const Duration(days: 7));
-      
+
       final testMeals = [
         Meal(
           id: 1,
@@ -60,7 +71,7 @@ void main() {
           .thenAnswer((_) async => testMeals);
 
       // Act
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences, mockRef);
       await Future.delayed(const Duration(milliseconds: 100)); // Allow initialization
 
       // Assert
@@ -75,7 +86,7 @@ void main() {
 
     test('should calculate meal impact correctly for low impact', () {
       // Arrange
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences, mockRef);
       
       // Set initial state
       notifier.state = WeeklyInvestmentState(
@@ -102,7 +113,7 @@ void main() {
 
     test('should calculate meal impact correctly for high impact', () {
       // Arrange
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences, mockRef);
       
       // Set initial state with higher current spending
       notifier.state = WeeklyInvestmentState(
@@ -129,7 +140,7 @@ void main() {
 
     test('should update weekly capacity correctly', () async {
       // Arrange
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences, mockRef);
       
       // Set initial state
       notifier.state = WeeklyInvestmentState(
@@ -163,7 +174,7 @@ void main() {
           .thenThrow(Exception('Database error'));
 
       // Act
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, testUserPreferences, mockRef);
       await Future.delayed(const Duration(milliseconds: 500)); // Allow async initialization
 
       // Assert
@@ -174,7 +185,7 @@ void main() {
 
     test('should handle null user preferences gracefully', () async {
       // Act
-      final notifier = WeeklyInvestmentNotifier(mockMealRepository, null);
+      final notifier = WeeklyInvestmentNotifier(mockMealRepository, null, mockRef);
       await Future.delayed(const Duration(milliseconds: 100)); // Allow initialization
 
       // Assert
@@ -411,13 +422,14 @@ void main() {
     test('should calculate investment impact within performance target', () {
       // Arrange
       final mockRepo = MockMealRepository();
-      final preferences = const UserPreferences(
+      final mockRefLocal = MockRef();
+      const preferences = UserPreferences(
         weeklyBudget: 200.0,
         mealFrequencyPerDay: 2,
         budgetLevel: 3,
       );
-      
-      final notifier = WeeklyInvestmentNotifier(mockRepo, preferences);
+
+      final notifier = WeeklyInvestmentNotifier(mockRepo, preferences, mockRefLocal);
       notifier.state = WeeklyInvestmentState(
         weeklyCapacity: 200.0,
         currentSpent: 100.0,
