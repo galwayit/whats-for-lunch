@@ -116,3 +116,13 @@ Row-level security: `groups` readable by the host and by any user with an rsvp r
 ## Secrets (set with `supabase secrets set`, never committed)
 
 `GOOGLE_PLACES_API_KEY`, `GEMINI_API_KEY`, `REVENUECAT_WEBHOOK_SECRET`, `FCM_SERVICE_ACCOUNT_JSON`, `INVITE_LINK_BASE` (e.g. `https://lunch.iapp.au/i/`).
+
+## Implementation notes (deviations decided during the build; details in BUILD_NOTES.md)
+
+- `groups.host_name` column added so `LunchGroup.hostName` can be returned without a join; taken from the JWT metadata at create time.
+- A non-empty `query` uses Places `places:searchText` (searchNearby has no keyword filter); `maxPrice` and `minRating` are applied after the cache lookup so they do not fragment the cache; the cache radius is rounded to 0.5 km.
+- The free AI quota is incremented before the Gemini call and refunded with `increment_ai_usage(app_user_id, day, -1)` when the call fails.
+- `AiRecommendation.userId` is `0` in backend responses; the client substitutes its local user id when persisting.
+- Anonymous web guests receive a `guestToken` in the respond response and send it back as the `x-guest-token` header (stored in localStorage) instead of a cookie.
+- `groups-confirm` verifies the host only; the Pro check happens at create and propose.
+- `rsvps` is in the realtime publication so a host screen can subscribe if wanted; the apps poll on resume by default.

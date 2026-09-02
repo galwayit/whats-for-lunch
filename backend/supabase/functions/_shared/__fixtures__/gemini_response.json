@@ -1,0 +1,49 @@
+{
+  "recommendations": [
+    {
+      "placeId": "ChIJrTLr-GyuEmsRBfy61i59si0",
+      "rank": 1,
+      "confidenceScore": 0.88,
+      "investmentScore": 0.9,
+      "factorScores": {
+        "budget": 0.7,
+        "dietary": 0.9,
+        "location": 0.8,
+        "history": 0.6,
+        "temporal": 0.8,
+        "social": 0.7
+      }
+    },
+    {
+      "placeId": "ChIJ_hallucinated_place",
+      "rank": 2,
+      "confidenceScore": 0.8,
+      "investmentScore": 0.8,
+      "factorScores": {
+        "budget": 0.1,
+        "dietary": 0.1,
+        "location": 0.1,
+        "history": 0.1,
+        "temporal": 0.1,
+        "social": 0.1
+      }
+    },
+    {
+      "placeId": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+      "rank": 3,
+      "confidenceScore": 0.75,
+      "investmentScore": 0.7,
+      "factorScores": {
+        "budget": 0.9,
+        "dietary": 0.6,
+        "location": 0.9,
+        "history": 0.5,
+        "temporal": 0.7,
+        "social": 0.8
+      }
+    }
+  ],
+  "reasoning": "Sushi Rocks fits the light craving and dietary needs; Trattoria Bridge is a strong value fallback.",
+  "overallConfidence": 0.82,
+  "investmentSummary": "Two well-rated options within a short walk, both under the weekly budget."
+}

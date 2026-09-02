@@ -1,0 +1,117 @@
+# Supabase project configuration for the Lunch backend.
+# Hand-written; see backend/README.md for the deployment steps.
+# Secrets are never stored here: use env(...) placeholders and `supabase secrets set`.
+
+project_id = "lunch"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["https://127.0.0.1:3000", "au.iapp.lunch://auth-callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+enable_anonymous_sign_ins = false
+enable_manual_linking = false
+
+[auth.email]
+enable_signup = false
+double_confirm_changes = true
+enable_confirmations = false
+
+# Sign in with Apple. The native apps send an id token + nonce, so the
+# client id is the app bundle id and the secret is the Apple client secret
+# JWT (generated from the Services ID key; rotate before it expires).
+[auth.external.apple]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_APPLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+redirect_uri = ""
+url = ""
+
+# Google Sign-In. client_id may hold several comma-separated ids (web,
+# iOS, Android) so id tokens from every platform validate.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+redirect_uri = ""
+url = ""
+skip_nonce_check = true
+
+[edge_runtime]
+enabled = true
+policy = "oneshot"
+inspector_port = 8083
+
+[analytics]
+enabled = false
+
+# ---- Edge functions ----
+# verify_jwt = false: reachable with the anon key; the function resolves the
+# optional user itself (see _shared/auth.ts). verify_jwt = true: the gateway
+# rejects requests without a valid user JWT before the function runs.
+
+[functions.places-nearby]
+verify_jwt = false
+
+[functions.places-details]
+verify_jwt = false
+
+[functions.places-photo]
+verify_jwt = false
+
+[functions.ai-recommend]
+verify_jwt = false
+
+[functions.invitations]
+verify_jwt = false
+
+[functions.invitations-respond]
+verify_jwt = false
+
+[functions.push-register]
+verify_jwt = false
+
+[functions.revenuecat-webhook]
+verify_jwt = false
+
+[functions.groups-create]
+verify_jwt = true
+
+[functions.groups-propose]
+verify_jwt = true
+
+[functions.groups-confirm]
+verify_jwt = true
+
+[functions.account-delete]
+verify_jwt = true

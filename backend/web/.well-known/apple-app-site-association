@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["APPLE_TEAM_ID_PLACEHOLDER.au.iapp.lunch"],
+        "components": [
+          { "/": "/i/*", "comment": "Lunch invitation links" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["APPLE_TEAM_ID_PLACEHOLDER.au.iapp.lunch"]
+  }
+}

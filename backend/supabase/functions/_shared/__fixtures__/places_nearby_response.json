@@ -1,0 +1,70 @@
+{
+  "places": [
+    {
+      "id": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+      "types": [
+        "italian_restaurant",
+        "pizza_restaurant",
+        "restaurant",
+        "meal_takeaway",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "formattedAddress": "12 Bridge St, Sydney NSW 2000, Australia",
+      "location": { "latitude": -33.8636, "longitude": 151.2092 },
+      "rating": 4.5,
+      "userRatingCount": 1287,
+      "priceLevel": "PRICE_LEVEL_MODERATE",
+      "displayName": { "text": "Trattoria Bridge", "languageCode": "en" },
+      "currentOpeningHours": { "openNow": true },
+      "photos": [
+        {
+          "name": "places/ChIJN1t_tDeuEmsRUsoyG83frY4/photos/AXCi2Q5abc",
+          "widthPx": 4032,
+          "heightPx": 3024
+        },
+        {
+          "name": "places/ChIJN1t_tDeuEmsRUsoyG83frY4/photos/AXCi2Q5def",
+          "widthPx": 1200,
+          "heightPx": 900
+        }
+      ]
+    },
+    {
+      "id": "ChIJrTLr-GyuEmsRBfy61i59si0",
+      "types": [
+        "japanese_restaurant",
+        "sushi_restaurant",
+        "restaurant",
+        "meal_delivery",
+        "meal_takeaway",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "formattedAddress": "3/45 George St, The Rocks NSW 2000, Australia",
+      "location": { "latitude": -33.8599, "longitude": 151.2085 },
+      "rating": 4.2,
+      "userRatingCount": 411,
+      "priceLevel": "PRICE_LEVEL_EXPENSIVE",
+      "displayName": { "text": "Sushi Rocks", "languageCode": "en" },
+      "currentOpeningHours": { "openNow": false },
+      "photos": []
+    },
+    {
+      "id": "ChIJ7cv00DwsDogRAMDACa2i4K8",
+      "types": ["restaurant", "food", "point_of_interest", "establishment"],
+      "formattedAddress": "200 Pitt St, Sydney NSW 2000, Australia",
+      "location": { "latitude": -33.8708, "longitude": 151.2081 },
+      "rating": 3.9,
+      "userRatingCount": 88,
+      "displayName": { "text": "Pitt Street Canteen", "languageCode": "en" }
+    },
+    {
+      "id": "ChIJ_missing_name",
+      "types": ["cafe", "food"],
+      "location": { "latitude": -33.87, "longitude": 151.21 }
+    }
+  ]
+}

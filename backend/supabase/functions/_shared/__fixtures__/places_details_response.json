@@ -1,0 +1,55 @@
+{
+  "id": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+  "types": ["italian_restaurant", "restaurant", "food", "point_of_interest", "establishment"],
+  "internationalPhoneNumber": "+61 2 9251 1234",
+  "formattedAddress": "12 Bridge St, Sydney NSW 2000, Australia",
+  "location": { "latitude": -33.8636, "longitude": 151.2092 },
+  "rating": 4.5,
+  "websiteUri": "https://trattoriabridge.example/",
+  "userRatingCount": 1287,
+  "priceLevel": "PRICE_LEVEL_MODERATE",
+  "displayName": { "text": "Trattoria Bridge", "languageCode": "en" },
+  "currentOpeningHours": {
+    "openNow": true,
+    "weekdayDescriptions": [
+      "Monday: 11:30 AM – 10:00 PM",
+      "Tuesday: 11:30 AM – 10:00 PM",
+      "Wednesday: 11:30 AM – 10:00 PM",
+      "Thursday: 11:30 AM – 10:00 PM",
+      "Friday: 11:30 AM – 11:00 PM",
+      "Saturday: 12:00 – 11:00 PM",
+      "Sunday: Closed"
+    ]
+  },
+  "photos": [
+    {
+      "name": "places/ChIJN1t_tDeuEmsRUsoyG83frY4/photos/AXCi2Q5abc",
+      "widthPx": 4032,
+      "heightPx": 3024
+    }
+  ],
+  "reviews": [
+    {
+      "name": "places/ChIJN1t_tDeuEmsRUsoyG83frY4/reviews/ChdDSUhNMG9nS0VJQ0FnSUNud1lxRmdBRRAB",
+      "relativePublishTimeDescription": "2 weeks ago",
+      "rating": 5,
+      "text": { "text": "Best carbonara in the CBD.", "languageCode": "en" },
+      "authorAttribution": {
+        "displayName": "Priya N",
+        "uri": "https://www.google.com/maps/contrib/1",
+        "photoUri": "https://lh3.googleusercontent.com/a/photo1"
+      },
+      "publishTime": "2026-08-19T03:21:44Z"
+    },
+    {
+      "name": "places/ChIJN1t_tDeuEmsRUsoyG83frY4/reviews/ChdDSUhNMG9nS0VJQ0FnSUNud1lxRmdBRRAC",
+      "relativePublishTimeDescription": "a month ago",
+      "rating": 3,
+      "authorAttribution": {
+        "displayName": "Tom L",
+        "uri": "https://www.google.com/maps/contrib/2"
+      },
+      "publishTime": "2026-07-30T10:00:00Z"
+    }
+  ]
+}

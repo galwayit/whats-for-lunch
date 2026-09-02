@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lunch invitation</title>
+  <meta name="description" content="You have been invited to lunch. Let the host know if you are coming.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8E7;
+      --green: #2F7F3F;
+      --orange: #FF6B35;
+      --brown: #6B4E3D;
+      --brown-soft: rgba(107, 78, 61, 0.14);
+      --white: #FFFFFF;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--cream);
+      color: var(--brown);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+      line-height: 1.45;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--green);
+    }
+    header .logo {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--orange);
+      display: grid; place-items: center;
+      color: var(--white); font-size: 18px;
+    }
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--white);
+      border: 1px solid var(--brown-soft);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(107, 78, 61, 0.08);
+    }
+    h1 { font-size: 24px; margin: 0 0 4px; line-height: 1.2; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; font-weight: 700; color: var(--orange); margin: 0 0 12px; }
+    .muted { opacity: 0.75; font-size: 14px; margin: 0; }
+    dl { margin: 18px 0 0; display: grid; grid-template-columns: 90px 1fr; gap: 8px 12px; font-size: 15px; }
+    dt { font-weight: 700; }
+    dd { margin: 0; }
+    .place-pending { color: var(--orange); font-weight: 600; }
+    .attendees { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .attendees li {
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      background: var(--cream); border: 1px solid var(--brown-soft);
+    }
+    .attendees li.accepted { border-color: var(--green); color: var(--green); }
+    .attendees li.declined { opacity: 0.55; text-decoration: line-through; }
+    .actions { display: flex; gap: 12px; margin-top: 22px; }
+    button {
+      flex: 1; border: 0; border-radius: 14px; padding: 14px 16px;
+      font: inherit; font-weight: 700; font-size: 16px; cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.2s ease;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .accept { background: var(--green); color: var(--white); }
+    .decline { background: var(--white); color: var(--brown); border: 2px solid var(--brown-soft); }
+    .name-row { margin-top: 18px; display: none; }
+    .name-row label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+    .name-row input {
+      width: 100%; padding: 12px 14px; border-radius: 12px; font: inherit; font-size: 16px;
+      border: 2px solid var(--brown-soft); background: var(--cream); color: var(--brown);
+    }
+    .name-row input:focus { outline: none; border-color: var(--green); }
+    .status { margin-top: 16px; font-weight: 700; color: var(--green); }
+    .status.declined { color: var(--brown); }
+    .error { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #FFE9E0; color: #9A3A1B; font-size: 14px; }
+    .stores { margin-top: 28px; text-align: center; font-size: 14px; }
+    .stores a {
+      display: inline-block; margin: 8px 6px 0; padding: 10px 16px; border-radius: 12px;
+      background: var(--brown); color: var(--white); text-decoration: none; font-weight: 700;
+    }
+    .hidden { display: none !important; }
+    footer { margin-top: 32px; font-size: 12px; opacity: 0.6; text-align: center; }
+  </style>
+</head>
+<body>
+  <!--
+    Configure the deployed functions base URL and store links here.
+    data-functions-url: https://<project-ref>.supabase.co/functions/v1
+    data-anon-key:      the Supabase anon key (public by design)
+  -->
+  <main id="app"
+        data-functions-url="https://YOUR-PROJECT-REF.supabase.co/functions/v1"
+        data-anon-key="YOUR-SUPABASE-ANON-KEY"
+        data-ios-url="https://apps.apple.com/app/idYOUR_APP_ID"
+        data-android-url="https://play.google.com/store/apps/details?id=au.iapp.lunch">
+    <header><span class="logo" aria-hidden="true">&#127860;</span> Lunch</header>
+
+    <section class="card" id="loading">
+      <p class="eyebrow">Invitation</p>
+      <h1>Looking up your invite&hellip;</h1>
+      <p class="muted">One moment.</p>
+    </section>
+
+    <section class="card hidden" id="invite">
+      <p class="eyebrow">You're invited</p>
+      <h1 id="group-name"></h1>
+      <p class="muted" id="host-line"></p>
+      <dl>
+        <dt>When</dt><dd id="when"></dd>
+        <dt>Where</dt><dd id="where"></dd>
+        <dt>Who</dt><dd><ul class="attendees" id="attendees"></ul></dd>
+      </dl>
+
+      <div class="name-row" id="name-row">
+        <label for="display-name">Your name</label>
+        <input id="display-name" maxlength="60" autocomplete="name" placeholder="e.g. Sam">
+      </div>
+
+      <div class="actions">
+        <button class="accept" id="accept">Accept</button>
+        <button class="decline" id="decline">Decline</button>
+      </div>
+      <p class="status hidden" id="status"></p>
+      <div class="error hidden" id="error"></div>
+
+      <div class="stores">
+        Get the app to see the pick, directions and reminders.
+        <div>
+          <a id="ios-link" href="#">App Store</a>
+          <a id="android-link" href="#">Google Play</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="not-found">
+      <p class="eyebrow">Invitation</p>
+      <h1>We couldn't find that invite</h1>
+      <p class="muted" id="not-found-detail">Check the link with your host, or open it in the Lunch app.</p>
+    </section>
+
+    <footer>Lunch &middot; iapp.au</footer>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+      var app = document.getElementById("app");
+      var functionsUrl = app.dataset.functionsUrl.replace(/\/$/, "");
+      var anonKey = app.dataset.anonKey;
+      document.getElementById("ios-link").href = app.dataset.iosUrl;
+      document.getElementById("android-link").href = app.dataset.androidUrl;
+
+      var $ = function (id) { return document.getElementById(id); };
+      var show = function (id) { $(id).classList.remove("hidden"); };
+      var hide = function (id) { $(id).classList.add("hidden"); };
+
+      // Path is /i/<code>; also accept ?code= for local testing.
+      var match = location.pathname.match(/\/i\/([A-Za-z0-9-]{8,10})\/?$/);
+      var code = (match ? match[1] : new URLSearchParams(location.search).get("code") || "").toUpperCase();
+      var tokenKey = "lunch.guestToken." + code;
+      var guestToken = null;
+      try { guestToken = localStorage.getItem(tokenKey); } catch (e) { guestToken = null; }
+
+      var pendingStatus = null;
+
+      function headers() {
+        var h = { "apikey": anonKey, "Authorization": "Bearer " + anonKey, "Content-Type": "application/json" };
+        if (guestToken) h["x-guest-token"] = guestToken;
+        return h;
+      }
+
+      function formatWhen(epochSeconds) {
+        var d = new Date(epochSeconds * 1000);
+        return d.toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+      }
+
+      function render(invitation) {
+        var g = invitation.group;
+        $("group-name").textContent = g.name;
+        $("host-line").textContent = "Hosted by " + (g.hostName || "your host");
+        $("when").textContent = formatWhen(g.scheduledAtEpochSeconds);
+        if (g.placeName) {
+          $("where").textContent = g.placeName + (g.placeAddress ? " - " + g.placeAddress : "");
+          $("where").className = "";
+        } else {
+          $("where").textContent = "Host is still choosing";
+          $("where").className = "place-pending";
+        }
+        var list = $("attendees");
+        list.innerHTML = "";
+        if (invitation.attendees.length === 0) {
+          var li = document.createElement("li");
+          li.textContent = "Be the first to reply";
+          list.appendChild(li);
+        }
+        invitation.attendees.forEach(function (a) {
+          var item = document.createElement("li");
+          item.className = a.status;
+          item.textContent = a.displayName;
+          list.appendChild(item);
+        });
+        if (invitation.myStatus) {
+          var s = $("status");
+          s.textContent = invitation.myStatus === "accepted" ? "You're in. See you there!" : "You've declined. Change your mind any time.";
+          s.className = "status " + invitation.myStatus;
+          show("status");
+        }
+        hide("loading"); show("invite");
+      }
+
+      function showError(message) {
+        $("error").textContent = message;
+        show("error");
+      }
+
+      function load() {
+        if (!/^[0-9A-HJKMNP-TV-Z]{8}$/.test(code)) {
+          hide("loading"); show("not-found");
+          return;
+        }
+        fetch(functionsUrl + "/invitations?code=" + encodeURIComponent(code), { headers: headers() })
+          .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.body && res.body.error ? res.body.error.message : "Request failed");
+            render(res.body.invitation);
+          })
+          .catch(function (err) {
+            hide("loading"); show("not-found");
+            $("not-found-detail").textContent = err.message;
+          });
+      }
+
+      function respond(status) {
+        var name = $("display-name").value.trim();
+        // Ask for a name the first time (no guest token yet).
+        if (!guestToken && !name) {
+          pendingStatus = status;
+          $("name-row").style.display = "block";
+          $("display-name").focus();
+          return;
+        }
+        hide("error");
+        $("accept").disabled = true; $("decline").disabled = true;
+        var payload = { code: code, status: status, displayName: name || null };
+        fetch(functionsUrl + "/invitations-respond", { method: "POST", headers: headers(), body: JSON.stringify(payload) })
+          .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.body && res.body.error ? res.body.error.message : "Request failed");
+            if (res.body.guestToken) {
+              guestToken = res.body.guestToken;
+              try { localStorage.setItem(tokenKey, guestToken); } catch (e) { /* private mode */ }
+            }
+            render(res.body.invitation);
+          })
+          .catch(function (err) { showError(err.message); })
+          .then(function () { $("accept").disabled = false; $("decline").disabled = false; });
+      }
+
+      $("accept").addEventListener("click", function () { respond("accepted"); });
+      $("decline").addEventListener("click", function () { respond("declined"); });
+      $("display-name").addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && pendingStatus) respond(pendingStatus);
+      });
+
+      load();
+    })();
+  </script>
+</body>
+</html>
