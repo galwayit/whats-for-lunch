@@ -57,7 +57,7 @@ def gen_swift(t):
         )
     lines.append("    }")
     lines.append("")
-    lines.append("    public enum Type {")
+    lines.append("    public enum `Type` {")
     lines.append(f"        public static let family = \"{t['typography']['family']['display']}\"")
     lines.append(f"        public static let textScaleMin: CGFloat = {t['typography']['textScale']['min']}")
     lines.append(f"        public static let textScaleMax: CGFloat = {t['typography']['textScale']['max']}")

@@ -41,7 +41,7 @@ public enum Tokens {
         public static let scrim = Color(light: Color(red: 0.2431, green: 0.1686, blue: 0.1255, opacity: 0.6000), dark: Color(red: 0.0000, green: 0.0000, blue: 0.0000, opacity: 0.6510))
     }
 
-    public enum Type {
+    public enum `Type` {
         public static let family = "Plus Jakarta Sans"
         public static let textScaleMin: CGFloat = 0.8
         public static let textScaleMax: CGFloat = 2.0
