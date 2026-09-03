@@ -1,0 +1,14 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "a_i_usage_metrics" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" INTEGER NOT NULL REFERENCES users (id), "request_type" TEXT NOT NULL, "tokens_used" INTEGER NOT NULL DEFAULT 0, "cost_in_cents" REAL NOT NULL DEFAULT 0.0, "response_time_ms" INTEGER, "was_successful" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 1 CHECK ("was_successful" IN (0, 1)), "error_message" TEXT, "timestamp" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)));
+
+insert:
+INSERT INTO a_i_usage_metrics (user_id, request_type, tokens_used, cost_in_cents, response_time_ms, was_successful, error_message, timestamp)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Successful requests of one type inside [start, end).
+countSuccessfulInRange:
+SELECT COUNT(*) FROM a_i_usage_metrics
+WHERE user_id = ? AND request_type = ? AND was_successful = 1 AND timestamp >= ? AND timestamp < ?;
+
+selectByUser:
+SELECT * FROM a_i_usage_metrics WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?;

@@ -1,0 +1,26 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "restaurant_cache" ("place_id" TEXT NOT NULL, "search_query" TEXT NOT NULL, "user_latitude" REAL NOT NULL, "user_longitude" REAL NOT NULL, "cached_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)), "expires_at" INTEGER NOT NULL, PRIMARY KEY (place_id, search_query));
+
+CREATE INDEX IF NOT EXISTS idx_restaurant_cache_expires ON restaurant_cache(expires_at);
+
+upsert:
+INSERT OR REPLACE INTO restaurant_cache (place_id, search_query, user_latitude, user_longitude, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+-- Place ids for a cache key that have not expired, in insertion order.
+selectFresh:
+SELECT place_id FROM restaurant_cache
+WHERE search_query = ? AND user_latitude = ? AND user_longitude = ? AND expires_at > ?
+ORDER BY rowid;
+
+-- Place ids for a cache key regardless of expiry (offline fallback).
+selectAny:
+SELECT place_id FROM restaurant_cache
+WHERE search_query = ? AND user_latitude = ? AND user_longitude = ?
+ORDER BY rowid;
+
+deleteForKey:
+DELETE FROM restaurant_cache WHERE search_query = ? AND user_latitude = ? AND user_longitude = ?;
+
+deleteExpired:
+DELETE FROM restaurant_cache WHERE expires_at < ?;

@@ -254,7 +254,13 @@ data class SubscriptionStatus(
 
 data class AuthSession(val userId: String, val email: String?, val displayName: String?)
 
-enum class RsvpStatus { PENDING, ACCEPTED, DECLINED }
+/** Wire form is lowercase (`pending`, `accepted`, `declined`), matching the backend. */
+@Serializable
+enum class RsvpStatus {
+    @SerialName("pending") PENDING,
+    @SerialName("accepted") ACCEPTED,
+    @SerialName("declined") DECLINED,
+}
 
 @Serializable
 data class LunchGroup(

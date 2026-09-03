@@ -1,0 +1,9 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "dietary_compatibility" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "place_id" TEXT NOT NULL REFERENCES restaurants (place_id), "dietary_restriction" TEXT NOT NULL, "compatibility_score" REAL NOT NULL, "is_community_verified" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("is_community_verified" IN (0, 1)), "verification_count" INTEGER NOT NULL DEFAULT 0, "last_verified" INTEGER);
+
+insert:
+INSERT INTO dietary_compatibility (place_id, dietary_restriction, compatibility_score, is_community_verified, verification_count, last_verified)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectByPlace:
+SELECT * FROM dietary_compatibility WHERE place_id = ?;

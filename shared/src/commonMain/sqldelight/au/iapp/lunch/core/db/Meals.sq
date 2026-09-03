@@ -1,0 +1,39 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "meals" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" INTEGER NOT NULL REFERENCES users (id), "restaurant_id" TEXT, "meal_type" TEXT NOT NULL, "cost" REAL NOT NULL, "date" INTEGER NOT NULL, "restaurant_name" TEXT, "notes" TEXT, "photo_ids" TEXT NOT NULL DEFAULT '[]');
+
+CREATE INDEX IF NOT EXISTS idx_meals_user_date ON meals(user_id, date DESC);
+
+insert:
+INSERT INTO meals (user_id, restaurant_id, meal_type, cost, date, restaurant_name, notes, photo_ids)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE meals SET user_id = ?, restaurant_id = ?, meal_type = ?, cost = ?, date = ?, restaurant_name = ?, notes = ?, photo_ids = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM meals WHERE id = ?;
+
+selectById:
+SELECT * FROM meals WHERE id = ?;
+
+selectByUser:
+SELECT * FROM meals WHERE user_id = ? ORDER BY date DESC, id DESC;
+
+-- Half-open range [start, end).
+selectInRange:
+SELECT * FROM meals WHERE user_id = ? AND date >= ? AND date < ? ORDER BY date DESC, id DESC;
+
+selectRecent:
+SELECT * FROM meals WHERE user_id = ? AND date >= ? ORDER BY date DESC, id DESC LIMIT ? OFFSET ?;
+
+restaurantNameFrequency:
+SELECT restaurant_name, COUNT(*) AS n, MAX(date) AS latest
+FROM meals
+WHERE user_id = ? AND restaurant_name IS NOT NULL AND date >= ?
+GROUP BY restaurant_name
+ORDER BY n DESC, latest DESC
+LIMIT ?;
+
+selectLatestId:
+SELECT id FROM meals ORDER BY id DESC LIMIT 1;

@@ -1,0 +1,22 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "a_i_recommendations" ("id" TEXT NOT NULL, "user_id" INTEGER NOT NULL REFERENCES users (id), "recommended_restaurant_ids" TEXT NOT NULL, "reasoning" TEXT NOT NULL, "factor_weights" TEXT NOT NULL DEFAULT '{}', "overall_confidence" REAL NOT NULL, "user_context" TEXT NOT NULL DEFAULT '{}', "generated_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)), "was_accepted" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("was_accepted" IN (0, 1)), "user_feedback" TEXT, "metadata" TEXT NOT NULL DEFAULT '{}', "expires_at" INTEGER NOT NULL, PRIMARY KEY (id));
+
+CREATE INDEX IF NOT EXISTS idx_ai_recommendations_expires ON a_i_recommendations(expires_at);
+
+upsert:
+INSERT OR REPLACE INTO a_i_recommendations (
+  id, user_id, recommended_restaurant_ids, reasoning, factor_weights, overall_confidence,
+  user_context, generated_at, was_accepted, user_feedback, metadata, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectById:
+SELECT * FROM a_i_recommendations WHERE id = ?;
+
+selectRecentByUser:
+SELECT * FROM a_i_recommendations WHERE user_id = ? ORDER BY generated_at DESC LIMIT ?;
+
+updateFeedback:
+UPDATE a_i_recommendations SET was_accepted = ?, user_feedback = ? WHERE id = ?;
+
+deleteExpired:
+DELETE FROM a_i_recommendations WHERE expires_at < ?;

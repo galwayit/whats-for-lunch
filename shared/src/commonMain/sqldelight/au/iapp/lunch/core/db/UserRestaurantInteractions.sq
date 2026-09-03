@@ -1,0 +1,26 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "user_restaurant_interactions" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" INTEGER NOT NULL, "restaurant_place_id" TEXT NOT NULL, "restaurant_name" TEXT, "interaction_type" TEXT NOT NULL, "interaction_date" INTEGER NOT NULL, "context" TEXT);
+
+CREATE INDEX IF NOT EXISTS idx_interactions_user_type ON user_restaurant_interactions(user_id, interaction_type, interaction_date DESC);
+CREATE INDEX IF NOT EXISTS idx_interactions_place ON user_restaurant_interactions(restaurant_place_id, interaction_date DESC);
+
+insert:
+INSERT INTO user_restaurant_interactions (user_id, restaurant_place_id, restaurant_name, interaction_type, interaction_date, context)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectByUser:
+SELECT * FROM user_restaurant_interactions WHERE user_id = ? ORDER BY interaction_date DESC, id DESC LIMIT ?;
+
+-- Places whose most recent favourite marker is 'favorited' (an 'unfavorited' row removes it).
+selectFavourites:
+SELECT i.restaurant_place_id, i.restaurant_name
+FROM user_restaurant_interactions i
+WHERE i.user_id = ?
+  AND i.interaction_type = 'favorited'
+  AND i.id = (
+    SELECT MAX(j.id) FROM user_restaurant_interactions j
+    WHERE j.user_id = i.user_id
+      AND j.restaurant_place_id = i.restaurant_place_id
+      AND j.interaction_type IN ('favorited', 'unfavorited')
+  )
+ORDER BY i.id DESC;

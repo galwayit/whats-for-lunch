@@ -1,0 +1,11 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "user_discovery_history" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" INTEGER NOT NULL REFERENCES users (id), "place_id" TEXT NOT NULL REFERENCES restaurants (place_id), "search_query" TEXT, "applied_filters" TEXT NOT NULL DEFAULT '{}', "was_selected" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("was_selected" IN (0, 1)), "viewed_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)));
+
+CREATE INDEX IF NOT EXISTS idx_discovery_user_date ON user_discovery_history(user_id, viewed_at DESC);
+
+insert:
+INSERT INTO user_discovery_history (user_id, place_id, search_query, applied_filters, was_selected, viewed_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectByUser:
+SELECT * FROM user_discovery_history WHERE user_id = ? ORDER BY viewed_at DESC LIMIT ?;

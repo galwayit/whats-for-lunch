@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -23,6 +24,19 @@ kotlin {
         }
     }
 
+    // `storeMain` sits between commonMain and the two store-backed targets
+    // (Android, iOS) so the RevenueCat wrapper is written once. Desktop has no
+    // store and uses an in-memory fake instead.
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("store") {
+                withAndroidTarget()
+                withIos()
+            }
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
@@ -40,7 +54,10 @@ kotlin {
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgrest)
             implementation(libs.supabase.functions)
-            implementation(libs.revenuecat.core)
+        }
+        // RevenueCat purchases-kmp ships Android and iOS variants only.
+        val storeMain by getting {
+            dependencies { implementation(libs.revenuecat.core) }
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -80,12 +97,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    testOptions {
+        // commonTest runs on the JVM under testDebugUnitTest; android.jar stubs
+        // (e.g. android.util.Log used by Kermit) must not throw there.
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 sqldelight {
     databases {
         create("LunchDatabase") {
             packageName.set("au.iapp.lunch.core.db")
+            // Without an explicit SQLite dialect the generator treats
+            // `INTEGER AS Boolean` as a custom adapter type (`import Boolean`).
+            dialect(libs.sqldelight.sqlite.dialect)
             // Schema must mirror the Drift schema v6 so an existing
             // diet_buddy.sqlite opens unchanged. See shared/README.md.
             schemaOutputDirectory.set(file("src/commonMain/sqldelight/schema"))

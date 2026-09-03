@@ -1,0 +1,24 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "restaurants" ("place_id" TEXT NOT NULL, "name" TEXT NOT NULL, "location" TEXT NOT NULL, "address" TEXT, "phone_number" TEXT, "website" TEXT, "latitude" REAL, "longitude" REAL, "distance_from_user" REAL, "rating" REAL, "review_count" INTEGER, "price_level" INTEGER, "price_ranges" TEXT NOT NULL DEFAULT '[]', "cuisine_type" TEXT, "cuisine_types" TEXT NOT NULL DEFAULT '[]', "supported_dietary_restrictions" TEXT NOT NULL DEFAULT '[]', "allergen_info" TEXT NOT NULL DEFAULT '[]', "dietary_compatibility_scores" TEXT NOT NULL DEFAULT '{}', "has_verified_dietary_info" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("has_verified_dietary_info" IN (0, 1)), "community_verification_count" INTEGER NOT NULL DEFAULT 0, "opening_hours" TEXT NOT NULL DEFAULT '[]', "is_open_now" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("is_open_now" IN (0, 1)), "current_wait_time" TEXT, "features" TEXT NOT NULL DEFAULT '[]', "average_meal_cost" REAL, "value_score" REAL, "meal_type_average_costs" TEXT NOT NULL DEFAULT '{}', "cached_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)), "last_verified" INTEGER, "photo_reference" TEXT, "photo_references" TEXT NOT NULL DEFAULT '[]', PRIMARY KEY (place_id));
+
+CREATE INDEX IF NOT EXISTS idx_restaurants_location ON restaurants(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_restaurants_rating_price ON restaurants(rating DESC, price_level);
+CREATE INDEX IF NOT EXISTS idx_restaurants_filter ON restaurants(is_open_now, has_verified_dietary_info, rating DESC);
+
+upsert:
+INSERT OR REPLACE INTO restaurants (
+  place_id, name, location, address, phone_number, website, latitude, longitude, distance_from_user,
+  rating, review_count, price_level, price_ranges, cuisine_type, cuisine_types, supported_dietary_restrictions,
+  allergen_info, dietary_compatibility_scores, has_verified_dietary_info, community_verification_count,
+  opening_hours, is_open_now, current_wait_time, features, average_meal_cost, value_score,
+  meal_type_average_costs, cached_at, last_verified, photo_reference, photo_references
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectByPlaceId:
+SELECT * FROM restaurants WHERE place_id = ?;
+
+selectByPlaceIds:
+SELECT * FROM restaurants WHERE place_id IN ?;
+
+selectAll:
+SELECT * FROM restaurants ORDER BY rating DESC;

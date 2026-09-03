@@ -1,0 +1,5 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "photos" ("id" TEXT NOT NULL, "user_id" INTEGER NOT NULL REFERENCES users (id), "file_name" TEXT NOT NULL, "local_path" TEXT NOT NULL, "cloud_url" TEXT, "file_size_bytes" INTEGER NOT NULL, "width" INTEGER, "height" INTEGER, "content_type" TEXT NOT NULL DEFAULT 'image/jpeg', "photo_type" TEXT NOT NULL, "associated_entity_id" TEXT, "metadata" TEXT NOT NULL DEFAULT '{}', "created_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)), "uploaded_at" INTEGER, "is_uploaded" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("is_uploaded" IN (0, 1)), "is_deleted" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("is_deleted" IN (0, 1)), PRIMARY KEY (id));
+
+selectByEntity:
+SELECT * FROM photos WHERE associated_entity_id = ? AND photo_type = ? AND is_deleted = 0 ORDER BY created_at DESC;

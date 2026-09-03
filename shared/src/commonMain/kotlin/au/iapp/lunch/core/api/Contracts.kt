@@ -23,6 +23,10 @@ interface RecommendationEngine {
     fun sort(restaurants: List<Restaurant>, option: SortOption, prefs: UserPreferences?): List<Restaurant>
     /** Dietary, allergen, rating, and price filtering as DiscoveryNotifier applied it. */
     fun applyPreferenceFilters(restaurants: List<Restaurant>, prefs: UserPreferences?): List<Restaurant>
+    /** Ported from DiscoverPage._getRecommendationReasons; its count drives the RELEVANCE sort. */
+    fun discoverReasons(restaurant: Restaurant, prefs: UserPreferences?): List<String>
+    /** Ported from Restaurant.calculateDietaryCompatibility (0..1, 1 when nothing is required). */
+    fun dietaryCompatibility(restaurant: Restaurant, dietaryRestrictions: List<String>, allergens: List<String>): Double
 }
 
 interface BudgetEngine {

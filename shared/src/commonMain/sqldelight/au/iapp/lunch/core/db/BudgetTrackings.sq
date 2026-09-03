@@ -1,0 +1,13 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "budget_trackings" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" INTEGER NOT NULL REFERENCES users (id), "amount" REAL NOT NULL, "category" TEXT NOT NULL, "date" INTEGER NOT NULL);
+
+CREATE INDEX IF NOT EXISTS idx_budget_user_date ON budget_trackings(user_id, date DESC);
+
+insert:
+INSERT INTO budget_trackings (user_id, amount, category, date) VALUES (?, ?, ?, ?);
+
+selectByUser:
+SELECT * FROM budget_trackings WHERE user_id = ? ORDER BY date DESC;
+
+selectInRange:
+SELECT * FROM budget_trackings WHERE user_id = ? AND date >= ? AND date < ? ORDER BY date DESC;

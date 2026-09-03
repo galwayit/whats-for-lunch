@@ -1,0 +1,23 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "users" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "name" TEXT NOT NULL, "preferences" TEXT NOT NULL, "created_at" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)));
+
+selectAll:
+SELECT * FROM users ORDER BY id;
+
+selectFirst:
+SELECT * FROM users ORDER BY id LIMIT 1;
+
+selectById:
+SELECT * FROM users WHERE id = ?;
+
+insert:
+INSERT INTO users (name, preferences, created_at) VALUES (?, ?, ?);
+
+updateName:
+UPDATE users SET name = ? WHERE id = ?;
+
+updatePreferences:
+UPDATE users SET preferences = ? WHERE id = ?;
+
+selectLatestId:
+SELECT id FROM users ORDER BY id DESC LIMIT 1;

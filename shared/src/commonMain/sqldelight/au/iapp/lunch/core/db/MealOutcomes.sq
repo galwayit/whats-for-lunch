@@ -1,0 +1,14 @@
+-- Verbatim from fixtures/drift_schema_v6.sql (Drift schema version 6).
+CREATE TABLE "meal_outcomes" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "meal_id" INTEGER NOT NULL, "user_id" INTEGER NOT NULL, "restaurant_place_id" TEXT, "rating" INTEGER, "would_revisit" INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0 CHECK ("would_revisit" IN (0, 1)), "feedback" TEXT, "recorded_at" INTEGER NOT NULL);
+
+CREATE INDEX IF NOT EXISTS idx_meal_outcomes_user ON meal_outcomes(user_id, recorded_at DESC);
+
+insert:
+INSERT INTO meal_outcomes (meal_id, user_id, restaurant_place_id, rating, would_revisit, feedback, recorded_at)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectByUser:
+SELECT * FROM meal_outcomes WHERE user_id = ? ORDER BY recorded_at DESC LIMIT ?;
+
+selectByMeal:
+SELECT * FROM meal_outcomes WHERE meal_id = ? ORDER BY recorded_at DESC;

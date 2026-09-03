@@ -1,0 +1,3134 @@
+{
+  "restaurants": [
+    {
+      "placeId": "r1",
+      "name": "Sakura Sushi",
+      "location": "",
+      "priceLevel": 2,
+      "distanceFromUser": 1.2,
+      "rating": 4.5,
+      "isOpenNow": true,
+      "cuisineType": "Japanese",
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r2",
+      "name": "Burger King Central",
+      "location": "",
+      "priceLevel": 1,
+      "distanceFromUser": 3.75,
+      "rating": 3.8,
+      "isOpenNow": false,
+      "cuisineType": "Fast Food",
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r3",
+      "name": "Le Gourmet",
+      "location": "",
+      "priceLevel": 4,
+      "distanceFromUser": 6.5,
+      "rating": 4.8,
+      "isOpenNow": true,
+      "cuisineType": "French",
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r4",
+      "name": "Mystery Diner",
+      "location": "",
+      "priceLevel": null,
+      "distanceFromUser": null,
+      "rating": 0.0,
+      "isOpenNow": false,
+      "cuisineType": null,
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r5",
+      "name": "No Data Cafe",
+      "location": "",
+      "priceLevel": null,
+      "distanceFromUser": null,
+      "rating": null,
+      "isOpenNow": false,
+      "cuisineType": null,
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r6",
+      "name": "Thai Corner",
+      "location": "",
+      "priceLevel": 3,
+      "distanceFromUser": 2.5,
+      "rating": 4.0,
+      "isOpenNow": true,
+      "cuisineType": "Thai",
+      "supportedDietaryRestrictions": [
+        "vegetarian"
+      ],
+      "allergenInfo": [
+        "peanuts"
+      ],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r7",
+      "name": "Green Bowl",
+      "location": "",
+      "priceLevel": 2,
+      "distanceFromUser": 0.35,
+      "rating": 4.25,
+      "isOpenNow": false,
+      "cuisineType": "Vegan",
+      "supportedDietaryRestrictions": [
+        "vegan",
+        "vegetarian"
+      ],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {
+        "gluten_free": 0.9
+      },
+      "hasVerifiedDietaryInfo": true
+    },
+    {
+      "placeId": "r8",
+      "name": "McDonalds Plaza",
+      "location": "",
+      "priceLevel": 1,
+      "distanceFromUser": 4.95,
+      "rating": 2.9,
+      "isOpenNow": true,
+      "cuisineType": "Fast Food",
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {},
+      "hasVerifiedDietaryInfo": false
+    },
+    {
+      "placeId": "r9",
+      "name": "Curry House",
+      "location": "",
+      "priceLevel": 2,
+      "distanceFromUser": 2.25,
+      "rating": 4.15,
+      "isOpenNow": true,
+      "cuisineType": "Indian",
+      "supportedDietaryRestrictions": [],
+      "allergenInfo": [],
+      "dietaryCompatibilityScores": {
+        "vegetarian": 0.5
+      },
+      "hasVerifiedDietaryInfo": false
+    }
+  ],
+  "prefs": {
+    "default": {
+      "budgetLevel": 2,
+      "maxTravelDistance": 5.0,
+      "includeChains": true,
+      "minimumRating": 3.0,
+      "requireDietaryVerification": true,
+      "dietaryRestrictions": [],
+      "allergens": [],
+      "mealFrequencyPerDay": 3,
+      "weeklyBudget": 200.0
+    },
+    "none": null,
+    "frugal_far": {
+      "budgetLevel": 1,
+      "maxTravelDistance": 10.0,
+      "includeChains": false,
+      "minimumRating": 4.0,
+      "requireDietaryVerification": true,
+      "dietaryRestrictions": [],
+      "allergens": [],
+      "mealFrequencyPerDay": 3,
+      "weeklyBudget": 200.0
+    },
+    "veg_strict": {
+      "budgetLevel": 3,
+      "maxTravelDistance": 5.0,
+      "includeChains": true,
+      "minimumRating": 3.0,
+      "requireDietaryVerification": true,
+      "dietaryRestrictions": [
+        "vegetarian"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "mealFrequencyPerDay": 3,
+      "weeklyBudget": 200.0
+    },
+    "unverified_ok": {
+      "budgetLevel": 4,
+      "maxTravelDistance": 100.0,
+      "includeChains": true,
+      "minimumRating": 0.0,
+      "requireDietaryVerification": false,
+      "dietaryRestrictions": [],
+      "allergens": [],
+      "mealFrequencyPerDay": 3,
+      "weeklyBudget": 200.0
+    },
+    "budget0": {
+      "budgetLevel": 0,
+      "maxTravelDistance": 100.0,
+      "includeChains": true,
+      "minimumRating": 0.0,
+      "requireDietaryVerification": true,
+      "dietaryRestrictions": [],
+      "allergens": [],
+      "mealFrequencyPerDay": 3,
+      "weeklyBudget": 200.0
+    }
+  },
+  "compatibilityScore": [
+    {
+      "prefs": "default",
+      "placeId": "r1",
+      "expected": 2.108
+    },
+    {
+      "prefs": "default",
+      "placeId": "r2",
+      "expected": 1.427
+    },
+    {
+      "prefs": "default",
+      "placeId": "r3",
+      "expected": 1.092
+    },
+    {
+      "prefs": "default",
+      "placeId": "r4",
+      "expected": 1.05
+    },
+    {
+      "prefs": "default",
+      "placeId": "r5",
+      "expected": 1.05
+    },
+    {
+      "prefs": "default",
+      "placeId": "r6",
+      "expected": 1.6100000000000003
+    },
+    {
+      "prefs": "default",
+      "placeId": "r7",
+      "expected": 2.049
+    },
+    {
+      "prefs": "default",
+      "placeId": "r8",
+      "expected": 1.4190000000000005
+    },
+    {
+      "prefs": "default",
+      "placeId": "r9",
+      "expected": 2.031
+    },
+    {
+      "prefs": "none",
+      "placeId": "r1",
+      "expected": 0.9
+    },
+    {
+      "prefs": "none",
+      "placeId": "r2",
+      "expected": 0.76
+    },
+    {
+      "prefs": "none",
+      "placeId": "r3",
+      "expected": 0.96
+    },
+    {
+      "prefs": "none",
+      "placeId": "r4",
+      "expected": 0.0
+    },
+    {
+      "prefs": "none",
+      "placeId": "r5",
+      "expected": 0.5
+    },
+    {
+      "prefs": "none",
+      "placeId": "r6",
+      "expected": 0.8
+    },
+    {
+      "prefs": "none",
+      "placeId": "r7",
+      "expected": 0.85
+    },
+    {
+      "prefs": "none",
+      "placeId": "r8",
+      "expected": 0.58
+    },
+    {
+      "prefs": "none",
+      "placeId": "r9",
+      "expected": 0.8300000000000001
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r1",
+      "expected": 1.7440000000000002
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r2",
+      "expected": 1.9395000000000002
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r3",
+      "expected": 0.797
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r4",
+      "expected": 1.05
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r5",
+      "expected": 1.05
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r6",
+      "expected": 1.2850000000000001
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r7",
+      "expected": 1.6595
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r8",
+      "expected": 1.9675000000000002
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r9",
+      "expected": 1.6985000000000001
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r1",
+      "expected": 1.7080000000000002
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r2",
+      "expected": 1.0270000000000001
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r3",
+      "expected": 1.4920000000000002
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r4",
+      "expected": 1.05
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r5",
+      "expected": 1.05
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r6",
+      "expected": 2.0100000000000002
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r7",
+      "expected": 1.649
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r8",
+      "expected": 1.0190000000000001
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r9",
+      "expected": 1.6310000000000002
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r1",
+      "expected": 1.3764
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r2",
+      "expected": 0.84075
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r3",
+      "expected": 2.1725000000000003
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r4",
+      "expected": 1.05
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r5",
+      "expected": 1.05
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r6",
+      "expected": 1.7525000000000004
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r7",
+      "expected": 1.26895
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r8",
+      "expected": 0.90115
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r9",
+      "expected": 1.3592500000000003
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r1",
+      "expected": 1.3764
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r2",
+      "expected": 1.6407500000000002
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r3",
+      "expected": 0.5725
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r4",
+      "expected": 1.05
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r5",
+      "expected": 1.05
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r6",
+      "expected": 0.9525
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r7",
+      "expected": 1.26895
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r8",
+      "expected": 1.7011500000000002
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r9",
+      "expected": 1.3592500000000003
+    }
+  ],
+  "reasons": [
+    {
+      "prefs": "default",
+      "placeId": "r1",
+      "expected": [
+        "Perfect budget match ($$)",
+        "Very close to you (1.2km)",
+        "Highly rated (4.5/5)",
+        "Open right now",
+        "Great japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r2",
+      "expected": [
+        "Close to your budget range",
+        "Within your preferred distance",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r3",
+      "expected": [
+        "Highly rated (4.8/5)",
+        "Open right now",
+        "Great french cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r6",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (2.5km)",
+        "Highly rated (4.0/5)",
+        "Open right now",
+        "Great thai cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r7",
+      "expected": [
+        "Perfect budget match ($$)",
+        "Very close to you (0.3km)",
+        "Highly rated (4.3/5)",
+        "Great vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r8",
+      "expected": [
+        "Close to your budget range",
+        "Within your preferred distance",
+        "Open right now",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r9",
+      "expected": [
+        "Perfect budget match ($$)",
+        "Very close to you (2.3km)",
+        "Highly rated (4.2/5)",
+        "Open right now",
+        "Great indian cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r1",
+      "expected": [
+        "Good ratings (4.5/5)",
+        "Japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r2",
+      "expected": [
+        "Good ratings (3.8/5)",
+        "Fast Food cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r3",
+      "expected": [
+        "Good ratings (4.8/5)",
+        "French cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r6",
+      "expected": [
+        "Good ratings (4.0/5)",
+        "Thai cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r7",
+      "expected": [
+        "Good ratings (4.3/5)",
+        "Vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r8",
+      "expected": [
+        "Good ratings (2.9/5)",
+        "Fast Food cuisine"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r9",
+      "expected": [
+        "Good ratings (4.2/5)",
+        "Indian cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r1",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (1.2km)",
+        "Highly rated (4.5/5)",
+        "Open right now",
+        "Great japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r2",
+      "expected": [
+        "Perfect budget match ($)",
+        "Very close to you (3.8km)",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r3",
+      "expected": [
+        "Within your preferred distance",
+        "Highly rated (4.8/5)",
+        "Open right now",
+        "Great french cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r6",
+      "expected": [
+        "Very close to you (2.5km)",
+        "Highly rated (4.0/5)",
+        "Open right now",
+        "Great thai cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r7",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (0.3km)",
+        "Highly rated (4.3/5)",
+        "Great vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r8",
+      "expected": [
+        "Perfect budget match ($)",
+        "Very close to you (5.0km)",
+        "Open right now",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r9",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (2.3km)",
+        "Highly rated (4.2/5)",
+        "Open right now",
+        "Great indian cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r1",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (1.2km)",
+        "Highly rated (4.5/5)",
+        "Open right now",
+        "Great japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r2",
+      "expected": [
+        "Within your preferred distance",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r3",
+      "expected": [
+        "Close to your budget range",
+        "Highly rated (4.8/5)",
+        "Open right now",
+        "Great french cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r6",
+      "expected": [
+        "Perfect budget match ($$$)",
+        "Very close to you (2.5km)",
+        "Highly rated (4.0/5)",
+        "Open right now",
+        "Great thai cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r7",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (0.3km)",
+        "Highly rated (4.3/5)",
+        "Great vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r8",
+      "expected": [
+        "Within your preferred distance",
+        "Open right now",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r9",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (2.3km)",
+        "Highly rated (4.2/5)",
+        "Open right now",
+        "Great indian cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r1",
+      "expected": [
+        "Very close to you (1.2km)",
+        "Highly rated (4.5/5)",
+        "Open right now",
+        "Great japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r2",
+      "expected": [
+        "Very close to you (3.8km)",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r3",
+      "expected": [
+        "Perfect budget match ($$$$)",
+        "Very close to you (6.5km)",
+        "Highly rated (4.8/5)",
+        "Open right now",
+        "Great french cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r6",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (2.5km)",
+        "Highly rated (4.0/5)",
+        "Open right now",
+        "Great thai cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r7",
+      "expected": [
+        "Very close to you (0.3km)",
+        "Highly rated (4.3/5)",
+        "Great vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r8",
+      "expected": [
+        "Very close to you (5.0km)",
+        "Open right now",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r9",
+      "expected": [
+        "Very close to you (2.3km)",
+        "Highly rated (4.2/5)",
+        "Open right now",
+        "Great indian cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r1",
+      "expected": [
+        "Very close to you (1.2km)",
+        "Highly rated (4.5/5)",
+        "Open right now",
+        "Great japanese cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r2",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (3.8km)",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r3",
+      "expected": [
+        "Very close to you (6.5km)",
+        "Highly rated (4.8/5)",
+        "Open right now",
+        "Great french cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r4",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r5",
+      "expected": [
+        "Popular choice in your area"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r6",
+      "expected": [
+        "Very close to you (2.5km)",
+        "Highly rated (4.0/5)",
+        "Open right now",
+        "Great thai cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r7",
+      "expected": [
+        "Very close to you (0.3km)",
+        "Highly rated (4.3/5)",
+        "Great vegan cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r8",
+      "expected": [
+        "Close to your budget range",
+        "Very close to you (5.0km)",
+        "Open right now",
+        "Great fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r9",
+      "expected": [
+        "Very close to you (2.3km)",
+        "Highly rated (4.2/5)",
+        "Open right now",
+        "Great indian cuisine"
+      ]
+    }
+  ],
+  "discoverReasons": [
+    {
+      "prefs": "default",
+      "placeId": "r1",
+      "expected": [
+        "Fits your $$ budget perfectly",
+        "Only 1.2km away - perfect distance",
+        "Highly rated (4.5) by other diners",
+        "Open right now - ready when you are",
+        "Delicious japanese cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r2",
+      "expected": [
+        "Fits your $$ budget perfectly",
+        "Only 3.8km away - perfect distance",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r3",
+      "expected": [
+        "Highly rated (4.8) by other diners",
+        "Open right now - ready when you are",
+        "Delicious french cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r4",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r5",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r6",
+      "expected": [
+        "Only 2.5km away - perfect distance",
+        "Highly rated (4.0) by other diners",
+        "Open right now - ready when you are",
+        "Delicious thai cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r7",
+      "expected": [
+        "Fits your $$ budget perfectly",
+        "Only 0.3km away - perfect distance",
+        "Highly rated (4.3) by other diners",
+        "Delicious vegan cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r8",
+      "expected": [
+        "Fits your $$ budget perfectly",
+        "Only 5.0km away - perfect distance",
+        "Open right now - ready when you are",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "default",
+      "placeId": "r9",
+      "expected": [
+        "Fits your $$ budget perfectly",
+        "Only 2.3km away - perfect distance",
+        "Highly rated (4.2) by other diners",
+        "Open right now - ready when you are",
+        "Delicious indian cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r1",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r2",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r3",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r4",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r5",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r6",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r7",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r8",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "none",
+      "placeId": "r9",
+      "expected": [
+        "Great choice for a delicious meal!"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r1",
+      "expected": [
+        "Only 1.2km away - perfect distance",
+        "Highly rated (4.5) by other diners",
+        "Open right now - ready when you are",
+        "Delicious japanese cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r2",
+      "expected": [
+        "Fits your $ budget perfectly",
+        "Only 3.8km away - perfect distance",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r3",
+      "expected": [
+        "Only 6.5km away - perfect distance",
+        "Highly rated (4.8) by other diners",
+        "Open right now - ready when you are",
+        "Delicious french cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r4",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r5",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r6",
+      "expected": [
+        "Only 2.5km away - perfect distance",
+        "Highly rated (4.0) by other diners",
+        "Open right now - ready when you are",
+        "Delicious thai cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r7",
+      "expected": [
+        "Only 0.3km away - perfect distance",
+        "Highly rated (4.3) by other diners",
+        "Delicious vegan cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r8",
+      "expected": [
+        "Fits your $ budget perfectly",
+        "Only 5.0km away - perfect distance",
+        "Open right now - ready when you are",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "placeId": "r9",
+      "expected": [
+        "Only 2.3km away - perfect distance",
+        "Highly rated (4.2) by other diners",
+        "Open right now - ready when you are",
+        "Delicious indian cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r1",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 1.2km away - perfect distance",
+        "Highly rated (4.5) by other diners",
+        "Open right now - ready when you are",
+        "Delicious japanese cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r2",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 3.8km away - perfect distance",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r3",
+      "expected": [
+        "Highly rated (4.8) by other diners",
+        "Open right now - ready when you are",
+        "Delicious french cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r4",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r5",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r6",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 2.5km away - perfect distance",
+        "Highly rated (4.0) by other diners",
+        "Open right now - ready when you are",
+        "Delicious thai cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r7",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 0.3km away - perfect distance",
+        "Highly rated (4.3) by other diners",
+        "Delicious vegan cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r8",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 5.0km away - perfect distance",
+        "Open right now - ready when you are",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "placeId": "r9",
+      "expected": [
+        "Fits your $$$ budget perfectly",
+        "Only 2.3km away - perfect distance",
+        "Highly rated (4.2) by other diners",
+        "Open right now - ready when you are",
+        "Delicious indian cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r1",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 1.2km away - perfect distance",
+        "Highly rated (4.5) by other diners",
+        "Open right now - ready when you are",
+        "Delicious japanese cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r2",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 3.8km away - perfect distance",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r3",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 6.5km away - perfect distance",
+        "Highly rated (4.8) by other diners",
+        "Open right now - ready when you are",
+        "Delicious french cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r4",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r5",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r6",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 2.5km away - perfect distance",
+        "Highly rated (4.0) by other diners",
+        "Open right now - ready when you are",
+        "Delicious thai cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r7",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 0.3km away - perfect distance",
+        "Highly rated (4.3) by other diners",
+        "Delicious vegan cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r8",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 5.0km away - perfect distance",
+        "Open right now - ready when you are",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "placeId": "r9",
+      "expected": [
+        "Fits your $$$$ budget perfectly",
+        "Only 2.3km away - perfect distance",
+        "Highly rated (4.2) by other diners",
+        "Open right now - ready when you are",
+        "Delicious indian cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r1",
+      "expected": [
+        "Only 1.2km away - perfect distance",
+        "Highly rated (4.5) by other diners",
+        "Open right now - ready when you are",
+        "Delicious japanese cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r2",
+      "expected": [
+        "Only 3.8km away - perfect distance",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r3",
+      "expected": [
+        "Only 6.5km away - perfect distance",
+        "Highly rated (4.8) by other diners",
+        "Open right now - ready when you are",
+        "Delicious french cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r4",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r5",
+      "expected": [
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r6",
+      "expected": [
+        "Only 2.5km away - perfect distance",
+        "Highly rated (4.0) by other diners",
+        "Open right now - ready when you are",
+        "Delicious thai cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r7",
+      "expected": [
+        "Only 0.3km away - perfect distance",
+        "Highly rated (4.3) by other diners",
+        "Delicious vegan cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r8",
+      "expected": [
+        "Only 5.0km away - perfect distance",
+        "Open right now - ready when you are",
+        "Delicious fast food cuisine"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "placeId": "r9",
+      "expected": [
+        "Only 2.3km away - perfect distance",
+        "Highly rated (4.2) by other diners",
+        "Open right now - ready when you are",
+        "Delicious indian cuisine",
+        "Local favorite - unique dining experience"
+      ]
+    }
+  ],
+  "bestMatch": [
+    {
+      "prefs": "default",
+      "rejected": [],
+      "expected": "r1"
+    },
+    {
+      "prefs": "default",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r7"
+    },
+    {
+      "prefs": "default",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r2"
+    },
+    {
+      "prefs": "default",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    },
+    {
+      "prefs": "none",
+      "rejected": [],
+      "expected": "r3"
+    },
+    {
+      "prefs": "none",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r3"
+    },
+    {
+      "prefs": "none",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r3"
+    },
+    {
+      "prefs": "none",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    },
+    {
+      "prefs": "frugal_far",
+      "rejected": [],
+      "expected": "r8"
+    },
+    {
+      "prefs": "frugal_far",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r8"
+    },
+    {
+      "prefs": "frugal_far",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r8"
+    },
+    {
+      "prefs": "frugal_far",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    },
+    {
+      "prefs": "veg_strict",
+      "rejected": [],
+      "expected": "r6"
+    },
+    {
+      "prefs": "veg_strict",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r6"
+    },
+    {
+      "prefs": "veg_strict",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r3"
+    },
+    {
+      "prefs": "veg_strict",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    },
+    {
+      "prefs": "unverified_ok",
+      "rejected": [],
+      "expected": "r3"
+    },
+    {
+      "prefs": "unverified_ok",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r3"
+    },
+    {
+      "prefs": "unverified_ok",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r3"
+    },
+    {
+      "prefs": "unverified_ok",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    },
+    {
+      "prefs": "budget0",
+      "rejected": [],
+      "expected": "r8"
+    },
+    {
+      "prefs": "budget0",
+      "rejected": [
+        "r1"
+      ],
+      "expected": "r8"
+    },
+    {
+      "prefs": "budget0",
+      "rejected": [
+        "r1",
+        "r7",
+        "r9",
+        "r6"
+      ],
+      "expected": "r8"
+    },
+    {
+      "prefs": "budget0",
+      "rejected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ],
+      "expected": null
+    }
+  ],
+  "sort": [
+    {
+      "prefs": "default",
+      "option": "RELEVANCE",
+      "expected": [
+        "r1",
+        "r9",
+        "r7",
+        "r6",
+        "r3",
+        "r8",
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "default",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "default",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "default",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "none",
+      "option": "RELEVANCE",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "none",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "none",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "none",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "option": "RELEVANCE",
+      "expected": [
+        "r3",
+        "r1",
+        "r9",
+        "r6",
+        "r7",
+        "r8",
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "option": "RELEVANCE",
+      "expected": [
+        "r1",
+        "r9",
+        "r6",
+        "r7",
+        "r3",
+        "r8",
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "option": "RELEVANCE",
+      "expected": [
+        "r3",
+        "r1",
+        "r9",
+        "r6",
+        "r7",
+        "r8",
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "option": "RELEVANCE",
+      "expected": [
+        "r3",
+        "r1",
+        "r9",
+        "r6",
+        "r7",
+        "r8",
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "option": "PRICE",
+      "expected": [
+        "r4",
+        "r5",
+        "r2",
+        "r8",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r3"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "option": "DISTANCE",
+      "expected": [
+        "r7",
+        "r1",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r3",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "option": "RATING",
+      "expected": [
+        "r3",
+        "r1",
+        "r7",
+        "r9",
+        "r6",
+        "r2",
+        "r8",
+        "r4",
+        "r5"
+      ]
+    }
+  ],
+  "applyPreferenceFilters": [
+    {
+      "prefs": "default",
+      "expected": [
+        "r1",
+        "r2",
+        "r5",
+        "r7",
+        "r9"
+      ]
+    },
+    {
+      "prefs": "none",
+      "expected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ]
+    },
+    {
+      "prefs": "frugal_far",
+      "expected": [
+        "r5"
+      ]
+    },
+    {
+      "prefs": "veg_strict",
+      "expected": [
+        "r7"
+      ]
+    },
+    {
+      "prefs": "unverified_ok",
+      "expected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ]
+    },
+    {
+      "prefs": "budget0",
+      "expected": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9"
+      ]
+    }
+  ],
+  "dietaryCompatibility": [
+    {
+      "placeId": "r1",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r1",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r1",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r1",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r2",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r2",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r2",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r2",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r3",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r3",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r3",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r3",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r4",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r4",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r4",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r4",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r5",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r5",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r5",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r5",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r6",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r6",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r6",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3666666666666667
+    },
+    {
+      "placeId": "r6",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 0.55
+    },
+    {
+      "placeId": "r7",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r7",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r7",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.9666666666666667
+    },
+    {
+      "placeId": "r7",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r8",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r8",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.0
+    },
+    {
+      "placeId": "r8",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.3333333333333333
+    },
+    {
+      "placeId": "r8",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r9",
+      "restrictions": [],
+      "allergens": [],
+      "expected": 1.0
+    },
+    {
+      "placeId": "r9",
+      "restrictions": [
+        "vegetarian"
+      ],
+      "allergens": [],
+      "expected": 0.5
+    },
+    {
+      "placeId": "r9",
+      "restrictions": [
+        "vegetarian",
+        "gluten_free"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "expected": 0.5
+    },
+    {
+      "placeId": "r9",
+      "restrictions": [],
+      "allergens": [
+        "peanuts",
+        "dairy"
+      ],
+      "expected": 1.0
+    }
+  ],
+  "budget": {
+    "targetExperiences": [
+      {
+        "mealFrequencyPerDay": 1,
+        "budgetLevel": 0,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 1,
+        "budgetLevel": 1,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 1,
+        "budgetLevel": 2,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 1,
+        "budgetLevel": 3,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 1,
+        "budgetLevel": 4,
+        "expected": 7
+      },
+      {
+        "mealFrequencyPerDay": 2,
+        "budgetLevel": 0,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 2,
+        "budgetLevel": 1,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 2,
+        "budgetLevel": 2,
+        "expected": 7
+      },
+      {
+        "mealFrequencyPerDay": 2,
+        "budgetLevel": 3,
+        "expected": 11
+      },
+      {
+        "mealFrequencyPerDay": 2,
+        "budgetLevel": 4,
+        "expected": 14
+      },
+      {
+        "mealFrequencyPerDay": 3,
+        "budgetLevel": 0,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 3,
+        "budgetLevel": 1,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 3,
+        "budgetLevel": 2,
+        "expected": 11
+      },
+      {
+        "mealFrequencyPerDay": 3,
+        "budgetLevel": 3,
+        "expected": 16
+      },
+      {
+        "mealFrequencyPerDay": 3,
+        "budgetLevel": 4,
+        "expected": 21
+      },
+      {
+        "mealFrequencyPerDay": 4,
+        "budgetLevel": 0,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 4,
+        "budgetLevel": 1,
+        "expected": 7
+      },
+      {
+        "mealFrequencyPerDay": 4,
+        "budgetLevel": 2,
+        "expected": 14
+      },
+      {
+        "mealFrequencyPerDay": 4,
+        "budgetLevel": 3,
+        "expected": 21
+      },
+      {
+        "mealFrequencyPerDay": 4,
+        "budgetLevel": 4,
+        "expected": 21
+      },
+      {
+        "mealFrequencyPerDay": 5,
+        "budgetLevel": 0,
+        "expected": 5
+      },
+      {
+        "mealFrequencyPerDay": 5,
+        "budgetLevel": 1,
+        "expected": 9
+      },
+      {
+        "mealFrequencyPerDay": 5,
+        "budgetLevel": 2,
+        "expected": 18
+      },
+      {
+        "mealFrequencyPerDay": 5,
+        "budgetLevel": 3,
+        "expected": 21
+      },
+      {
+        "mealFrequencyPerDay": 5,
+        "budgetLevel": 4,
+        "expected": 21
+      }
+    ],
+    "mealImpact": [
+      {
+        "currentSpent": 30.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 15.0,
+        "expected": {
+          "mealCost": 15.0,
+          "projectedSpent": 45.0,
+          "projectedRemaining": 155.0,
+          "impactLevel": "low",
+          "guidanceLevel": "excellent",
+          "message": "Perfect! This investment keeps you well within your comfort zone.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 100.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 39.99,
+        "expected": {
+          "mealCost": 39.99,
+          "projectedSpent": 139.99,
+          "projectedRemaining": 60.00999999999999,
+          "impactLevel": "moderate",
+          "guidanceLevel": "good",
+          "message": "Great balance between enjoyment and your weekly investment goals.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 100.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 40.0,
+        "expected": {
+          "mealCost": 40.0,
+          "projectedSpent": 140.0,
+          "projectedRemaining": 60.0,
+          "impactLevel": "high",
+          "guidanceLevel": "moderate",
+          "message": "This is a significant investment. Make sure it aligns with your priorities.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 150.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 29.0,
+        "expected": {
+          "mealCost": 29.0,
+          "projectedSpent": 179.0,
+          "projectedRemaining": 21.0,
+          "impactLevel": "high",
+          "guidanceLevel": "moderate",
+          "message": "This is a significant investment. Make sure it aligns with your priorities.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 150.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 60.0,
+        "expected": {
+          "mealCost": 60.0,
+          "projectedSpent": 210.0,
+          "projectedRemaining": 0.0,
+          "impactLevel": "very_high",
+          "guidanceLevel": "high",
+          "message": "This investment will exceed your weekly capacity. Consider adjusting the amount.",
+          "exceedsCapacity": true
+        }
+      },
+      {
+        "currentSpent": 0.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 180.0,
+        "expected": {
+          "mealCost": 180.0,
+          "projectedSpent": 180.0,
+          "projectedRemaining": 20.0,
+          "impactLevel": "very_high",
+          "guidanceLevel": "high",
+          "message": "This investment will exceed your weekly capacity. Consider adjusting the amount.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 0.0,
+        "weeklyCapacity": 0.0,
+        "mealCost": 10.0,
+        "expected": {
+          "mealCost": 10.0,
+          "projectedSpent": 10.0,
+          "projectedRemaining": 0.0,
+          "impactLevel": "very_high",
+          "guidanceLevel": "high",
+          "message": "This investment will exceed your weekly capacity. Consider adjusting the amount.",
+          "exceedsCapacity": true
+        }
+      },
+      {
+        "currentSpent": 199.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 1.0,
+        "expected": {
+          "mealCost": 1.0,
+          "projectedSpent": 200.0,
+          "projectedRemaining": 0.0,
+          "impactLevel": "very_high",
+          "guidanceLevel": "high",
+          "message": "This investment will exceed your weekly capacity. Consider adjusting the amount.",
+          "exceedsCapacity": false
+        }
+      },
+      {
+        "currentSpent": 50.0,
+        "weeklyCapacity": 200.0,
+        "mealCost": 10.0,
+        "expected": {
+          "mealCost": 10.0,
+          "projectedSpent": 60.0,
+          "projectedRemaining": 140.0,
+          "impactLevel": "moderate",
+          "guidanceLevel": "good",
+          "message": "Great balance between enjoyment and your weekly investment goals.",
+          "exceedsCapacity": false
+        }
+      }
+    ],
+    "budgetImpact": [
+      {
+        "weeklyBudget": 200.0,
+        "cost": 5.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 2.5,
+          "impactLevel": "low",
+          "message": "Great choice! This experience fits well within your weekly investment plan.",
+          "remainingBudget": 195.0
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 9.99,
+        "expected": {
+          "percentageOfWeeklyBudget": 4.995,
+          "impactLevel": "low",
+          "message": "Great choice! This experience fits well within your weekly investment plan.",
+          "remainingBudget": 190.01
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 10.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 5.0,
+          "impactLevel": "moderate",
+          "message": "Nice balance between enjoyment and your weekly goals.",
+          "remainingBudget": 190.0
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 29.99,
+        "expected": {
+          "percentageOfWeeklyBudget": 14.995,
+          "impactLevel": "moderate",
+          "message": "Nice balance between enjoyment and your weekly goals.",
+          "remainingBudget": 170.01
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 30.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 15.0,
+          "impactLevel": "high",
+          "message": "A special experience - make sure it aligns with your priorities.",
+          "remainingBudget": 170.0
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 49.99,
+        "expected": {
+          "percentageOfWeeklyBudget": 24.995,
+          "impactLevel": "high",
+          "message": "A special experience - make sure it aligns with your priorities.",
+          "remainingBudget": 150.01
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 50.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 25.0,
+          "impactLevel": "very_high",
+          "message": "This is a significant investment in your dining experience.",
+          "remainingBudget": 150.0
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": 120.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 60.0,
+          "impactLevel": "very_high",
+          "message": "This is a significant investment in your dining experience.",
+          "remainingBudget": 80.0
+        }
+      },
+      {
+        "weeklyBudget": 0.0,
+        "cost": 10.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 0.0,
+          "impactLevel": null,
+          "message": "",
+          "remainingBudget": 0.0
+        }
+      },
+      {
+        "weeklyBudget": -5.0,
+        "cost": 10.0,
+        "expected": {
+          "percentageOfWeeklyBudget": 0.0,
+          "impactLevel": null,
+          "message": "",
+          "remainingBudget": 0.0
+        }
+      },
+      {
+        "weeklyBudget": 200.0,
+        "cost": null,
+        "expected": {
+          "percentageOfWeeklyBudget": 0.0,
+          "impactLevel": null,
+          "message": "",
+          "remainingBudget": 0.0
+        }
+      },
+      {
+        "weeklyBudget": 150.0,
+        "cost": 22.5,
+        "expected": {
+          "percentageOfWeeklyBudget": 15.0,
+          "impactLevel": "high",
+          "message": "A special experience - make sure it aligns with your priorities.",
+          "remainingBudget": 127.5
+        }
+      }
+    ],
+    "levels": [
+      {
+        "progress": 0.0,
+        "capacityUsageLevel": "LOW",
+        "guidanceLevel": "EXCELLENT"
+      },
+      {
+        "progress": 0.1,
+        "capacityUsageLevel": "LOW",
+        "guidanceLevel": "EXCELLENT"
+      },
+      {
+        "progress": 0.2999,
+        "capacityUsageLevel": "LOW",
+        "guidanceLevel": "EXCELLENT"
+      },
+      {
+        "progress": 0.3,
+        "capacityUsageLevel": "MODERATE",
+        "guidanceLevel": "EXCELLENT"
+      },
+      {
+        "progress": 0.3775,
+        "capacityUsageLevel": "MODERATE",
+        "guidanceLevel": "EXCELLENT"
+      },
+      {
+        "progress": 0.5,
+        "capacityUsageLevel": "MODERATE",
+        "guidanceLevel": "GOOD"
+      },
+      {
+        "progress": 0.69,
+        "capacityUsageLevel": "MODERATE",
+        "guidanceLevel": "GOOD"
+      },
+      {
+        "progress": 0.7,
+        "capacityUsageLevel": "HIGH",
+        "guidanceLevel": "GOOD"
+      },
+      {
+        "progress": 0.8,
+        "capacityUsageLevel": "HIGH",
+        "guidanceLevel": "MODERATE"
+      },
+      {
+        "progress": 0.899,
+        "capacityUsageLevel": "HIGH",
+        "guidanceLevel": "MODERATE"
+      },
+      {
+        "progress": 0.9,
+        "capacityUsageLevel": "VERY_HIGH",
+        "guidanceLevel": "MODERATE"
+      },
+      {
+        "progress": 0.925,
+        "capacityUsageLevel": "VERY_HIGH",
+        "guidanceLevel": "MODERATE"
+      },
+      {
+        "progress": 0.95,
+        "capacityUsageLevel": "VERY_HIGH",
+        "guidanceLevel": "HIGH"
+      },
+      {
+        "progress": 1.0,
+        "capacityUsageLevel": "VERY_HIGH",
+        "guidanceLevel": "HIGH"
+      },
+      {
+        "progress": 1.5,
+        "capacityUsageLevel": "VERY_HIGH",
+        "guidanceLevel": "HIGH"
+      }
+    ]
+  },
+  "smartMealType": [
+    {
+      "hour": 0,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 1,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 2,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 3,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 4,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 5,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 6,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 7,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 8,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 9,
+      "expected": "breakfast"
+    },
+    {
+      "hour": 10,
+      "expected": "lunch"
+    },
+    {
+      "hour": 11,
+      "expected": "lunch"
+    },
+    {
+      "hour": 12,
+      "expected": "lunch"
+    },
+    {
+      "hour": 13,
+      "expected": "lunch"
+    },
+    {
+      "hour": 14,
+      "expected": "lunch"
+    },
+    {
+      "hour": 15,
+      "expected": "snack"
+    },
+    {
+      "hour": 16,
+      "expected": "snack"
+    },
+    {
+      "hour": 17,
+      "expected": "snack"
+    },
+    {
+      "hour": 18,
+      "expected": "dinner"
+    },
+    {
+      "hour": 19,
+      "expected": "dinner"
+    },
+    {
+      "hour": 20,
+      "expected": "dinner"
+    },
+    {
+      "hour": 21,
+      "expected": "dinner"
+    },
+    {
+      "hour": 22,
+      "expected": "dinner"
+    },
+    {
+      "hour": 23,
+      "expected": "dinner"
+    }
+  ],
+  "level": [
+    {
+      "points": 0,
+      "expected": "Beginner"
+    },
+    {
+      "points": 10,
+      "expected": "Beginner"
+    },
+    {
+      "points": 49,
+      "expected": "Beginner"
+    },
+    {
+      "points": 50,
+      "expected": "Explorer"
+    },
+    {
+      "points": 100,
+      "expected": "Explorer"
+    },
+    {
+      "points": 149,
+      "expected": "Explorer"
+    },
+    {
+      "points": 150,
+      "expected": "Optimizer"
+    },
+    {
+      "points": 299,
+      "expected": "Optimizer"
+    },
+    {
+      "points": 300,
+      "expected": "Expert"
+    },
+    {
+      "points": 499,
+      "expected": "Expert"
+    },
+    {
+      "points": 500,
+      "expected": "Master"
+    },
+    {
+      "points": 1000,
+      "expected": "Master"
+    }
+  ],
+  "toStringAsFixed1": [
+    {
+      "value": 0.0,
+      "expected": "0.0",
+      "expected2": "0.00"
+    },
+    {
+      "value": 0.05,
+      "expected": "0.1",
+      "expected2": "0.05"
+    },
+    {
+      "value": 0.15,
+      "expected": "0.1",
+      "expected2": "0.15"
+    },
+    {
+      "value": 0.25,
+      "expected": "0.3",
+      "expected2": "0.25"
+    },
+    {
+      "value": 0.35,
+      "expected": "0.3",
+      "expected2": "0.35"
+    },
+    {
+      "value": 1.2,
+      "expected": "1.2",
+      "expected2": "1.20"
+    },
+    {
+      "value": 2.25,
+      "expected": "2.3",
+      "expected2": "2.25"
+    },
+    {
+      "value": 2.35,
+      "expected": "2.4",
+      "expected2": "2.35"
+    },
+    {
+      "value": 3.75,
+      "expected": "3.8",
+      "expected2": "3.75"
+    },
+    {
+      "value": 4.45,
+      "expected": "4.5",
+      "expected2": "4.45"
+    },
+    {
+      "value": 4.5,
+      "expected": "4.5",
+      "expected2": "4.50"
+    },
+    {
+      "value": 4.95,
+      "expected": "5.0",
+      "expected2": "4.95"
+    },
+    {
+      "value": 9.99,
+      "expected": "10.0",
+      "expected2": "9.99"
+    },
+    {
+      "value": 10.0,
+      "expected": "10.0",
+      "expected2": "10.00"
+    },
+    {
+      "value": 12.345,
+      "expected": "12.3",
+      "expected2": "12.35"
+    },
+    {
+      "value": 100.05,
+      "expected": "100.0",
+      "expected2": "100.05"
+    },
+    {
+      "value": 0.999,
+      "expected": "1.0",
+      "expected2": "1.00"
+    },
+    {
+      "value": 1e-7,
+      "expected": "0.0",
+      "expected2": "0.00"
+    },
+    {
+      "value": 123456.75,
+      "expected": "123456.8",
+      "expected2": "123456.75"
+    }
+  ]
+}
