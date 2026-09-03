@@ -73,8 +73,8 @@ object TokenType {
     const val TEXT_SCALE_MIN = 0.8f
     const val TEXT_SCALE_MAX = 2.0f
     val display = TextRole(32, 800, 38, -0.5, false)
-    val title = TextRole(22, 700, 28, 0, false)
-    val heading = TextRole(17, 700, 22, 0, false)
+    val title = TextRole(22, 700, 28, 0.0, false)
+    val heading = TextRole(17, 700, 22, 0.0, false)
     val body = TextRole(16, 500, 24, 0.15, false)
     val bodySmall = TextRole(14, 400, 20, 0.25, false)
     val caption = TextRole(13, 500, 18, 0.2, false)

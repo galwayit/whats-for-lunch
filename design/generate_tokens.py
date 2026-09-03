@@ -124,7 +124,8 @@ def gen_kotlin(t):
     lines.append(f"    const val TEXT_SCALE_MAX = {t['typography']['textScale']['max']}f")
     for role, r in t["typography"]["roles"].items():
         upper = "true" if r.get("uppercase") else "false"
-        lines.append(f"    val {role} = TextRole({r['size']}, {r['weight']}, {r['lineHeight']}, {r['tracking']}, {upper})")
+        # tracking is a Double in the Kotlin TextRole; json integers such as 0 must not become Int literals
+        lines.append(f"    val {role} = TextRole({r['size']}, {r['weight']}, {r['lineHeight']}, {float(r['tracking'])}, {upper})")
     lines.append("}")
     lines.append("")
     for group in ("spacing", "radius", "size"):
