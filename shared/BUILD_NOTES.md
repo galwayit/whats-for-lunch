@@ -112,13 +112,32 @@ is idle while the flow is fed from a real dispatcher.
 
 ## Fixture database
 
-`src/desktopTest/resources/fixtures/diet_buddy_v6_flutter.sqlite`: `PRAGMA user_version = 6`,
+`src/commonTest/resources/fixtures/diet_buddy_v6_flutter.sqlite`: `PRAGMA user_version = 6`,
 13 tables, one row in `users` (id 1, "Demo User", `created_at` 1788327233, `preferences`
 `{}`), every other table empty. Booleans are `INTEGER`, timestamps epoch seconds.
 
 ## iOS framework
 
-See the section appended below once `:shared:linkDebugFrameworkIosSimulatorArm64` has run.
+`./gradlew :shared:linkDebugFrameworkIosSimulatorArm64` (about 1 min warm) produces
+`shared/build/bin/iosSimulatorArm64/debugFramework/LunchCore.framework` (static, ~80 MB
+debug). SKIE 0.10.4 adds `Modules/LunchCore.swiftmodule` and `Headers/LunchCore-Swift.h`,
+so Swift sees `suspend` functions as `async` and `Flow` as `AsyncSequence`. Device builds
+use `:shared:linkDebugFrameworkIosArm64`; Xcode should call
+`:shared:embedAndSignAppleFrameworkForXcode` from a Run Script phase (see
+`iosApp/LunchApp/Core/README.md` for the adapter plan).
+
+Constraints discovered while linking (2026-09-03):
+
+- RevenueCat `purchases-kmp` is pinned to `2.10.2+17.55.1`. Every 3.x klib is compiled
+  with Kotlin 2.3.20 (klib `abi_version=2.3.0`) and the Kotlin 2.2.0 native resolver
+  skips it with a misleading `KLIB resolver: Could not find ... .klib`. Moving to 3.x
+  means moving Kotlin to 2.3.20 and SKIE to a matching release together.
+- `commonMain` must stay off JVM-only collection APIs (`putIfAbsent`,
+  `computeIfAbsent`, `java.*`); the desktop and Android compilations accept them, only
+  the Kotlin/Native compilation rejects them.
+- The RevenueCat iOS SDK itself (`PurchasesHybridCommon`) must be added to the Xcode
+  app target via Swift Package Manager before `RevenueCatEntitlementRepository` can run
+  on a device; the framework links without it because the cinterop is header-only.
 
 ## Open issues
 

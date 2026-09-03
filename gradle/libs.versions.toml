@@ -3,7 +3,7 @@
 kotlin = "2.2.0"
 agp = "8.11.1"
 compileSdk = "35"
-minSdk = "26"
+minSdk = "33" # Android 13; legacy devices are out of scope (decision 2026-09-03)
 targetSdk = "35"
 
 # Multiplatform libraries
@@ -17,7 +17,7 @@ kermit = "2.0.6"
 supabase = "3.1.4"
 # RevenueCat Kotlin Multiplatform SDK. Verify the latest 3.x on Maven Central before building:
 # https://central.sonatype.com/artifact/com.revenuecat.purchases/purchases-kmp-core
-revenuecat = "3.0.0"
+revenuecat = "2.10.2+17.55.1" # 3.x klibs are built with Kotlin 2.3.20 and cannot be read by Kotlin 2.2.0
 skie = "0.10.4"
 multiplatform-settings = "1.3.0"
 

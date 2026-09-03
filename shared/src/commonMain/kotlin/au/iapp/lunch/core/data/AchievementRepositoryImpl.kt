@@ -40,7 +40,7 @@ internal class AchievementRepositoryImpl(
                 val user = db.usersQueries.selectById(userId).executeAsOneOrNull() ?: return@transaction
                 val unlocked = unlockedFrom(user.preferences).toMutableMap()
                 val now = clock.nowEpochSeconds()
-                achievements.forEach { unlocked.putIfAbsent(it.id, it.unlockedAtEpochSeconds ?: now) }
+                achievements.forEach { unlocked.getOrPut(it.id) { it.unlockedAtEpochSeconds ?: now } } // getOrPut: putIfAbsent is JVM-only
                 val value = JsonObject(unlocked.mapValues { JsonPrimitive(it.value) })
                 db.usersQueries.updatePreferences(
                     preferences = UserPreferencesJson.withExtra(user.preferences, UserPreferencesJson.NATIVE_ACHIEVEMENTS_KEY, value),
