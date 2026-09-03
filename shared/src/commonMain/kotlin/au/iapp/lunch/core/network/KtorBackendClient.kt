@@ -85,6 +85,10 @@ internal class KtorBackendClient(
     override suspend fun groupsConfirm(request: GroupsConfirmRequest): LunchGroup =
         post<GroupsConfirmRequest, GroupResponse>("groups-confirm", request).group
 
+    override suspend fun groupsCancel(groupId: String) {
+        post<GroupsCancelRequest, Unit>("groups-cancel", GroupsCancelRequest(groupId))
+    }
+
     override suspend fun invitation(code: String): Invitation =
         execute<InvitationResponse> { http.get("invitations") { commonHeaders(); parameter("code", code) } }.invitation
 

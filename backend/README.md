@@ -91,9 +91,9 @@ make test       # deno test (pure modules; no network)
 make deploy     # supabase db push + supabase functions deploy <each>
 ```
 
-`make deploy-functions` loops over the twelve functions. The JWT policy per
+`make deploy-functions` loops over the thirteen functions. The JWT policy per
 function comes from `config.toml` (`verify_jwt = false` for the public ones,
-`true` for `groups-create`, `groups-propose`, `groups-confirm`, `account-delete`).
+`true` for `groups-create`, `groups-propose`, `groups-confirm`, `groups-cancel`, `account-delete`).
 
 Smoke test:
 
@@ -133,7 +133,10 @@ Use the "Send test event" button after deploying; expect `{"ok":true,"updated":0
 
 1. Firebase console -> Project settings -> Service accounts -> Generate new private key.
 2. Set the file's contents as `FCM_SERVICE_ACCOUNT_JSON` (one line).
-3. Both apps call `POST /push-register` with their FCM token. iOS needs APNs configured in Firebase.
+3. Both apps call `POST /push-register` with their FCM registration token. On iOS the
+   Firebase Messaging SDK maps the APNs token to an FCM token, so add
+   `iosApp/LunchApp/GoogleService-Info.plist` and configure the app's APNs authentication key
+   in Firebase. Never send the raw APNs token to this endpoint.
 
 The sender signs the OAuth assertion with Web Crypto; no Firebase SDK is used.
 
@@ -172,7 +175,7 @@ apps' `CoreConfig.inviteLinkBase` must match too.
 ## Verification
 
 ```sh
-make check   # Checked 45 files (fmt) + type check of every .ts
+make check   # Checked 46 files (fmt) + type check of every .ts
 make test    # 48 tests, all pure (prompt snapshot, parser, geohash, haversine,
              # Places mapping, quota, RevenueCat mapping, invites, push JWT, errors)
 ```

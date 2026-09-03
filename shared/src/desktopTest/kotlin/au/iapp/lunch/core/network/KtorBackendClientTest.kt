@@ -147,15 +147,17 @@ class KtorBackendClientTest {
         backend.route("groups-create", GroupResponse.serializer(), GroupResponse(Samples.group()), HttpStatusCode.Created)
         backend.route("groups-propose", GroupsProposeResponse.serializer(), GroupsProposeResponse(listOf(GroupProposal(Samples.restaurant(), listOf("close")))))
         backend.route("groups-confirm", GroupResponse.serializer(), GroupResponse(Samples.group().copy(placeId = "place-1")))
+        backend.route("groups-cancel", body = "")
 
         val created = client.groupsCreate(GroupsCreateRequest("Friday team lunch", 1_788_600_000, -33.87, 151.21, 2.0))
         val proposals = client.groupsPropose("group-1", hostPreferences = null)
         val confirmed = client.groupsConfirm(GroupsConfirmRequest("group-1", "place-1", "Sample Sushi", "1 George St"))
+        client.groupsCancel("group-1")
 
         assertEquals("ABCD1234", created.inviteCode)
         assertEquals(listOf("close"), proposals.single().reasons)
         assertEquals("place-1", confirmed.placeId)
-        assertTrue(backend.lastBody().contains("\"placeName\":\"Sample Sushi\""))
+        assertTrue(backend.lastBody().contains("\"groupId\":\"group-1\""))
     }
 
     @Test

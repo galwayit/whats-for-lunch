@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lunch invitation</title>
   <meta name="description" content="You have been invited to lunch. Let the host know if you are coming.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --cream: #FFF8E7;
@@ -20,7 +17,7 @@
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
     body {
-      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--cream);
       color: var(--brown);
       display: flex;
@@ -105,7 +102,7 @@
   <main id="app"
         data-functions-url="https://YOUR-PROJECT-REF.supabase.co/functions/v1"
         data-anon-key="YOUR-SUPABASE-ANON-KEY"
-        data-ios-url="https://apps.apple.com/app/idYOUR_APP_ID"
+        data-ios-url="https://apps.apple.com/app/id6808090102"
         data-android-url="https://play.google.com/store/apps/details?id=au.iapp.lunch">
     <header><span class="logo" aria-hidden="true">&#127860;</span> Lunch</header>
 
@@ -228,6 +225,11 @@
       }
 
       function load() {
+        if (functionsUrl.indexOf("YOUR-PROJECT-REF") !== -1 || anonKey.indexOf("YOUR-SUPABASE") !== -1) {
+          hide("loading"); show("not-found");
+          $("not-found-detail").textContent = "The invitation service is not configured yet. Ask the host to try again later.";
+          return;
+        }
         if (!/^[0-9A-HJKMNP-TV-Z]{8}$/.test(code)) {
           hide("loading"); show("not-found");
           return;

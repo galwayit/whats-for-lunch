@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["APPLE_TEAM_ID_PLACEHOLDER.au.iapp.lunch"],
+        "appIDs": ["RYM9BD2B27.au.iapp.lunch"],
         "components": [
           { "/": "/i/*", "comment": "Lunch invitation links" }
         ]
@@ -10,6 +10,6 @@
     ]
   },
   "webcredentials": {
-    "apps": ["APPLE_TEAM_ID_PLACEHOLDER.au.iapp.lunch"]
+    "apps": ["RYM9BD2B27.au.iapp.lunch"]
   }
 }

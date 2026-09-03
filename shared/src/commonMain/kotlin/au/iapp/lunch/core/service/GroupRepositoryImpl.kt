@@ -3,7 +3,6 @@ package au.iapp.lunch.core.service
 import au.iapp.lunch.core.api.GroupRepository
 import au.iapp.lunch.core.api.UserRepository
 import au.iapp.lunch.core.data.coreResult
-import au.iapp.lunch.core.model.CoreError
 import au.iapp.lunch.core.model.GroupProposal
 import au.iapp.lunch.core.model.Invitation
 import au.iapp.lunch.core.model.Location
@@ -59,9 +58,8 @@ internal class GroupRepositoryImpl(
         emit(rows.map { it.toRsvp() })
     }
 
-    /** No cancel function exists yet and the tables are read-only for clients; see BUILD_NOTES.md. */
     override suspend fun cancel(groupId: String): Result<Unit> =
-        Result.failure(CoreError.Service(CANCEL_UNSUPPORTED, "Cancelling a group is not supported by the backend yet"))
+        coreResult { backend.groupsCancel(groupId) }
 
     @Serializable
     private data class GroupRow(
@@ -116,8 +114,6 @@ internal class GroupRepositoryImpl(
     }
 
     companion object {
-        const val CANCEL_UNSUPPORTED = "GROUP_CANCEL_UNSUPPORTED"
-
         /** PostgREST renders timestamptz as ISO-8601 with an offset. */
         private fun epochSeconds(timestamp: String): Long = Instant.parse(timestamp).epochSeconds
     }

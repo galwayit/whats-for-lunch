@@ -20,6 +20,7 @@ internal interface BackendClient {
     suspend fun groupsCreate(request: GroupsCreateRequest): LunchGroup
     suspend fun groupsPropose(groupId: String, hostPreferences: UserPreferences?): List<GroupProposal>
     suspend fun groupsConfirm(request: GroupsConfirmRequest): LunchGroup
+    suspend fun groupsCancel(groupId: String)
     suspend fun invitation(code: String): Invitation
     suspend fun invitationsRespond(code: String, status: RsvpStatus, displayName: String?): Invitation
     suspend fun pushRegister(token: String, platform: String)

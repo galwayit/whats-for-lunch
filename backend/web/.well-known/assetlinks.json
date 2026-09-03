@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "au.iapp.lunch",
+      "package_name": "au.iapp.guess_what.what_we_have_for_lunch",
       "sha256_cert_fingerprints": [
         "ANDROID_SIGNING_SHA256_PLACEHOLDER:REPLACE:WITH:THE:UPLOAD:KEY:FINGERPRINT:FROM:PLAY:CONSOLE:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
       ]

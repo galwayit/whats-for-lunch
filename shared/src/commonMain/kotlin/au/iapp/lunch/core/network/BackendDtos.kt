@@ -112,6 +112,9 @@ internal data class GroupsConfirmRequest(
 )
 
 @Serializable
+internal data class GroupsCancelRequest(val groupId: String)
+
+@Serializable
 internal data class GroupResponse(val group: LunchGroup)
 
 @Serializable

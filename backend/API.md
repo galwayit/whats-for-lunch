@@ -78,6 +78,10 @@ Behaviour: host and Pro checks; nearby search around the group area (uses the sa
 
 Request: `{ "groupId": "uuid", "placeId": "...", "placeName": "...", "placeAddress": "..." }` → updates the group, fans out an `invitation` push to guests who already have a pending rsvp with a device token. Response: `{ "group": LunchGroup }`.
 
+## POST /groups-cancel (auth required, host only)
+
+Request: `{ "groupId": "uuid" }` → sets `cancelled_at` and returns 204. The operation is idempotent. Cancelled groups disappear from the host's group list and their invitation codes return 404.
+
 ## GET /invitations?code=ABCD1234
 
 Public. Response: `{ "invitation": Invitation }`. Used by the apps and by the web landing page.

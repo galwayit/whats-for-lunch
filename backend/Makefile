@@ -3,7 +3,7 @@ DENO ?= deno
 SUPABASE ?= supabase
 FUNCTIONS_DIR := supabase/functions
 FUNCTIONS := places-nearby places-details places-photo ai-recommend groups-create \
-  groups-propose groups-confirm invitations invitations-respond push-register \
+  groups-propose groups-confirm groups-cancel invitations invitations-respond push-register \
   revenuecat-webhook account-delete
 
 .PHONY: check fmt test deploy deploy-db deploy-functions secrets help
