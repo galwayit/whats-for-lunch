@@ -199,8 +199,3 @@ nonisolated struct SwiftRecommendationEngine: RecommendationEngine {
         return Self.discoverChainKeywords.contains(where: { name.contains($0) })
     }
 }
-
-nonisolated extension Double {
-    /// Kotlin `toFixed1()`: one decimal, dot separator, no grouping (e.g. "0.8", "4.6").
-    var fixed1: String { String(format: "%.1f", locale: Locale(identifier: "en_US_POSIX"), self) }
-}

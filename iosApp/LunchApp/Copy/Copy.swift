@@ -45,8 +45,8 @@ nonisolated enum Copy {
         static let locationDeniedTitle = "Location is off"
         static let locationDeniedBody = "Turn on location for this app in Settings to find places near you."
         static let locationDeniedCta = "Open Settings"
-        static let notLinkedTitle = "Core not linked yet"
-        static let notLinkedBody = "The shared Kotlin core isn't part of this build. Launch with -previewCore to explore the app with sample data."
+        static let notLinkedTitle = "App setup required"
+        static let notLinkedBody = "This build is missing its production service configuration. Add Config/Lunch.plist, then rebuild the app."
     }
 
     enum Onboarding {
@@ -284,6 +284,7 @@ nonisolated enum Copy {
         static let proBadge = "PRO"
         static let successTitle = "You're on Lunch Pro"
         static let successBody = "Group lunches, unlimited AI picks and your full history are unlocked."
+        static let restoreNothing = "No purchases to restore"
         static let storeName = "App Store"
     }
 
@@ -298,6 +299,11 @@ nonisolated enum Copy {
         static let hostCta = "Start free trial"
         static let guestOfferTitle = "Enjoyed the lunch?"
         static let guestOfferBody = "Lunch Pro lets you host the next one."
+    }
+
+    enum Push {
+        /// push.reminder in design/copy.md: "%s is in an hour at %s".
+        static func reminder(group: String, place: String) -> String { "\(group) is in an hour at \(place)" }
     }
 
     enum Info {
@@ -336,5 +342,15 @@ nonisolated enum Copy {
         static let invitationTitle = "Invitation"
         static let invitationMissing = "This invitation isn't available"
         static let invitationMissingBody = "The link may have expired or the lunch was cancelled."
+        static let choosingPlace = "Choosing a place"
+        static let noProposals = "No places match this group yet"
+        static let noProposalsBody = "Try a larger radius or adjust your restaurant preferences."
+        static let locationReady = "Current location ready"
+        static let locationRequired = "A location is needed to suggest nearby places."
+        static let calendarAdded = "Added to Calendar"
+        static let reminderSet = "Reminder set"
+        static let groupCancelled = "Lunch cancelled"
+        static let cancelTitle = "Cancel this lunch?"
+        static let cancelBody = "The invitation will stop working for everyone."
     }
 }

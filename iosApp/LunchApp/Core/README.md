@@ -27,12 +27,13 @@ exist for views only; they are not part of the contract.
   Selected by the `-previewCore` launch argument (see `App/LaunchArguments.swift` for the flags).
 - `Core/Engines/*` - pure Swift ports of the four Kotlin engines. They implement the same rules as
   `shared/.../core/engine/*Impl.kt` and are what previews and unit tests use.
-- `Core/NotConfiguredCore` - the placeholder shown until the Kotlin framework is linked.
+- `Core/KotlinLunchCore` - production adapter over the linked Kotlin framework. It converts
+  models explicitly, bridges SKIE flows to `AsyncStream`, and feeds Core Location into KMP.
+- `Core/NotConfiguredCore` - safe fallback when `Config/Lunch.plist` is absent or incomplete.
 
-## The SKIE adapter (next milestone)
+## The SKIE adapter
 
-`KotlinLunchCore: LunchCoreClient` will wrap the framework's `LunchCore` instance: each property
-forwards to the Kotlin object, SKIE turns `suspend` into `async throws` and `Flow` into
-`AsyncSequence` (wrap in `AsyncStream`), `Result` failures are rethrown as `CoreError`, and the
-models are converted field-by-field (Kotlin `Long` -> `Int64`, enum ordinals -> Swift cases). Nothing
-in `Features/` needs to change for that swap; only `LunchApp.swift` picks the implementation.
+`KotlinLunchCore: LunchCoreClient` wraps the production framework's `SwiftLunchCore` facade.
+SKIE turns Kotlin `suspend` calls into `async throws` and flows into `AsyncSequence`; the adapter
+converts those flows to `AsyncStream`, translates `CoreError`, and maps models field-by-field.
+Normal launches select it when `Lunch.plist` is complete; `-previewCore` remains deterministic.

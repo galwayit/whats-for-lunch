@@ -2,8 +2,7 @@
 //  NotLinkedView.swift
 //  LunchApp
 //
-//  Shown when the app runs on `NotConfiguredCore`, i.e. without `-previewCore` and before the
-//  Kotlin framework is linked.
+//  Shown when a normal launch cannot start the production core.
 //
 
 import SwiftUI

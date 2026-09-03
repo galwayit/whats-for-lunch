@@ -46,10 +46,12 @@ struct MealLogCard: View {
             Text(Copy.Track.logType)
                 .lunchText(.caption)
                 .foregroundStyle(Tokens.Palette.textSecondary)
-            HStack(spacing: Tokens.Spacing.sm) {
-                ForEach(TrackViewModel.mealTypes, id: \.self) { type in
-                    Chip(title: app.core.mealDefaults.displayName(mealType: type), isSelected: model.mealType == type, identifier: "meal_type_\(type)") {
-                        model.mealType = type
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Tokens.Spacing.sm) {
+                    ForEach(TrackViewModel.mealTypes, id: \.self) { type in
+                        Chip(title: app.core.mealDefaults.displayName(mealType: type), isSelected: model.mealType == type, identifier: "meal_type_\(type)") {
+                            model.mealType = type
+                        }
                     }
                 }
             }

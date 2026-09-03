@@ -342,3 +342,17 @@ nonisolated enum CoreError: Error, Hashable {
     case notSignedIn
     case unknown(String)
 }
+
+// These are value-only transfer objects used by AsyncStream. Codable collections
+// and Foundation scalar values are immutable across each yielded copy.
+extension UserPreferences: @unchecked Sendable {}
+extension UserProfile: @unchecked Sendable {}
+extension Meal: @unchecked Sendable {}
+extension RestaurantReview: @unchecked Sendable {}
+extension Restaurant: @unchecked Sendable {}
+extension Achievement: @unchecked Sendable {}
+extension GateDecision: @unchecked Sendable {}
+extension SubscriptionStatus: @unchecked Sendable {}
+extension AuthSession: @unchecked Sendable {}
+extension LunchGroup: @unchecked Sendable {}
+extension Rsvp: @unchecked Sendable {}

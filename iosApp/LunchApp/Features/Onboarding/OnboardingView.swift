@@ -279,10 +279,17 @@ struct DietaryChipGrid: View {
     let selected: Set<String>
     var includeNone = false
     var onlyAllergens = false
+    /// Hides the allergen options; Preferences shows them in their own section.
+    var onlyDiets = false
     let onToggle: (String) -> Void
 
     private var options: [(label: String, key: String)] {
-        var list = Copy.Dietary.options.filter { onlyAllergens == Copy.Dietary.allergenKeys.contains($0.key) }
+        var list = Copy.Dietary.options.filter { option in
+            let isAllergen = Copy.Dietary.allergenKeys.contains(option.key)
+            if onlyAllergens { return isAllergen }
+            if onlyDiets { return !isAllergen }
+            return true
+        }
         if includeNone { list.append(Copy.Dietary.none) }
         return list
     }

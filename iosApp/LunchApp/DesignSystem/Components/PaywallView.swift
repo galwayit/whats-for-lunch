@@ -59,7 +59,7 @@ struct PaywallView: View {
             .padding(Tokens.Spacing.pageWide)
         }
         .background(Tokens.Palette.ground)
-        .onAppear {
+        .onChange(of: [yearly?.identifier, monthly?.identifier], initial: true) { _, _ in
             if selectedIdentifier == nil { selectedIdentifier = (yearly ?? monthly)?.identifier }
         }
     }

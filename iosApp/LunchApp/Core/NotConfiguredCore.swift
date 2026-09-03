@@ -2,17 +2,16 @@
 //  NotConfiguredCore.swift
 //  LunchApp
 //
-//  Placeholder `LunchCoreClient` used when the shared Kotlin framework is not linked. Every
-//  call fails with `CoreError.service(code: "CORE_NOT_LINKED")` and every stream finishes at
-//  once, so the app boots and shows the not-linked screen. It also doubles as the checklist of
-//  members the `KotlinLunchCore` adapter must implement.
+//  Safe `LunchCoreClient` fallback used when production configuration is incomplete or startup
+//  fails. Every call fails consistently and every stream finishes at once, so a misconfigured
+//  build shows a useful diagnostic instead of crashing.
 //
 
 import Foundation
 
 enum NotConfigured {
-    static let code = "CORE_NOT_LINKED"
-    static let error = CoreError.service(code: code, message: "The shared core is not linked in this build.")
+    static let code = "APP_NOT_CONFIGURED"
+    static let error = CoreError.service(code: code, message: "The production services are not configured in this build.")
     static func empty<T>() -> AsyncStream<T> { AsyncStream { $0.finish() } }
 }
 

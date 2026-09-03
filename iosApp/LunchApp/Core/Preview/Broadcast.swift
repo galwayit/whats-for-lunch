@@ -16,6 +16,12 @@ final class Broadcast<Value: Sendable> {
         self.value = value
     }
 
+    deinit {
+        for continuation in continuations.values {
+            continuation.finish()
+        }
+    }
+
     func send(_ newValue: Value) {
         value = newValue
         for continuation in continuations.values {
@@ -29,7 +35,9 @@ final class Broadcast<Value: Sendable> {
             continuations[id] = continuation
             continuation.yield(value)
             continuation.onTermination = { [weak self] _ in
-                Task { @MainActor in self?.continuations[id] = nil }
+                Task { @MainActor [weak self] in
+                    self?.continuations[id] = nil
+                }
             }
         }
     }

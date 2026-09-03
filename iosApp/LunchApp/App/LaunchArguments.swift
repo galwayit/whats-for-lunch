@@ -5,6 +5,8 @@
 //  Parses the launch arguments that pick the core implementation and seed the preview core.
 //  Flags are `-name 1` / `-name 0`; a bare `-name` counts as on. Used by LunchApp.swift and
 //  by Maestro / screenshot runs, e.g. `-previewCore -isPro 1 -signedIn 1 -onboarded 0`.
+//  `-openRoute <name>` presents a route on start (preview core only) so screenshot runs can reach
+//  screens that normally sit behind in-app navigation; names are listed on `AppRoute.init(launchName:)`.
 //
 
 import Foundation
@@ -30,6 +32,12 @@ nonisolated struct LaunchArguments: Equatable {
     var isOnboarded: Bool { flag("onboarded") ?? true }
     /// Invitation code to open on launch, as if the universal link had been tapped.
     var inviteCode: String? { value("openInvite") }
+    /// Route to present after start, e.g. `-openRoute paywall` or `-openRoute groupDetail:grp_1`.
+    /// Honoured only with `-previewCore`; production launches ignore it.
+    var openRoute: AppRoute? {
+        guard usesPreviewCore, let name = value("openRoute") else { return nil }
+        return AppRoute(launchName: name)
+    }
     /// Gallery section to open (`-gallerySection cards`).
     var gallerySection: String? { value("gallerySection") }
 

@@ -3,7 +3,7 @@
 //  LunchApp
 //
 //  Reads Config/Lunch.plist (see Lunch.plist.example). The file is git-ignored, so every value
-//  is optional and the app runs without it: the core is simply reported as not linked.
+//  is optional and the app runs without it: production features report that setup is required.
 //
 
 import Foundation
@@ -17,6 +17,10 @@ nonisolated struct LunchConfig: Equatable {
 
     static let defaultInviteLinkBase = "https://lunch.iapp.au/i"
     static let inviteHost = "lunch.iapp.au"
+    static let privacyUrl = URL(string: "https://lunch.iapp.au/privacy/")!
+    static let supportUrl = URL(string: "https://lunch.iapp.au/support/")!
+    static let termsUrl = URL(string: "https://lunch.iapp.au/terms/")!
+    static let appStoreUrl = URL(string: "https://apps.apple.com/app/id6808090102")!
 
     static let current = LunchConfig(bundle: .main)
 
@@ -45,9 +49,14 @@ nonisolated struct LunchConfig: Equatable {
         )
     }
 
-    /// True once the backend values exist. The Kotlin core is still not linked in this build,
-    /// so `LunchApp` shows the not-linked screen regardless; this is for the adapter milestone.
+    /// True once the backend values exist.
     var hasBackend: Bool { supabaseUrl != nil && supabaseAnonKey != nil }
+
+    /// Every value required to start the production core. Keeping this stricter than
+    /// `hasBackend` prevents a partially configured Release build from crashing later.
+    var isComplete: Bool {
+        hasBackend && backendBaseUrl != nil && revenueCatApiKey != nil
+    }
 
     func inviteUrl(code: String) -> String {
         inviteLinkBase.hasSuffix("/") ? inviteLinkBase + code : inviteLinkBase + "/" + code

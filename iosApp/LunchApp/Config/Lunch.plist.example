@@ -11,10 +11,10 @@
 	<key>supabaseAnonKey</key>
 	<string>YOUR_SUPABASE_ANON_KEY</string>
 	<key>backendBaseUrl</key>
-	<string>https://api.lunch.iapp.au</string>
+	<string>https://YOUR-PROJECT-REF.supabase.co/functions/v1</string>
 	<key>revenueCatApiKey</key>
 	<string>appl_YOUR_REVENUECAT_KEY</string>
 	<key>inviteLinkBase</key>
-	<string>https://lunch.iapp.au/invite</string>
+	<string>https://lunch.iapp.au/i/</string>
 </dict>
 </plist>

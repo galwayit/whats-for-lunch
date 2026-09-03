@@ -8,8 +8,8 @@
 //    - `val x: StateFlow<T>`         ->  `var x: T { get }` plus `var xUpdates: AsyncStream<T>`
 //    - `fun f(): Flow<T>`            ->  `func f() -> AsyncStream<T>`
 //    - plain `fun`                   ->  plain `func`
-//  Implementations today: `PreviewLunchCore` (in-memory) and `NotConfiguredCore` (placeholder).
-//  The SKIE-backed `KotlinLunchCore` adapter arrives once the shared framework is linked.
+//  Implementations: `KotlinLunchCore` (production), `PreviewLunchCore` (in-memory), and
+//  `NotConfiguredCore` (safe fallback when Lunch.plist has missing values).
 //
 
 import Foundation

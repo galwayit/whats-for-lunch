@@ -16,7 +16,7 @@ struct ScreenHeader<Trailing: View>: View {
     let onDismiss: () -> Void
     @ViewBuilder var trailing: () -> Trailing
 
-    init(title: String, dismissal: Dismissal = .close, onDismiss: @escaping () -> Void, @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }) {
+    init(title: String, dismissal: Dismissal = .close, onDismiss: @escaping () -> Void, @ViewBuilder trailing: @escaping () -> Trailing) {
         self.title = title
         self.dismissal = dismissal
         self.onDismiss = onDismiss
@@ -43,5 +43,11 @@ struct ScreenHeader<Trailing: View>: View {
         }
         .padding(.horizontal, Tokens.Spacing.sm)
         .padding(.vertical, Tokens.Spacing.sm)
+    }
+}
+
+extension ScreenHeader where Trailing == EmptyView {
+    init(title: String, dismissal: Dismissal = .close, onDismiss: @escaping () -> Void) {
+        self.init(title: title, dismissal: dismissal, onDismiss: onDismiss) { EmptyView() }
     }
 }

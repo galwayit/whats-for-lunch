@@ -13,7 +13,7 @@ import Observation
 @Observable
 final class AppEnvironment {
     let core: LunchCoreClient
-    /// False when running on `NotConfiguredCore`; the root shows the not-linked screen.
+    /// False when configuration is incomplete or core startup failed.
     let isCoreLinked: Bool
 
     private(set) var user: UserProfile?

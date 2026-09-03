@@ -13,7 +13,13 @@ enum FeatureFlags {
 
     /// Use the in-memory core even without `-previewCore`. Off: without the Kotlin framework
     /// linked, a plain launch shows the not-linked screen so the gap is visible.
+    /// Demo builds (`SWIFT_ACTIVE_COMPILATION_CONDITIONS` containing `DEMO`) turn it on so the
+    /// app is explorable from the home screen of a device without launch arguments.
+    #if DEMO
+    static let previewCoreByDefault = true
+    #else
     static let previewCoreByDefault = false
+    #endif
 
     static var showsGallery: Bool { !showRealApp || LaunchArguments.current.showsGallery }
 
