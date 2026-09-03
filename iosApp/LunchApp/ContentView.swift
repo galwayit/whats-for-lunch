@@ -2,27 +2,32 @@
 //  ContentView.swift
 //  LunchApp
 //
-//  Root switch. The component gallery is the entry for this milestone; the tab shell is
-//  reachable behind `FeatureFlags.showsRootTabs` (launch argument `-rootTabs`).
+//  Root switch: gallery (`-gallery`), not-linked screen, onboarding, or the tab shell.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AppEnvironment.self) private var app
+
     var body: some View {
-        if FeatureFlags.showsRootTabs {
-            RootTabView()
-        } else {
+        if FeatureFlags.showsGallery {
             ComponentGallery()
+        } else if !app.isCoreLinked {
+            NotLinkedView()
+        } else if !app.hasCompletedOnboarding {
+            OnboardingView()
+        } else {
+            RootTabView()
         }
     }
 }
 
 #Preview("Light") {
-    ContentView()
+    ContentView().environment(AppEnvironment.preview())
 }
 
 #Preview("Dark") {
-    ContentView()
+    ContentView().environment(AppEnvironment.preview())
         .preferredColorScheme(.dark)
 }

@@ -27,7 +27,7 @@ struct RecommendationCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            RestaurantPhoto(url: restaurant.photoUrl)
+            RestaurantPhoto(url: restaurant.photoURL)
             VStack(alignment: .leading, spacing: Tokens.Spacing.md) {
                 header
                 reasonList

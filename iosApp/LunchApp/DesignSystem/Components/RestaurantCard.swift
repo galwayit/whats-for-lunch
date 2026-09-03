@@ -29,7 +29,7 @@ struct RestaurantCard: View {
     var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 0) {
-                RestaurantPhoto(url: restaurant.photoUrl)
+                RestaurantPhoto(url: restaurant.photoURL)
                     .overlay(alignment: .topTrailing) { favouriteButton.padding(Tokens.Spacing.md) }
                 details.padding(Tokens.Spacing.md)
             }

@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct WeeklyBudgetStrip: View {
-    let budget: WeeklyBudget
+    let budget: WeeklyBudgetState
     var tone: CapacityRing.Tone = .healthy
     let onTap: () -> Void
 

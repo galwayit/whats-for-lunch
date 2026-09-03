@@ -23,7 +23,7 @@ struct ProposalCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            RestaurantPhoto(url: restaurant.photoUrl, height: Self.photoHeight)
+            RestaurantPhoto(url: restaurant.photoURL, height: Self.photoHeight)
             VStack(alignment: .leading, spacing: Tokens.Spacing.md) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(restaurant.name).lunchText(.heading).foregroundStyle(Tokens.Palette.text)

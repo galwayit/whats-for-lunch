@@ -2,38 +2,39 @@
 //  RootTabView.swift
 //  LunchApp
 //
-//  Four placeholder tabs behind the custom tab bar. Screens replace the placeholders in the
-//  next milestone.
+//  Four tabs behind the custom tab bar, plus the modal route stack and the toast host.
 //
 
 import SwiftUI
 
 struct RootTabView: View {
-    @State private var selection = LunchTab.home
+    @Environment(AppEnvironment.self) private var app
 
     var body: some View {
+        @Bindable var app = app
         VStack(spacing: 0) {
-            placeholder(for: selection)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            LunchTabBar(selection: $selection)
+            Group {
+                switch app.selectedTab {
+                case .home: HomeView()
+                case .discover: DiscoverView()
+                case .track: TrackView()
+                case .profile: ProfileView()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            LunchTabBar(selection: $app.selectedTab)
         }
         .background(Tokens.Palette.ground.ignoresSafeArea())
-    }
-
-    private func placeholder(for tab: LunchTab) -> some View {
-        VStack(spacing: Tokens.Spacing.md) {
-            IconView(icon: tab.icon, size: Tokens.Size.iconDefault * 2, filled: true)
-                .foregroundStyle(Tokens.Palette.primary)
-            Text(tab.title).lunchText(.label).foregroundStyle(Tokens.Palette.textSecondary)
-        }
+        .toastHost()
+        .routePresenter(level: 0)
     }
 }
 
 #Preview("Light") {
-    RootTabView()
+    RootTabView().environment(AppEnvironment.preview())
 }
 
 #Preview("Dark") {
-    RootTabView()
+    RootTabView().environment(AppEnvironment.preview())
         .preferredColorScheme(.dark)
 }
