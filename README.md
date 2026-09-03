@@ -13,7 +13,7 @@ The Flutter app that preceded this is kept buildable in `archive/flutter/` and t
 shared/        Kotlin Multiplatform core: domain rules, SQLite (same file as the Flutter app),
                backend client, purchases, auth, groups. Consumed by both apps.
 androidApp/    Jetpack Compose app (applicationId au.iapp.guess_what.what_we_have_for_lunch)
-iosApp/        SwiftUI app (same bundle id) linking shared as LunchCore.xcframework
+iosApp/        SwiftUI app (`au.iapp.lunch`) linking the shared LunchCore framework
 backend/       Supabase project: migrations, Edge Functions, invitation web page, .well-known files
 design/        tokens.json (single source of truth), generate_tokens.py, Stitch reference screens
 maestro/       End-to-end flows that run unchanged on iOS and Android
