@@ -7,6 +7,8 @@ The Flutter app that preceded this is kept buildable in `archive/flutter/` and t
 `flutter-baseline`. The evaluation and the migration playbook that led here are linked from
 `archive/flutter/README.md` history and the project notes.
 
+New to the project? Read [HANDOFF.md](HANDOFF.md) after this file.
+
 ## Layout
 
 ```
@@ -23,9 +25,12 @@ archive/       The Flutter app and its documents, frozen
 ## Toolchain
 
 - JDK 21 (`export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home`)
-- Gradle 8.14 via `./gradlew`; Android SDK path in `local.properties`
-- Xcode 16 or newer for `iosApp`
+- Gradle 8.14.4 via `./gradlew`; Android SDK path in `local.properties`
+- Xcode 27 (Swift 6.4) for `iosApp`
 - Deno 2 for backend checks and tests; Supabase CLI for deploys
+
+Kotlin, SKIE, RevenueCat and the Xcode package pin move as one chain. Read `HANDOFF.md`
+before changing any of them.
 
 ## Everyday commands
 
