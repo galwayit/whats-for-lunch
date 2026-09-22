@@ -7,6 +7,8 @@
  */
 package au.iapp.lunch.ui.components
 
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -23,3 +25,18 @@ fun formatLunchTime(epochSeconds: Long): String =
 /** "3 Sep 2026" in the device time zone. */
 fun formatLunchDate(epochSeconds: Long): String =
     dateFormatter.format(Instant.ofEpochSecond(epochSeconds).atZone(ZoneId.systemDefault()))
+
+/**
+ * One fraction digit, rounded half-up on the exact binary value, the way Dart's
+ * `double.toStringAsFixed(1)` does (2.25 -> "2.3", 0.15 -> "0.1"). Platform formatters
+ * round half-even and would disagree with the reason strings the shared engine builds
+ * ("Highly rated (4.5/5)", "Only 1.2km away"), so every rating and distance the screens
+ * format goes through here.
+ *
+ * This mirrors `au.iapp.lunch.core.platform.toFixed1`, which is `internal` to :shared and
+ * therefore not callable from this module; make that helper public and this copy can go.
+ */
+fun dartOneDecimal(value: Double): String {
+    if (!value.isFinite()) return value.toString()
+    return BigDecimal(value).setScale(1, RoundingMode.HALF_UP).toPlainString()
+}

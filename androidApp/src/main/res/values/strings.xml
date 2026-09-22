@@ -133,4 +133,212 @@
     <string name="a11y_invite_link">Invite link</string>
     <string name="a11y_percent">%1$d percent</string>
     <string name="a11y_distance_km">%1$s km</string>
+
+    <!-- Screens: global -->
+    <string name="action_skip">Skip</string>
+    <string name="action_share">Share</string>
+    <string name="action_close">Close</string>
+    <string name="error_location_denied_title">Location is off</string>
+    <string name="error_location_denied_body">Turn on location for this app in Settings to find places near you.</string>
+    <string name="error_location_denied_action">Open Settings</string>
+    <string name="error_not_linked_title">Core not linked yet</string>
+    <string name="error_not_linked_body">The shared Kotlin core isn\'t configured in this build. Launch with --ez previewCore true to explore the app with sample data.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Onboarding</string>
+    <string name="onboarding_step">STEP %1$d OF 5</string>
+    <string name="onboarding_step1_eyebrow">Getting started</string>
+    <string name="onboarding_step1_title">Welcome to What We Have For Lunch</string>
+    <string name="onboarding_step1_body">Discover and plan your daily meals with ease and joy.</string>
+    <string name="onboarding_step2_eyebrow">About you</string>
+    <string name="onboarding_step2_title">What should we call you?</string>
+    <string name="onboarding_step3_eyebrow">Your budget</string>
+    <string name="onboarding_step3_title">Your budget</string>
+    <string name="onboarding_step3_body">Pick a typical price level and how far you\'ll go.</string>
+    <string name="onboarding_step3_distance">Max distance: %1$s km</string>
+    <string name="onboarding_step3_chains">Include chain restaurants</string>
+    <string name="onboarding_step3_chains_hint">McDonald\'s, Subway, KFC and similar</string>
+    <string name="onboarding_step4_eyebrow">Dietary needs</string>
+    <string name="onboarding_step4_title">Any dietary needs?</string>
+    <string name="onboarding_step4_body">We\'ll only suggest places that work for you.</string>
+    <string name="onboarding_step5_eyebrow">Almost there</string>
+    <string name="onboarding_step5_title">Find lunch near you</string>
+    <string name="onboarding_step5_body">We use your location only while you\'re using the app, to find places within your distance.</string>
+    <string name="onboarding_step5_cta">Allow location</string>
+    <string name="onboarding_step5_skip">Not now</string>
+    <string name="onboarding_finish_cta">Let\'s eat</string>
+    <string name="dietary_vegetarian">Vegetarian</string>
+    <string name="dietary_vegan">Vegan</string>
+    <string name="dietary_gluten_free">Gluten free</string>
+    <string name="dietary_dairy_free">Dairy free</string>
+    <string name="dietary_halal">Halal</string>
+    <string name="dietary_kosher">Kosher</string>
+    <string name="dietary_nut_allergy">Nut allergy</string>
+    <string name="dietary_shellfish_allergy">Shellfish allergy</string>
+    <string name="dietary_none">None of these</string>
+
+    <!-- Home -->
+    <string name="home_group_row_title">Lunch together</string>
+    <string name="home_group_row_empty">Invite friends and pick a place everyone can eat at.</string>
+    <string name="home_craving_placeholder">Craving something? Ask the AI</string>
+    <string name="home_why_title">Why this place?</string>
+
+    <!-- AI recommendations -->
+    <string name="ai_title">AI recommendations</string>
+    <string name="ai_craving_placeholder">What are you craving?</string>
+    <string name="ai_ask">Ask</string>
+    <string name="ai_thinking_title">Thinking about your lunch…</string>
+    <string name="ai_thinking_body">Matching cravings, budget and distance</string>
+    <string name="ai_history_title">Earlier picks</string>
+    <string name="ai_empty_title">Tell us what you feel like</string>
+    <string name="ai_empty_body">Cravings, a cuisine, or how much time you have. We\'ll pick three places.</string>
+    <string name="ai_confidence">%1$s confidence</string>
+
+    <!-- Discover -->
+    <string name="discover_title">Lunch Explorer</string>
+    <string name="discover_count">%1$d Restaurants Found</string>
+    <string name="discover_sort">Sort: %1$s</string>
+    <string name="discover_sort_title">Sort by</string>
+    <string name="discover_sort_relevance">Relevance</string>
+    <string name="discover_sort_price">Price</string>
+    <string name="discover_sort_distance">Distance</string>
+    <string name="discover_sort_rating">Rating</string>
+    <string name="discover_filter_dietary_title">Dietary needs</string>
+    <string name="discover_filter_distance_title">Maximum distance</string>
+    <string name="discover_filter_rating_title">Minimum rating</string>
+    <string name="discover_chip_price">Price: %1$s</string>
+    <string name="discover_chip_distance">Distance: %1$s km</string>
+    <string name="discover_chip_rating">Rating: %1$s+</string>
+    <string name="discover_chip_dietary">Dietary: %1$d</string>
+    <string name="discover_detail_reviews">Reviews</string>
+    <string name="discover_detail_open_maps">Open in Maps</string>
+    <string name="discover_detail_no_reviews">No reviews yet</string>
+    <string name="discover_favourite_limit_title">You\'ve saved 10 favourites</string>
+    <string name="discover_favourite_limit_body">Lunch Pro keeps unlimited favourites.</string>
+    <string name="discover_favourite_limit_cta">See Lunch Pro</string>
+
+    <!-- Track -->
+    <string name="track_title">Meal Tracker</string>
+    <string name="track_log_title">Quick meal log</string>
+    <string name="track_log_type">MEAL TYPE</string>
+    <string name="track_type_breakfast">Breakfast</string>
+    <string name="track_type_lunch">Lunch</string>
+    <string name="track_type_dinner">Dinner</string>
+    <string name="track_type_snack">Snack</string>
+    <string name="track_log_date">Date</string>
+    <string name="track_log_notes_placeholder">Notes (optional)</string>
+    <string name="track_log_logged">Logged</string>
+    <string name="track_recent_title">Recent meals</string>
+    <string name="track_recent_empty_title">No meals logged yet</string>
+    <string name="track_recent_empty_body">Start logging to track your dining journey.</string>
+    <string name="track_filter_week">This week</string>
+    <string name="track_filter_month">This month</string>
+    <string name="track_filter_all">All time</string>
+    <string name="track_history_gate_body">Lunch Pro keeps your full history and insights.</string>
+    <string name="track_history_gate_cta">See Lunch Pro</string>
+    <string name="track_achievement_unlocked">Achievement unlocked: %1$s</string>
+
+    <!-- Budget setup -->
+    <string name="budget_title">Weekly budget</string>
+    <string name="budget_step">STEP %1$d OF 3</string>
+    <string name="budget_step1_title">How much do you want to invest in lunch each week?</string>
+    <string name="budget_step2_title">What kind of experiences do you enjoy?</string>
+    <string name="budget_step3_title">Celebrate milestones?</string>
+    <string name="budget_step3_body">We\'ll cheer when you hit a goal. No pressure, no guilt.</string>
+    <string name="budget_celebrations">Celebrate milestones</string>
+    <string name="budget_finish">Save budget</string>
+    <string name="budget_per_week">%1$s a week</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_badge">FOOD EXPLORER</string>
+    <string name="profile_section_preferences">YOUR PREFERENCES</string>
+    <string name="profile_section_pro">LUNCH PRO</string>
+    <string name="profile_section_settings">SETTINGS</string>
+    <string name="profile_section_account">ACCOUNT</string>
+    <string name="profile_pref_budget">Budget level</string>
+    <string name="profile_pref_distance">Max distance</string>
+    <string name="profile_pref_chains">Include chains</string>
+    <string name="profile_chains_on">On</string>
+    <string name="profile_chains_off">Off</string>
+    <string name="profile_pro_free_title">Lunch Pro</string>
+    <string name="profile_pro_free_body">Host group lunches, unlimited AI picks, full history.</string>
+    <string name="profile_pro_free_cta">Try free for 7 days</string>
+    <string name="profile_plan_yearly">Yearly</string>
+    <string name="profile_plan_monthly">Monthly</string>
+    <string name="profile_signin_title">Sign in</string>
+    <string name="profile_signin_body">Needed to host group lunches and to keep your data across devices.</string>
+    <string name="profile_signin_apple">Continue with Apple</string>
+    <string name="profile_signin_google">Continue with Google</string>
+    <string name="profile_signout">Sign out</string>
+    <string name="profile_signed_in_as">Signed in as %1$s</string>
+    <string name="profile_settings_edit">Edit preferences</string>
+    <string name="profile_settings_notifications">Notifications</string>
+    <string name="profile_settings_privacy">Privacy</string>
+    <string name="profile_settings_help">Help &amp; support</string>
+    <string name="profile_export">Export my data</string>
+    <string name="profile_delete_title">Delete account</string>
+    <string name="profile_delete_body">This removes your account, groups, and invitations from our servers. Meals stay on this device unless you delete the app.</string>
+    <string name="profile_delete_confirm">Delete</string>
+
+    <!-- Preferences -->
+    <string name="preferences_title">Preferences</string>
+    <string name="preferences_section_budget">Budget preferences</string>
+    <string name="preferences_section_location">Location preferences</string>
+    <string name="preferences_section_restaurant">Restaurant preferences</string>
+    <string name="preferences_section_dietary">Dietary needs</string>
+    <string name="preferences_section_allergens">Allergens</string>
+    <string name="preferences_weekly">Weekly budget: %1$s</string>
+    <string name="preferences_distance">Max travel distance: %1$s km</string>
+    <string name="preferences_saved">Preferences saved</string>
+
+    <!-- Info screens -->
+    <string name="info_privacy_body">We store your meals and preferences on this device. Signing in copies them to your account so you can restore them on a new phone. We never sell your data. The full policy lives at lunch.iapp.au/privacy.</string>
+    <string name="info_help_body">Tap I AM HUNGRY for a pick near you, log what you ate in Track, and set a weekly budget so the ring can guide you. Questions? Email hello@iapp.au.</string>
+
+    <!-- Paywall and gates -->
+    <string name="paywall_success_title">You\'re on Lunch Pro</string>
+    <string name="paywall_success_body">Group lunches, unlimited AI picks and your full history are unlocked.</string>
+    <string name="gate_guest_offer_title">Enjoyed the lunch?</string>
+    <string name="gate_guest_offer_body">Lunch Pro lets you host the next one.</string>
+
+    <!-- Groups -->
+    <string name="group_create_title">New group lunch</string>
+    <string name="group_create_name_placeholder">Group name</string>
+    <string name="group_create_when">When</string>
+    <string name="group_create_where">Around</string>
+    <string name="group_create_radius">Radius</string>
+    <string name="group_create_radius_chip">%1$d km</string>
+    <string name="group_create_propose">Propose places</string>
+    <string name="group_create_current_location">Current location</string>
+    <string name="group_create_locating">Finding your area…</string>
+    <string name="group_proposals_title">Pick a place</string>
+    <string name="group_detail_invite">Invite friends</string>
+    <string name="group_detail_guests">Guests</string>
+    <string name="group_detail_reminder">Remind everyone an hour before</string>
+    <string name="group_detail_cancel">Cancel lunch</string>
+
+    <!-- Invitation -->
+    <string name="invitation_title">Invitation</string>
+    <string name="invite_accepted_title">You\'re in</string>
+    <string name="invite_declined_title">Maybe next time</string>
+    <string name="invite_name_prompt">What\'s your name?</string>
+    <string name="invite_get_app">Get the app</string>
+    <string name="invitation_missing_title">This invitation isn\'t available</string>
+    <string name="invitation_missing_body">The link may have expired or the lunch was cancelled.</string>
+
+    <!-- Shared dates and toasts (feature screens) -->
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
+    <string name="paywall_restored">Lunch Pro restored</string>
+    <string name="paywall_restore_nothing">No purchases to restore</string>
+    <string name="group_cancelled">Lunch cancelled</string>
+    <string name="group_create_date">Date</string>
+    <string name="group_create_time">Time</string>
+    <string name="signin_unavailable">Sign-in isn\'t available in this build yet</string>
+    <string name="profile_export_subject">My lunch data</string>
+    <string name="invite_calendar">Add to calendar</string>
+    <string name="budget_target_experiences">About %1$d lunches a week</string>
+    <string name="track_ring_remaining_short">left this week</string>
+    <string name="track_log_date_value">Date: %1$s</string>
 </resources>

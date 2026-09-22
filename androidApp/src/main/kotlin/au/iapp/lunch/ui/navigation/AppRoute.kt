@@ -32,4 +32,33 @@ sealed class AppRoute {
 
     // From anywhere (app link https://lunch.iapp.au/i/<code>)
     data class Invitation(val code: String) : AppRoute()
+
+    companion object {
+        /** Routes reachable from the `openRoute` launch extra; null for anything else. */
+        fun fromKey(key: String): AppRoute? = when (val trimmed = key.trim().lowercase()) {
+            "ai" -> AiRecommendations(pickPlaceId = null)
+            "paywall" -> Paywall
+            "preferences" -> Preferences
+            "signin", "sign_in" -> SignIn
+            "privacy" -> Privacy
+            "help" -> Help
+            "budget" -> BudgetSetup
+            "group_create", "groupcreate" -> GroupCreate
+            "home" -> Tab(LunchTab.Home)
+            "discover" -> Tab(LunchTab.Discover)
+            "track" -> Tab(LunchTab.Track)
+            "profile" -> Tab(LunchTab.Profile)
+            // `group_detail:<id>` and `proposals:<id>` carry the group they open.
+            else -> trimmed.substringBefore(':').let { name ->
+                val id = trimmed.substringAfter(':', missingDelimiterValue = "")
+                when {
+                    id.isEmpty() -> null
+                    name == "group_detail" -> GroupDetail(id)
+                    name == "proposals" -> GroupProposals(id)
+                    name == "invite" -> Invitation(id.uppercase())
+                    else -> null
+                }
+            }
+        }
+    }
 }

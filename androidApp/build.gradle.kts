@@ -5,6 +5,13 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+/** A quoted string literal for BuildConfig from `-Plunch.<property>` or `$env`, else "". */
+fun lunchSecret(property: String, env: String): String {
+    val value = (project.findProperty("lunch.$property") as? String)?.takeIf { it.isNotBlank() }
+        ?: System.getenv(env).orEmpty()
+    return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
 android {
     namespace = "au.iapp.lunch"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -28,7 +35,22 @@ android {
         }
     }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        // Backend configuration mirrors iosApp/LunchApp/Config/Lunch.plist.example. Values come
+        // from Gradle properties (-Plunch.supabaseUrl=...) or environment variables
+        // (LUNCH_SUPABASE_URL, ...) and default to empty, in which case the app shows the
+        // "not configured" screen. Never commit real values.
+        buildConfigField("String", "LUNCH_SUPABASE_URL", lunchSecret("supabaseUrl", "LUNCH_SUPABASE_URL"))
+        buildConfigField("String", "LUNCH_SUPABASE_ANON_KEY", lunchSecret("supabaseAnonKey", "LUNCH_SUPABASE_ANON_KEY"))
+        buildConfigField("String", "LUNCH_BACKEND_BASE_URL", lunchSecret("backendBaseUrl", "LUNCH_BACKEND_BASE_URL"))
+        buildConfigField("String", "LUNCH_REVENUECAT_API_KEY", lunchSecret("revenueCatApiKey", "LUNCH_REVENUECAT_API_KEY"))
+        buildConfigField("String", "LUNCH_INVITE_LINK_BASE", lunchSecret("inviteLinkBase", "LUNCH_INVITE_LINK_BASE"))
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

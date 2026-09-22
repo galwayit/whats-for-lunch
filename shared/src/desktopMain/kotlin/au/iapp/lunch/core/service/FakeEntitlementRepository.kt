@@ -65,14 +65,14 @@ class FakeEntitlementRepository(
         val MONTHLY = ProPackage(
             identifier = "\$rc_monthly",
             productId = "lunch_pro_monthly",
-            localizedPrice = "A$4.99",
+            localizedPrice = "A$2.99",
             periodLabel = "month",
             hasFreeTrial = false,
         )
         val YEARLY = ProPackage(
             identifier = "\$rc_annual",
             productId = "lunch_pro_yearly",
-            localizedPrice = "A$29.99",
+            localizedPrice = "A$19.99",
             periodLabel = "year",
             hasFreeTrial = true,
             trialLabel = "7-day free trial",

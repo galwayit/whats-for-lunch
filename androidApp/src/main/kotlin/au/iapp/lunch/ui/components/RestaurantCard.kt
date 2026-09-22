@@ -44,7 +44,6 @@ import au.iapp.lunch.ui.theme.LunchTheme
 import au.iapp.lunch.ui.theme.TokenSize
 import au.iapp.lunch.ui.theme.TokenSpacing
 import au.iapp.lunch.ui.theme.pressable
-import java.util.Locale
 
 object RestaurantCardDefaults {
     val ratingIconSize: Dp = TokenSize.iconDefault - TokenSpacing.sm
@@ -140,7 +139,7 @@ fun restaurantMeta(restaurant: Restaurant): String = listOfNotNull(
     stringResource(if (restaurant.isOpenNow) R.string.discover_detail_open_now else R.string.discover_detail_closed),
 ).joinToString(RestaurantCardDefaults.META_SEPARATOR)
 
-internal fun formatOneDecimal(value: Double): String = String.format(Locale.getDefault(), "%.1f", value)
+internal fun formatOneDecimal(value: Double): String = dartOneDecimal(value)
 
 /** Filled star and a one-decimal rating in `primary`. */
 @Composable
