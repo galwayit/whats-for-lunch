@@ -125,7 +125,7 @@ is idle while the flow is fed from a real dispatcher.
 
 `./gradlew :shared:linkDebugFrameworkIosSimulatorArm64` (about 1 min warm) produces
 `shared/build/bin/iosSimulatorArm64/debugFramework/LunchCore.framework` (static, ~80 MB
-debug). SKIE 0.10.4 adds `Modules/LunchCore.swiftmodule` and `Headers/LunchCore-Swift.h`,
+debug). SKIE 0.10.14 adds `Modules/LunchCore.swiftmodule` and `Headers/LunchCore-Swift.h`,
 so Swift sees `suspend` functions as `async` and `Flow` as `AsyncSequence`. Device builds
 use `:shared:linkDebugFrameworkIosArm64`; Xcode should call
 `:shared:embedAndSignAppleFrameworkForXcode` from a Run Script phase (see
@@ -133,16 +133,26 @@ use `:shared:linkDebugFrameworkIosArm64`; Xcode should call
 
 Constraints discovered while linking (2026-09-03):
 
-- RevenueCat `purchases-kmp` is pinned to `2.10.2+17.55.1`. Every 3.x klib is compiled
-  with Kotlin 2.3.20 (klib `abi_version=2.3.0`) and the Kotlin 2.2.0 native resolver
-  skips it with a misleading `KLIB resolver: Could not find ... .klib`. Moving to 3.x
-  means moving Kotlin to 2.3.20 and SKIE to a matching release together.
+- The RevenueCat, Kotlin, SKIE and Xcode versions move as one chain and must be bumped
+  together (resolved 2026-09-23). `purchases-kmp` 3.9.0 needs Kotlin >= 2.3, which needs
+  SKIE 0.10.14 (Kotlin 2.4.10), which needs Gradle >= 8.14.4. On the Xcode side the
+  `purchases-hybrid-common` SPM pin must resolve to the same `purchases-ios` that the
+  Kotlin SDK was built against: `purchases-kmp` 3.9.0 uses `purchases-ios` 5.89.0, which
+  `purchases-hybrid-common` 19.0.0 pins exactly. Getting this wrong fails late, at the
+  app link step, not at Gradle resolution.
+- Do not go back to `purchases-kmp` 2.10.2+17.55.1. It pins `purchases-ios` 5.67.1, whose
+  `PaywallColor.swift` does not compile under Swift 6.4 (Xcode 27): the compiler now
+  synthesises a memberwise `init(stringRepresentation:)` that collides with the
+  hand-written one. Every 3.x klib is compiled with Kotlin 2.3.20 or newer
+  (klib `abi_version >= 2.3.0`), so an older Kotlin native resolver skips it with a
+  misleading `KLIB resolver: Could not find ... .klib`.
 - `commonMain` must stay off JVM-only collection APIs (`putIfAbsent`,
   `computeIfAbsent`, `java.*`); the desktop and Android compilations accept them, only
   the Kotlin/Native compilation rejects them.
-- The RevenueCat iOS SDK itself (`PurchasesHybridCommon`) must be added to the Xcode
-  app target via Swift Package Manager before `RevenueCatEntitlementRepository` can run
-  on a device; the framework links without it because the cinterop is header-only.
+- The RevenueCat iOS SDK itself (`PurchasesHybridCommon`) is an SPM dependency of the
+  Xcode app target; `RevenueCatEntitlementRepository` cannot run on a device without it.
+  The Kotlin framework itself links without it because the cinterop is header-only, but
+  the app has ~221 undefined RevenueCat symbols that only the SPM product satisfies.
 
 ## Swift facade (`au.iapp.lunch.core.swift`, 2026-09-03)
 
@@ -185,7 +195,7 @@ for await meals in core.meals.observeRecent(userId: user.id, limit: 20, windowDa
 let done = core.users.hasCompletedOnboarding.value       // SkieSwiftStateFlow<KotlinBoolean>
 ```
 
-Generated signatures (SKIE 0.10.4, `shared/build/skie/binaries/debugFramework/DEBUG/iosSimulatorArm64/swift/generated/Shared/`):
+Generated signatures (SKIE 0.10.14, `shared/build/skie/binaries/debugFramework/DEBUG/iosSimulatorArm64/swift/generated/Shared/`):
 `createUser(name:preferences:) async throws -> UserProfile`,
 `log(meal:) async throws -> KotlinLong`, `restaurantSuggestions(userId:) async throws -> [String]`,
 `purchase(packageIdentifier:) async throws -> SubscriptionStatus`, `updateName(name:) async throws -> Void`.
@@ -246,7 +256,7 @@ exported as `LunchCoreCoreError*` classes and appear in `Shared.CoreError.swift`
 
 ## Open issues
 
-- `expect`/`actual` classes warning (`SystemClock`) is the Kotlin 2.2 beta notice; add
+- `expect`/`actual` classes warning (`SystemClock`) is the Kotlin beta notice; add
   `-Xexpect-actual-classes` to the compiler args if it should be silenced.
 - Android unit tests (`androidUnitTest`) only cover what `commonTest` shares; the
   repository/service tests are desktop-only by design (JDBC SQLite driver).

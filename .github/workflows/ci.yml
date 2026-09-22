@@ -47,14 +47,19 @@ jobs:
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
       - name: Select Xcode
-        # Swift 6 code is written against Xcode 26; fall back to the newest Xcode on the image.
-        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | tail -1)" || sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | tail -1)"
+        # Use the newest Xcode on the image. RevenueCat's purchases-ios must match the
+        # Swift version: 5.67.1 and earlier do not compile under Swift 6.4 (Xcode 27).
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
       - name: Build LunchCore framework for the simulator
         run: ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --no-daemon
       - name: Build and test the app
         run: |
+          # Simulator names change with every Xcode release, so resolve one at run time.
+          UDID=$(xcrun simctl list devices available --json \
+            | python3 -c 'import json,sys; ds=json.load(sys.stdin)["devices"]; print(next(d["udid"] for v in sorted(ds) for d in ds[v] if "iPhone" in d["name"]))')
+          echo "Testing on simulator $UDID"
           xcodebuild -project iosApp/LunchApp.xcodeproj -scheme LunchApp \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "platform=iOS Simulator,id=$UDID" \
             -configuration Debug test CODE_SIGNING_ALLOWED=NO | xcpretty || exit ${PIPESTATUS[0]}
 
   backend:

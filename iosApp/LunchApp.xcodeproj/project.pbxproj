@@ -528,7 +528,7 @@
 			repositoryURL = "https://github.com/RevenueCat/purchases-hybrid-common.git";
 			requirement = {
 				kind = exactVersion;
-				version = 17.55.1;
+				version = 19.0.0;
 			};
 		};
 		1A0000000000000000000022 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
