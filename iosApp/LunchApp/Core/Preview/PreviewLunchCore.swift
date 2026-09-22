@@ -64,19 +64,20 @@ final class PreviewLunchCore: LunchCoreClient {
         let auth = PreviewAuthRepository(isSignedIn: options.isSignedIn, network: network)
         let gates = PreviewGateService(entitlements: entitlements, auth: auth, aiUsedToday: options.aiUsedToday ? 1 : 0)
         let ai = PreviewAiService(engine: engine, gates: gates, network: network)
+        let locales = PreviewLocaleResolver(anchor: PreviewData.userLocation)
         self.location = options.usesDeviceLocation
             ? DeviceLocationProvider(fallback: PreviewData.userLocation)
             : PreviewLocationProvider()
         self.users = PreviewUserRepository(user: options.isOnboarded ? PreviewData.user : nil)
         self.meals = PreviewMealRepository(meals: options.isOnboarded ? PreviewData.meals : [])
-        self.restaurants = PreviewRestaurantRepository(network: network)
+        self.restaurants = PreviewRestaurantRepository(network: network, locales: locales)
         self.favourites = PreviewFavouritesRepository(initial: options.isOnboarded ? [PreviewData.greenGardenBowls.placeId, PreviewData.falafelRepublic.placeId] : [], gates: gates)
         self.achievements = PreviewAchievementRepository()
         self.ai = ai
         self.entitlements = entitlements
         self.gates = gates
         self.auth = auth
-        self.groups = PreviewGroupRepository(engine: engine, network: network, auth: auth)
+        self.groups = PreviewGroupRepository(engine: engine, network: network, auth: auth, locales: locales)
     }
 }
 

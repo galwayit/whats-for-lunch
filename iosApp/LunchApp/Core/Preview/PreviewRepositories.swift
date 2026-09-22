@@ -105,31 +105,22 @@ final class PreviewMealRepository: MealRepository {
 
 final class PreviewRestaurantRepository: RestaurantRepository {
     private let network: PreviewNetwork
+    private let locales: PreviewLocaleResolver
     private var cache: [String: Restaurant] = Dictionary(uniqueKeysWithValues: PreviewData.restaurants.map { ($0.placeId, $0) })
 
-    init(network: PreviewNetwork) {
+    init(network: PreviewNetwork, locales: PreviewLocaleResolver) {
         self.network = network
+        self.locales = locales
     }
 
     func searchNearby(location: Location, radiusKm: Double, query: String?, forceRefresh: Bool) async throws -> [Restaurant] {
         try await network.roundTrip()
         let needle = query?.trimmingCharacters(in: .whitespaces).lowercased() ?? ""
-        // The sample places are laid out around `PreviewData.userLocation`. Shift the whole
-        // set by the offset to the caller's position so the demo shows them around the phone
-        // with their intended distances, instead of leaving them a state away and filtering
-        // every one of them out. The offset is zero when the anchor is in use.
-        let offsetLatitude = location.latitude - PreviewData.userLocation.latitude
-        let offsetLongitude = location.longitude - PreviewData.userLocation.longitude
-        return PreviewData.restaurants
-            .map { restaurant in
-                var located = restaurant
-                if let latitude = restaurant.latitude, let longitude = restaurant.longitude {
-                    located.latitude = latitude + offsetLatitude
-                    located.longitude = longitude + offsetLongitude
-                    located.distanceFromUser = Self.distanceKm(from: location, toLatitude: latitude + offsetLatitude, longitude: longitude + offsetLongitude)
-                }
-                return located
-            }
+        // The sample places are written around `PreviewData.userLocation`. Move the whole set
+        // to wherever the caller is, or a demo in another city lists the wrong suburbs and the
+        // radius filter drops every one of them. The locale is identity at the anchor itself.
+        let locale = await locales.locale(for: location)
+        return locale.relocate(PreviewData.restaurants, from: location)
             .filter { ($0.distanceFromUser ?? .infinity) <= radiusKm }
             .filter { needle.isEmpty || $0.name.lowercased().contains(needle) || $0.cuisineTypes.contains { $0.lowercased().contains(needle) } }
             .sorted { ($0.distanceFromUser ?? 0) < ($1.distanceFromUser ?? 0) }
@@ -138,7 +129,12 @@ final class PreviewRestaurantRepository: RestaurantRepository {
     func details(placeId: String) async throws -> Restaurant {
         try await network.roundTrip()
         guard let restaurant = cache[placeId] else { throw CoreError.service(code: "NOT_FOUND", message: "Unknown place \(placeId)") }
-        return restaurant
+        // Use whatever the last search resolved, so the sheet agrees with the list behind it.
+        let locale = locales.current
+        return locale.relocate(restaurant, from: Location(
+            latitude: PreviewData.userLocation.latitude + locale.offsetLatitude,
+            longitude: PreviewData.userLocation.longitude + locale.offsetLongitude
+        ))
     }
 
     func reviews(placeId: String) async throws -> [RestaurantReview] {

@@ -190,9 +190,11 @@ final class PreviewGroupRepository: GroupRepository {
     private let engine: RecommendationEngine
     private let network: PreviewNetwork
     private let auth: AuthRepository
+    private let locales: PreviewLocaleResolver
     private static let proposalCount = 3
 
-    init(engine: RecommendationEngine, network: PreviewNetwork, auth: AuthRepository) {
+    init(engine: RecommendationEngine, network: PreviewNetwork, auth: AuthRepository, locales: PreviewLocaleResolver) {
+        self.locales = locales
         groups = Broadcast([PreviewData.group])
         rsvpsByGroup = [PreviewData.group.id: Broadcast(PreviewData.rsvps)]
         self.engine = engine
@@ -225,15 +227,13 @@ final class PreviewGroupRepository: GroupRepository {
     func propose(groupId: String) async throws -> [GroupProposal] {
         try await network.roundTrip(.seconds(1))
         guard let group = groups.value.first(where: { $0.id == groupId }) else { throw Self.notFound(groupId) }
-        let area = Location(latitude: group.areaLatitude, longitude: group.areaLongitude)
-        let nearby = PreviewData.restaurants
-            .map { restaurant -> Restaurant in
-                var located = restaurant
-                if let latitude = restaurant.latitude, let longitude = restaurant.longitude {
-                    located.distanceFromUser = PreviewRestaurantRepository.distanceKm(from: area, toLatitude: latitude, longitude: longitude)
-                }
-                return located
-            }
+        // The group's area moves with the sample data, so proposals stay near the user too.
+        let locale = locales.current
+        let area = Location(
+            latitude: group.areaLatitude + locale.offsetLatitude,
+            longitude: group.areaLongitude + locale.offsetLongitude
+        )
+        let nearby = locale.relocate(PreviewData.restaurants, from: area)
             .filter { ($0.distanceFromUser ?? .infinity) <= group.radiusKm }
         let ranked = engine.sort(restaurants: nearby, option: .relevance, prefs: PreviewData.user.preferences)
         return ranked.prefix(Self.proposalCount).map { GroupProposal(restaurant: $0, reasons: Array(engine.reasons(restaurant: $0, prefs: PreviewData.user.preferences).prefix(3))) }
