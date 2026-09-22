@@ -4,41 +4,41 @@ import SwiftUI
 public enum Tokens {
     public enum Palette {
         /// Screen background. One value; Discover's #FDFAF3 is retired.
-        public static let ground = Color(light: Color(red: 1.0000, green: 0.9725, blue: 0.9059, opacity: 1.0000), dark: Color(red: 0.0784, green: 0.1176, blue: 0.0863, opacity: 1.0000))
+        public static let ground = Color(light: (1.0000, 0.9725, 0.9059, 1.0000), dark: (0.0784, 0.1176, 0.0863, 1.0000))
         /// Cards, inputs, sheets.
-        public static let surface = Color(light: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000), dark: Color(red: 0.1020, green: 0.1686, blue: 0.1176, opacity: 1.0000))
+        public static let surface = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.1020, 0.1686, 0.1176, 1.0000))
         /// Nested cards, tab bar.
-        public static let surfaceRaised = Color(light: Color(red: 0.9922, green: 0.9804, blue: 0.9529, opacity: 1.0000), dark: Color(red: 0.1333, green: 0.2196, blue: 0.1647, opacity: 1.0000))
+        public static let surfaceRaised = Color(light: (0.9922, 0.9804, 0.9529, 1.0000), dark: (0.1333, 0.2196, 0.1647, 1.0000))
         /// Body text.
-        public static let text = Color(light: Color(red: 0.2902, green: 0.2078, blue: 0.1529, opacity: 1.0000), dark: Color(red: 0.9176, green: 0.8941, blue: 0.8471, opacity: 1.0000))
+        public static let text = Color(light: (0.2902, 0.2078, 0.1529, 1.0000), dark: (0.9176, 0.8941, 0.8471, 1.0000))
         /// Captions, hints, unselected tabs.
-        public static let textSecondary = Color(light: Color(red: 0.5451, green: 0.4353, blue: 0.2784, opacity: 1.0000), dark: Color(red: 0.7098, green: 0.6588, blue: 0.5608, opacity: 1.0000))
+        public static let textSecondary = Color(light: (0.5451, 0.4353, 0.2784, 1.0000), dark: (0.7098, 0.6588, 0.5608, 1.0000))
         /// Text on primary fills.
-        public static let textOnPrimary = Color(light: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000), dark: Color(red: 0.0549, green: 0.1020, blue: 0.0627, opacity: 1.0000))
+        public static let textOnPrimary = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.0549, 0.1020, 0.0627, 1.0000))
         /// Text on the action fill.
-        public static let textOnAction = Color(light: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000), dark: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 1.0000))
+        public static let textOnAction = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (1.0000, 1.0000, 1.0000, 1.0000))
         /// Structure, selected states, primary buttons.
-        public static let primary = Color(light: Color(red: 0.1843, green: 0.4980, blue: 0.2471, opacity: 1.0000), dark: Color(red: 0.3725, green: 0.7569, blue: 0.4471, opacity: 1.0000))
+        public static let primary = Color(light: (0.1843, 0.4980, 0.2471, 1.0000), dark: (0.3725, 0.7569, 0.4471, 1.0000))
         /// Tinted fills (10% / 14%).
-        public static let primarySoft = Color(light: Color(red: 0.1843, green: 0.4980, blue: 0.2471, opacity: 0.1020), dark: Color(red: 0.3725, green: 0.7569, blue: 0.4471, opacity: 0.1412))
+        public static let primarySoft = Color(light: (0.1843, 0.4980, 0.2471, 0.1020), dark: (0.3725, 0.7569, 0.4471, 0.1412))
         /// The Hungry button and the paywall button only.
-        public static let action = Color(light: Color(red: 1.0000, green: 0.4196, blue: 0.2078, opacity: 1.0000), dark: Color(red: 1.0000, green: 0.5412, blue: 0.3608, opacity: 1.0000))
+        public static let action = Color(light: (1.0000, 0.4196, 0.2078, 1.0000), dark: (1.0000, 0.5412, 0.3608, 1.0000))
         /// Rings and glows around the action.
-        public static let actionSoft = Color(light: Color(red: 1.0000, green: 0.4196, blue: 0.2078, opacity: 0.1216), dark: Color(red: 1.0000, green: 0.5412, blue: 0.3608, opacity: 0.1608))
+        public static let actionSoft = Color(light: (1.0000, 0.4196, 0.2078, 0.1216), dark: (1.0000, 0.5412, 0.3608, 0.1608))
         /// Positive badges.
-        public static let success = Color(light: Color(red: 0.1804, green: 0.4902, blue: 0.1961, opacity: 1.0000), dark: Color(red: 0.4353, green: 0.8118, blue: 0.5020, opacity: 1.0000))
+        public static let success = Color(light: (0.1804, 0.4902, 0.1961, 1.0000), dark: (0.4353, 0.8118, 0.5020, 1.0000))
         /// Caution badges.
-        public static let warning = Color(light: Color(red: 0.7216, green: 0.3255, blue: 0.0000, opacity: 1.0000), dark: Color(red: 1.0000, green: 0.6902, blue: 0.4039, opacity: 1.0000))
+        public static let warning = Color(light: (0.7216, 0.3255, 0.0000, 1.0000), dark: (1.0000, 0.6902, 0.4039, 1.0000))
         /// Errors, destructive actions.
-        public static let danger = Color(light: Color(red: 0.7176, green: 0.1098, blue: 0.1098, opacity: 1.0000), dark: Color(red: 1.0000, green: 0.5412, blue: 0.5020, opacity: 1.0000))
+        public static let danger = Color(light: (0.7176, 0.1098, 0.1098, 1.0000), dark: (1.0000, 0.5412, 0.5020, 1.0000))
         /// Neutral information badges.
-        public static let info = Color(light: Color(red: 0.1059, green: 0.3686, blue: 0.5412, opacity: 1.0000), dark: Color(red: 0.4863, green: 0.7686, blue: 0.9608, opacity: 1.0000))
+        public static let info = Color(light: (0.1059, 0.3686, 0.5412, 1.0000), dark: (0.4863, 0.7686, 0.9608, 1.0000))
         /// Card borders, dividers (14% / 10%).
-        public static let hairline = Color(light: Color(red: 0.4196, green: 0.3059, blue: 0.2392, opacity: 0.1412), dark: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.1020))
+        public static let hairline = Color(light: (0.4196, 0.3059, 0.2392, 0.1412), dark: (1.0000, 1.0000, 1.0000, 0.1020))
         /// Focused borders, strong dividers.
-        public static let hairlineStrong = Color(light: Color(red: 0.4196, green: 0.3059, blue: 0.2392, opacity: 0.2784), dark: Color(red: 1.0000, green: 1.0000, blue: 1.0000, opacity: 0.2196))
+        public static let hairlineStrong = Color(light: (0.4196, 0.3059, 0.2392, 0.2784), dark: (1.0000, 1.0000, 1.0000, 0.2196))
         /// Behind sheets and dialogs.
-        public static let scrim = Color(light: Color(red: 0.2431, green: 0.1686, blue: 0.1255, opacity: 0.6000), dark: Color(red: 0.0000, green: 0.0000, blue: 0.0000, opacity: 0.6510))
+        public static let scrim = Color(light: (0.2431, 0.1686, 0.1255, 0.6000), dark: (0.0000, 0.0000, 0.0000, 0.6510))
     }
 
     public enum `Type` {
@@ -112,8 +112,23 @@ public struct TextRole {
 }
 
 public extension Color {
+    /// sRGB components, in the order red, green, blue, alpha.
+    typealias RGBA = (Double, Double, Double, Double)
+
     /// Resolves to the light or dark value from the active trait collection.
-    init(light: Color, dark: Color) {
-        self.init(uiColor: UIColor { trait in trait.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light) })
+    ///
+    /// UIKit resolves a dynamic colour on whichever thread is drawing, and for SwiftUI
+    /// that is often its async render thread rather than the main one. The target builds
+    /// with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, so both the initialiser and the
+    /// provider closure have to opt out explicitly: otherwise the closure is treated as
+    /// main-actor work and trips a dispatch queue assertion the moment it is resolved off
+    /// the main thread. For the same reason the components become `UIColor`s up front,
+    /// rather than calling the main-actor-isolated `UIColor(_: Color)` inside the closure.
+    nonisolated init(light: RGBA, dark: RGBA) {
+        let lightColor = UIColor(red: light.0, green: light.1, blue: light.2, alpha: light.3)
+        let darkColor = UIColor(red: dark.0, green: dark.1, blue: dark.2, alpha: dark.3)
+        self.init(uiColor: UIColor { @Sendable trait in
+            trait.userInterfaceStyle == .dark ? darkColor : lightColor
+        })
     }
 }

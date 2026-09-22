@@ -15,17 +15,22 @@ struct PreviewCoreOptions: Equatable {
     var isOffline = false
     var aiUsedToday = false
     var isOnboarded = true
+    /// Ask CoreLocation where the phone actually is instead of answering with the sample
+    /// anchor. Demo builds turn this on; screenshots and tests leave it off so the sample
+    /// data stays in one fixed place.
+    var usesDeviceLocation = false
 
-    init(isPro: Bool = false, isSignedIn: Bool = false, isOffline: Bool = false, aiUsedToday: Bool = false, isOnboarded: Bool = true) {
+    init(isPro: Bool = false, isSignedIn: Bool = false, isOffline: Bool = false, aiUsedToday: Bool = false, isOnboarded: Bool = true, usesDeviceLocation: Bool = false) {
         self.isPro = isPro
         self.isSignedIn = isSignedIn
         self.isOffline = isOffline
         self.aiUsedToday = aiUsedToday
         self.isOnboarded = isOnboarded
+        self.usesDeviceLocation = usesDeviceLocation
     }
 
     init(arguments: LaunchArguments) {
-        self.init(isPro: arguments.isPro, isSignedIn: arguments.isSignedIn, isOffline: arguments.isOffline, aiUsedToday: arguments.aiUsedToday, isOnboarded: arguments.isOnboarded)
+        self.init(isPro: arguments.isPro, isSignedIn: arguments.isSignedIn, isOffline: arguments.isOffline, aiUsedToday: arguments.aiUsedToday, isOnboarded: arguments.isOnboarded, usesDeviceLocation: FeatureFlags.usesDeviceLocationInPreview && !arguments.usesPreviewCore)
     }
 }
 
@@ -59,7 +64,9 @@ final class PreviewLunchCore: LunchCoreClient {
         let auth = PreviewAuthRepository(isSignedIn: options.isSignedIn, network: network)
         let gates = PreviewGateService(entitlements: entitlements, auth: auth, aiUsedToday: options.aiUsedToday ? 1 : 0)
         let ai = PreviewAiService(engine: engine, gates: gates, network: network)
-        self.location = PreviewLocationProvider()
+        self.location = options.usesDeviceLocation
+            ? DeviceLocationProvider(fallback: PreviewData.userLocation)
+            : PreviewLocationProvider()
         self.users = PreviewUserRepository(user: options.isOnboarded ? PreviewData.user : nil)
         self.meals = PreviewMealRepository(meals: options.isOnboarded ? PreviewData.meals : [])
         self.restaurants = PreviewRestaurantRepository(network: network)

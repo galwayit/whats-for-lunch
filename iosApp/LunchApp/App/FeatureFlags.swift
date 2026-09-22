@@ -21,6 +21,15 @@ enum FeatureFlags {
     static let previewCoreByDefault = false
     #endif
 
+    /// Demo builds ask CoreLocation for a real fix so the sample places sit around the
+    /// phone rather than around the fixed Sydney anchor. A run started with `-previewCore`
+    /// keeps the anchor, so screenshots and tests stay deterministic.
+    #if DEMO
+    static let usesDeviceLocationInPreview = true
+    #else
+    static let usesDeviceLocationInPreview = false
+    #endif
+
     static var showsGallery: Bool { !showRealApp || LaunchArguments.current.showsGallery }
 
     /// Gallery section from `-gallerySection <name>` (a `GallerySection` raw value); unknown names show all.

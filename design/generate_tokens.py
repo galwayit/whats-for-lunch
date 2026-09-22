@@ -52,8 +52,8 @@ def gen_swift(t):
         dr, dg, db, da = parse_hex(spec["dark"])
         lines.append(f"        /// {spec['role']}")
         lines.append(
-            f"        public static let {camel(name)} = Color(light: Color(red: {lr:.4f}, green: {lg:.4f}, blue: {lb:.4f}, opacity: {la:.4f}), "
-            f"dark: Color(red: {dr:.4f}, green: {dg:.4f}, blue: {db:.4f}, opacity: {da:.4f}))"
+            f"        public static let {camel(name)} = Color(light: ({lr:.4f}, {lg:.4f}, {lb:.4f}, {la:.4f}), "
+            f"dark: ({dr:.4f}, {dg:.4f}, {db:.4f}, {da:.4f}))"
         )
     lines.append("    }")
     lines.append("")
@@ -94,9 +94,24 @@ def gen_swift(t):
     lines.append("}")
     lines.append("")
     lines.append("public extension Color {")
+    lines.append("    /// sRGB components, in the order red, green, blue, alpha.")
+    lines.append("    typealias RGBA = (Double, Double, Double, Double)")
+    lines.append("")
     lines.append("    /// Resolves to the light or dark value from the active trait collection.")
-    lines.append("    init(light: Color, dark: Color) {")
-    lines.append("        self.init(uiColor: UIColor { trait in trait.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light) })")
+    lines.append("    ///")
+    lines.append("    /// UIKit resolves a dynamic colour on whichever thread is drawing, and for SwiftUI")
+    lines.append("    /// that is often its async render thread rather than the main one. The target builds")
+    lines.append("    /// with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, so both the initialiser and the")
+    lines.append("    /// provider closure have to opt out explicitly: otherwise the closure is treated as")
+    lines.append("    /// main-actor work and trips a dispatch queue assertion the moment it is resolved off")
+    lines.append("    /// the main thread. For the same reason the components become `UIColor`s up front,")
+    lines.append("    /// rather than calling the main-actor-isolated `UIColor(_: Color)` inside the closure.")
+    lines.append("    nonisolated init(light: RGBA, dark: RGBA) {")
+    lines.append("        let lightColor = UIColor(red: light.0, green: light.1, blue: light.2, alpha: light.3)")
+    lines.append("        let darkColor = UIColor(red: dark.0, green: dark.1, blue: dark.2, alpha: dark.3)")
+    lines.append("        self.init(uiColor: UIColor { @Sendable trait in")
+    lines.append("            trait.userInterfaceStyle == .dark ? darkColor : lightColor")
+    lines.append("        })")
     lines.append("    }")
     lines.append("}")
     return "\n".join(lines) + "\n"

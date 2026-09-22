@@ -114,11 +114,19 @@ final class PreviewRestaurantRepository: RestaurantRepository {
     func searchNearby(location: Location, radiusKm: Double, query: String?, forceRefresh: Bool) async throws -> [Restaurant] {
         try await network.roundTrip()
         let needle = query?.trimmingCharacters(in: .whitespaces).lowercased() ?? ""
+        // The sample places are laid out around `PreviewData.userLocation`. Shift the whole
+        // set by the offset to the caller's position so the demo shows them around the phone
+        // with their intended distances, instead of leaving them a state away and filtering
+        // every one of them out. The offset is zero when the anchor is in use.
+        let offsetLatitude = location.latitude - PreviewData.userLocation.latitude
+        let offsetLongitude = location.longitude - PreviewData.userLocation.longitude
         return PreviewData.restaurants
             .map { restaurant in
                 var located = restaurant
                 if let latitude = restaurant.latitude, let longitude = restaurant.longitude {
-                    located.distanceFromUser = Self.distanceKm(from: location, toLatitude: latitude, longitude: longitude)
+                    located.latitude = latitude + offsetLatitude
+                    located.longitude = longitude + offsetLongitude
+                    located.distanceFromUser = Self.distanceKm(from: location, toLatitude: latitude + offsetLatitude, longitude: longitude + offsetLongitude)
                 }
                 return located
             }
