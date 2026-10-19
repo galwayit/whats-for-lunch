@@ -1,0 +1,148 @@
+{
+  "date_local": "2026-10-06",
+  "timezone": "Australia/Melbourne",
+  "project_ref": "cswdcbmywzzisovsgwac",
+  "secret_names_verified_in_chrome": [
+    "GOOGLE_PLACES_API_KEY",
+    "INVITE_LINK_BASE",
+    "REVENUECAT_WEBHOOK_SECRET",
+    "GEMINI_API_KEY",
+    "OPENAI_API_KEY",
+    "REVENUECAT_SECRET_API_KEY",
+    "REVENUECAT_PROJECT_ID"
+  ],
+  "revenuecat_project_id_digest_matches": "proj66f64377",
+  "missing_configuration": [
+    "REVENUECAT_PRO_PRODUCT_IDS",
+    "APPLE_CLIENT_ID",
+    "APPLE_TEAM_ID",
+    "APPLE_KEY_ID",
+    "APPLE_SIGN_IN_PRIVATE_KEY",
+    "FCM_SERVICE_ACCOUNT_JSON"
+  ],
+  "optional_missing": [
+    "REVENUECAT_ALLOW_APPLE_SANDBOX",
+    "ANTHROPIC_API_KEY"
+  ],
+  "pending_migrations": [
+    "20261001035112_production_billing_security",
+    "20261001140622_ai_provider_system_parameters",
+    "20261001144342_group_invitation_planning"
+  ],
+  "live_functions": {
+    "count": 13,
+    "version": 6,
+    "missing": [
+      "ai-config",
+      "groups-update",
+      "groups-suggestions",
+      "invitations-suggest"
+    ]
+  },
+  "production_mutations_this_check": "Temporary diagnostic deployed under explicit approval, then removed; original 13 app functions and database unchanged.",
+  "credential_values_exposed_or_exported": false,
+  "temporary_diagnostic": {
+    "local_path": "/private/tmp/lunch-service-check-20261006",
+    "deno_check": "passed",
+    "deployment": "explicitly approved initial check and corrected OpenAI-only retry completed; removed after each run",
+    "source_sha256": "ae3012e7ca5e8c1a3bca3c3870ae6fd55a8662bf55b196af82f8befd45e9efad",
+    "remaining_function_count": 13,
+    "deletion_verified": true,
+    "authentication": "Exact matching against project server keys; unauthenticated and invalid-key requests returned 401.",
+    "final_deletion_verified": true,
+    "final_remaining_functions": 13
+  },
+  "revenuecat_v2_key_digest_matches_generated_key": true,
+  "credential_verification_method": "Compared SHA256 in memory using the existing masked RevenueCat key copy control; only the boolean result was emitted; temporary clipboard cleared.",
+  "database_schema_verified": {
+    "system_parameters": "absent",
+    "ai_reservations": "absent",
+    "revenuecat_events": "absent",
+    "group_suggestions": "absent"
+  },
+  "migration_dry_run": "passed; exactly the three pending migrations listed; no remote changes",
+  "provider_acceptance_initial": {
+    "checked_at": "2026-10-05T15:43:50.176Z",
+    "revenuecat": {
+      "subscriptions": {
+        "status": "provider_error",
+        "http_status": 404,
+        "error_type": "resource_missing"
+      },
+      "products": {
+        "status": "ok",
+        "http_status": 200,
+        "item_count": 3,
+        "products": [
+          {
+            "id": "prod8276b473c0",
+            "store_identifier": "yearly",
+            "type": "subscription"
+          },
+          {
+            "id": "prod8906ff6d15",
+            "store_identifier": "lifetime",
+            "type": "non_consumable"
+          },
+          {
+            "id": "prodf57e01282b",
+            "store_identifier": "monthly",
+            "type": "subscription"
+          }
+        ]
+      }
+    },
+    "google": {
+      "status": "ok",
+      "model": "gemini-3.8-flash",
+      "tokens": 777,
+      "latency_ms": 4102
+    },
+    "openai": {
+      "status": "failed",
+      "model": "gpt-5.4-mini",
+      "reason": "http_403",
+      "latency_ms": 2031
+    },
+    "configuration": {
+      "GOOGLE_PLACES_API_KEY": true,
+      "REVENUECAT_PRO_PRODUCT_IDS": false,
+      "REVENUECAT_ALLOW_APPLE_SANDBOX": false,
+      "APPLE_CLIENT_ID": false,
+      "APPLE_TEAM_ID": false,
+      "APPLE_KEY_ID": false,
+      "APPLE_SIGN_IN_PRIVATE_KEY": false,
+      "FCM_SERVICE_ACCOUNT_JSON": false
+    }
+  },
+  "openai_corrected_acceptance": {
+    "checked_at": "2026-10-05T15:52:33.369Z",
+    "openai": {
+      "status": "ok",
+      "model": "gpt-5.6-luna",
+      "tokens": 380,
+      "latency_ms": 2820
+    }
+  },
+  "openai_project": {
+    "project_id": "proj_v1GaSY5BsvwtrTIDgfMFwZgJ",
+    "allowed_models": [
+      "gpt-5.6-luna",
+      "gpt-4.1-nano-2025-04-14"
+    ],
+    "responses_permission": "Write",
+    "key_expiration": "2026-11-05",
+    "permissions_or_limits_changed": false
+  },
+  "local_model_configuration": {
+    "openai_backup": "gpt-5.6-luna",
+    "state": "changed locally; unapplied migration",
+    "validation": "passed; migration seed matches example",
+    "backend_tests_passed": 102
+  },
+  "files_sha256": {
+    "backend/ai-providers.example.json": "a2103b4f7b7c0a688c2badd6697991743a4d9da4c3d43e6a46bdbe513ab8e1a9",
+    "backend/supabase/migrations/20261001140622_ai_provider_system_parameters.sql": "b79ceb08d495557b0c5313bcd187f2edff11396a949358c452d516c5000ad2e9",
+    "backend/AI_PROVIDERS.md": "af406625cbef4c824ad68ac4c49f74a36aa61ca32e4ba26b9af81ccbdcb663ea"
+  }
+}

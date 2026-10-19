@@ -1,0 +1,37 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "install",
+      "app",
+      "--device",
+      "00008101-000D44620111001E",
+      "/private/tmp/lunch-ray-debug-20261006/Build/Products/Debug-iphoneos/LunchApp.app",
+      "--json-output",
+      "release-evidence/2026-10-06/test-deploy-device/iphone-install.json"
+    ],
+    "commandType" : "devicectl.device.install.app",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "642.16"
+  },
+  "result" : {
+    "deviceIdentifier" : "EECC81E4-36CE-57D9-924B-7210DEB4C166",
+    "installedApplications" : [
+      {
+        "bundleID" : "au.iapp.lunch",
+        "databaseSequenceNumber" : 2796,
+        "databaseUUID" : "509928DE-C2A5-4881-A223-5086A9C85C55",
+        "installationURL" : "file:///private/var/containers/Bundle/Application/90F38059-BD21-4A96-8BEC-DA9E82340266/LunchApp.app/",
+        "launchServicesIdentifier" : "unknown",
+        "options" : {
+
+        }
+      }
+    ]
+  }
+}

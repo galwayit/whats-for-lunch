@@ -1,0 +1,46 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "info",
+      "apps",
+      "--device",
+      "00008101-000D44620111001E",
+      "--filter",
+      "bundleIdentifier == 'au.iapp.lunch'",
+      "--json-output",
+      "release-evidence/2026-10-06/test-deploy-device/iphone-installed-app.json"
+    ],
+    "commandType" : "devicectl.device.info.apps",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "642.16"
+  },
+  "result" : {
+    "apps" : [
+      {
+        "appClip" : false,
+        "builtByDeveloper" : true,
+        "bundleIdentifier" : "au.iapp.lunch",
+        "bundleVersion" : "3",
+        "containerAccessible" : true,
+        "defaultApp" : false,
+        "hidden" : false,
+        "internalApp" : false,
+        "name" : "What We Have For Lunch",
+        "removable" : true,
+        "url" : "file:///private/var/containers/Bundle/Application/90F38059-BD21-4A96-8BEC-DA9E82340266/LunchApp.app/",
+        "version" : "1.0.0"
+      }
+    ],
+    "defaultAppsIncluded" : false,
+    "deviceIdentifier" : "EECC81E4-36CE-57D9-924B-7210DEB4C166",
+    "hiddenAppsIncluded" : false,
+    "internalAppsIncluded" : false,
+    "removableAppsIncluded" : true
+  }
+}

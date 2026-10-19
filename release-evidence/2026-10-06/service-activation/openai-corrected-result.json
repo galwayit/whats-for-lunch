@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-10-05T15:52:33.369Z",
+  "openai": {
+    "status": "ok",
+    "model": "gpt-5.6-luna",
+    "tokens": 380,
+    "latency_ms": 2820
+  }
+}

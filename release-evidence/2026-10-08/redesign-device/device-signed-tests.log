@@ -1,0 +1,347 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project iosApp/LunchApp.xcodeproj -scheme LunchApp -configuration Debug -destination platform=iOS,id=00008101-000D44620111001E -derivedDataPath /private/tmp/lunch-ray-redesign-20261008 -resultBundlePath /private/tmp/lunch-ray-redesign-20261008-device-signed-tests.xcresult -xcconfig /private/tmp/lunch-redesign-test-signing.xcconfig -parallel-testing-enabled NO CURRENT_PROJECT_VERSION=6 test
+
+Build settings from command line:
+    CURRENT_PROJECT_VERSION = 6
+
+Build settings from configuration file '/private/tmp/lunch-redesign-test-signing.xcconfig':
+    CODE_SIGN_STYLE = $(LUNCH_STYLE_$(TARGET_NAME))
+    DEVELOPMENT_TEAM = $(LUNCH_TEAM_$(TARGET_NAME))
+    LUNCH_PROFILE_LunchAppUITests = iOS Team Provisioning Profile: *
+    LUNCH_STYLE_LunchApp = Automatic
+    LUNCH_STYLE_LunchAppTests = Automatic
+    LUNCH_STYLE_LunchAppUITests = Manual
+    LUNCH_TEAM_LunchApp = RYM9BD2B27
+    LUNCH_TEAM_LunchAppTests = RYM9BD2B27
+    LUNCH_TEAM_LunchAppUITests = 8976Q989K4
+    PROVISIONING_PROFILE_SPECIFIER = $(LUNCH_PROFILE_$(TARGET_NAME))
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  nanopb: https://github.com/firebase/nanopb.git @ 2.30910.1
+  RevenueCat: https://github.com/RevenueCat/purchases-ios-spm @ 5.89.0
+  GTMSessionFetcher: https://github.com/google/gtm-session-fetcher.git @ 5.3.1
+  GoogleAppMeasurement: https://github.com/google/GoogleAppMeasurement.git @ 12.17.0
+  Promises: https://github.com/google/promises.git @ 2.4.1
+  abseil: https://github.com/google/abseil-cpp-binary.git @ 1.2024072200.0
+  AppAuth: https://github.com/openid/AppAuth-iOS.git @ 3.0.0
+  Firebase: https://github.com/firebase/firebase-ios-sdk.git @ 12.17.0
+  GoogleDataTransport: https://github.com/google/GoogleDataTransport.git @ 10.1.1
+  GTMAppAuth: https://github.com/google/GTMAppAuth.git @ 6.0.0
+  AppCheck: https://github.com/google/app-check.git @ 11.3.2
+  gRPC: https://github.com/google/grpc-binary.git @ 1.69.1
+  GoogleUtilities: https://github.com/google/GoogleUtilities.git @ 8.1.3
+  GoogleSignIn: https://github.com/google/GoogleSignIn-iOS.git @ 10.0.0
+  InteropForGoogle: https://github.com/google/interop-ios-for-google-sdks.git @ 101.0.0
+  GoogleAdsOnDeviceConversion: https://github.com/googleads/google-ads-on-device-conversion-ios-sdk @ 3.6.1
+  leveldb: https://github.com/firebase/leveldb.git @ 1.22.5
+  PurchasesHybridCommon: https://github.com/RevenueCat/purchases-hybrid-common.git @ 19.0.0
+  Sentry: https://github.com/getsentry/sentry-cocoa.git @ 9.30.0
+
+Writing result bundle at path:
+	/private/tmp/lunch-ray-redesign-20261008-device-signed-tests.xcresult
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (69 targets)
+    Target 'LunchAppTests' in project 'LunchApp'
+        ➜ Explicit dependency on target 'LunchApp' in project 'LunchApp'
+    Target 'LunchAppUITests' in project 'LunchApp'
+        ➜ Explicit dependency on target 'LunchApp' in project 'LunchApp'
+    Target 'LunchApp' in project 'LunchApp'
+        ➜ Explicit dependency on target 'PurchasesHybridCommon-product' in project 'PurchasesHybridCommon'
+        ➜ Explicit dependency on target 'FirebaseMessaging-product' in project 'Firebase'
+        ➜ Explicit dependency on target 'GoogleSignIn-product' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignInSwift-product' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'Sentry-Dynamic-product' in project 'Sentry'
+    Target 'Sentry-Dynamic-product' in project 'Sentry' (no dependencies)
+    Target 'GoogleSignInSwift-product' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignInSwift' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn_GoogleSignInSwift' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'AppAuth-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppCheckCore-product' in project 'AppCheck'
+        ➜ Explicit dependency on target 'GTMAppAuth-product' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+    Target 'GoogleSignInSwift' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn_GoogleSignInSwift' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'AppAuth-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppCheckCore-product' in project 'AppCheck'
+        ➜ Explicit dependency on target 'GTMAppAuth-product' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+    Target 'GoogleSignIn_GoogleSignInSwift' in project 'GoogleSignIn' (no dependencies)
+    Target 'GoogleSignIn-product' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn_GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'AppAuth-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppCheckCore-product' in project 'AppCheck'
+        ➜ Explicit dependency on target 'GTMAppAuth-product' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+    Target 'GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'GoogleSignIn_GoogleSignIn' in project 'GoogleSignIn'
+        ➜ Explicit dependency on target 'AppAuth-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppCheckCore-product' in project 'AppCheck'
+        ➜ Explicit dependency on target 'GTMAppAuth-product' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+    Target 'GTMAppAuth-product' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMAppAuth' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMAppAuth_GTMAppAuth' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+    Target 'GTMAppAuth' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMAppAuth_GTMAppAuth' in project 'GTMAppAuth'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'AppAuthCore-product' in project 'AppAuth'
+    Target 'GTMSessionFetcherCore-product' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher' (no dependencies)
+    Target 'GTMAppAuth_GTMAppAuth' in project 'GTMAppAuth' (no dependencies)
+    Target 'AppCheckCore-product' in project 'AppCheck'
+        ➜ Explicit dependency on target 'AppCheckCore' in project 'AppCheck'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULUserDefaults-product' in project 'GoogleUtilities'
+    Target 'AppCheckCore' in project 'AppCheck'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULUserDefaults-product' in project 'GoogleUtilities'
+    Target 'AppAuthCore-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuth_AppAuthCore' in project 'AppAuth'
+    Target 'AppAuth-product' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuth' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuth_AppAuth' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore' in project 'AppAuth'
+    Target 'AppAuth' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuth_AppAuth' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuthCore' in project 'AppAuth'
+    Target 'AppAuthCore' in project 'AppAuth'
+        ➜ Explicit dependency on target 'AppAuth_AppAuthCore' in project 'AppAuth'
+    Target 'AppAuth_AppAuthCore' in project 'AppAuth' (no dependencies)
+    Target 'AppAuth_AppAuth' in project 'AppAuth' (no dependencies)
+    Target 'GoogleSignIn_GoogleSignIn' in project 'GoogleSignIn' (no dependencies)
+    Target 'FirebaseMessaging-product' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseMessaging' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseMessaging' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseInstallations' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'GULUserDefaults-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULAppDelegateSwizzler-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULReachability-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleDataTransport-product' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'nanopb-product' in project 'nanopb'
+    Target 'FirebaseMessaging' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseMessaging' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseInstallations' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'GULUserDefaults-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULAppDelegateSwizzler-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULReachability-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleDataTransport-product' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'nanopb-product' in project 'nanopb'
+    Target 'GoogleDataTransport-product' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'GoogleDataTransport' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'GoogleDataTransport_GoogleDataTransport' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'nanopb-product' in project 'nanopb'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+    Target 'GoogleDataTransport' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'GoogleDataTransport_GoogleDataTransport' in project 'GoogleDataTransport'
+        ➜ Explicit dependency on target 'nanopb-product' in project 'nanopb'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+    Target 'nanopb-product' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb_nanopb' in project 'nanopb'
+    Target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb_nanopb' in project 'nanopb'
+    Target 'nanopb_nanopb' in project 'nanopb' (no dependencies)
+    Target 'GoogleDataTransport_GoogleDataTransport' in project 'GoogleDataTransport' (no dependencies)
+    Target 'GULReachability-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+    Target 'GULAppDelegateSwizzler-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-Network' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-Reachability' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities' (no dependencies)
+    Target 'FirebaseInstallations' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseInstallations' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'GULUserDefaults-product' in project 'GoogleUtilities'
+    Target 'GULUserDefaults-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-UserDefaults' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-UserDefaults' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-UserDefaults' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-UserDefaults' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-UserDefaults' in project 'GoogleUtilities' (no dependencies)
+    Target 'FBLPromises-product' in project 'Promises'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+        ➜ Explicit dependency on target 'Promises_FBLPromises' in project 'Promises'
+    Target 'FBLPromises' in project 'Promises'
+        ➜ Explicit dependency on target 'Promises_FBLPromises' in project 'Promises'
+    Target 'Promises_FBLPromises' in project 'Promises' (no dependencies)
+    Target 'Firebase_FirebaseInstallations' in project 'Firebase' (no dependencies)
+    Target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger-product' in project 'GoogleUtilities'
+    Target 'GULLogger-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities' (no dependencies)
+    Target 'GULEnvironment-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+    Target 'third-party-IsAppEncrypted' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities' (no dependencies)
+    Target 'Firebase_FirebaseCore' in project 'Firebase' (no dependencies)
+    Target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData-product' in project 'GoogleUtilities'
+    Target 'GULNSData-product' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities' (no dependencies)
+    Target 'Firebase_FirebaseCoreInternal' in project 'Firebase' (no dependencies)
+    Target 'Firebase' in project 'Firebase' (no dependencies)
+    Target 'Firebase_FirebaseMessaging' in project 'Firebase' (no dependencies)
+    Target 'PurchasesHybridCommon-product' in project 'PurchasesHybridCommon'
+        ➜ Explicit dependency on target 'PurchasesHybridCommon' in project 'PurchasesHybridCommon'
+        ➜ Explicit dependency on target 'RevenueCat-product' in project 'RevenueCat'
+    Target 'PurchasesHybridCommon' in project 'PurchasesHybridCommon'
+        ➜ Explicit dependency on target 'RevenueCat-product' in project 'RevenueCat'
+    Target 'RevenueCat-product' in project 'RevenueCat'
+        ➜ Explicit dependency on target 'RevenueCat' in project 'RevenueCat'
+        ➜ Explicit dependency on target 'RevenueCat_RevenueCat' in project 'RevenueCat'
+    Target 'RevenueCat' in project 'RevenueCat'
+        ➜ Explicit dependency on target 'RevenueCat_RevenueCat' in project 'RevenueCat'
+    Target 'RevenueCat_RevenueCat' in project 'RevenueCat' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/rayding/galway/what_we_have_for_lunch/iosApp/LunchApp/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+Build description signature: 0af0d635b1a2038b1abe4891a19b7ee0
+Build description path: /tmp/lunch-ray-redesign-20261008/Build/Intermediates.noindex/XCBuildData/0af0d635b1a2038b1abe4891a19b7ee0.xcbuilddata
+note: Run script build phase 'Build Kotlin framework' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'LunchApp' from project 'LunchApp')
+note: Run script build phase 'Generate auth Info.plist' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'LunchApp' from project 'LunchApp')
+note: Run script build phase 'Copy runtime config' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'LunchApp' from project 'LunchApp')
+/Users/rayding/galway/what_we_have_for_lunch/iosApp/LunchApp.xcodeproj: error: Provisioning profile "iOS Team Provisioning Profile: *" is Xcode managed, but signing settings require a manually managed profile. (in target 'LunchAppUITests' from project 'LunchApp')
+
+Test session results, code coverage, and logs:
+	/tmp/lunch-ray-redesign-20261008-device-signed-tests.xcresult
+
+Testing failed:
+	Provisioning profile "iOS Team Provisioning Profile: *" is Xcode managed, but signing settings require a manually managed profile.
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	Testing project LunchApp with scheme LunchApp
+(1 failure)

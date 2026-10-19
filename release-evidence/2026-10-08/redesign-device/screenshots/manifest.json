@@ -1,0 +1,141 @@
+[
+  {
+    "file": "subscription-prompt-after-one-free-ai-request.png",
+    "name": "Subscription prompt after one free AI request",
+    "test": "AIFreeAllowanceUITests/testFirstFreeRequestThenSubscriptionPaywall()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "place-picker-full-screen-error.png",
+    "name": "Place picker full-screen error",
+    "test": "InvitationPlanningUITests/testFailedPlacePickerKeepsHeaderAtTopOfFullScreen()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "guest-suggestion-awaiting-host.png",
+    "name": "Guest suggestion awaiting host",
+    "test": "InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "invitation-details-and-three-choices.png",
+    "name": "Invitation details and three choices",
+    "test": "InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-group-split-bill.png",
+    "name": "Redesign - Group split bill",
+    "test": "RedesignSmokeUITests/testGroupSplitSheetOpensWithItsModelAndCanReopen()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-preferences-dark.png",
+    "name": "Redesign - Preferences Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-profile-dark.png",
+    "name": "Redesign - Profile Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-track-dark.png",
+    "name": "Redesign - Track Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-discover-dark.png",
+    "name": "Redesign - Discover Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-recommendation-dark.png",
+    "name": "Redesign - Recommendation Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-home-dark.png",
+    "name": "Redesign - Home Dark",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInDarkAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-preferences-light.png",
+    "name": "Redesign - Preferences Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-profile-light.png",
+    "name": "Redesign - Profile Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-track-light.png",
+    "name": "Redesign - Track Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-discover-light.png",
+    "name": "Redesign - Discover Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-recommendation-light.png",
+    "name": "Redesign - Recommendation Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-home-light.png",
+    "name": "Redesign - Home Light",
+    "test": "RedesignSmokeUITests/testMainScreensAndRecommendationInLightAppearance()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-meal-prefilled-with-my-share.png",
+    "name": "Redesign - Meal prefilled with my share",
+    "test": "RedesignSmokeUITests/testRestaurantDetailsCanPrefillMealAndSplitBill()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-split-bill-with-restaurant-cost.png",
+    "name": "Redesign - Split bill with restaurant cost",
+    "test": "RedesignSmokeUITests/testRestaurantDetailsCanPrefillMealAndSplitBill()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "redesign-restaurant-details.png",
+    "name": "Redesign - Restaurant details",
+    "test": "RedesignSmokeUITests/testRestaurantDetailsCanPrefillMealAndSplitBill()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "invitation-report-and-block-choices.png",
+    "name": "Invitation report and block choices",
+    "test": "SubmissionReadinessUITests/testGuestCanReachReportingAndBlockingFromInvitation()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "manual-search-area-before-submitting.png",
+    "name": "Manual search area before submitting",
+    "test": "SubmissionReadinessUITests/testManualAreaIsAvailableWithoutRequestingDeviceLocation()",
+    "device": "Ray\u2019s iPhone"
+  },
+  {
+    "file": "email-verification-form.png",
+    "name": "Email verification form",
+    "test": "AuthScreenUITests/testRegistrationCanVerifyEmailAndDismiss()",
+    "device": "Ray\u2019s iPhone",
+    "build": "9"
+  }
+]

@@ -1,0 +1,92 @@
+{
+  "checked_at_utc": "2026-10-01T14:35:53.686247+00:00",
+  "scope": "Runtime primary/backup AI providers, consent and safe failure handling; local verification only",
+  "live_ai_root_cause": "Earlier authenticated live ai_requests query recorded Missing environment variable GEMINI_API_KEY for the reported Pro failures.",
+  "providers": [
+    "google",
+    "openai",
+    "anthropic",
+    "openai-compatible"
+  ],
+  "prepared_route": {
+    "enabled": false,
+    "primary": "google",
+    "backup": "openai",
+    "other_selectable_profile": "claude"
+  },
+  "verification": {
+    "backend": {
+      "passed": 79,
+      "failed": 0,
+      "typecheck": "passed",
+      "format": "passed"
+    },
+    "shared_desktop": {
+      "passed": 140,
+      "failed": 0
+    },
+    "android_ai_viewmodels": {
+      "passed": 5,
+      "failed": 0
+    },
+    "ios_ai_consent": {
+      "passed": 8,
+      "failed": 0,
+      "xcresult": "/Users/rayding/Library/Developer/XcodeBuildMCP/workspaces/what_we_have_for_lunch-79b85cd66aeb/result-bundles/test_sim_2026-10-01T14-24-49-109Z_pid54175_13bd812f.xcresult"
+    },
+    "postgres_checks_passed": 48,
+    "ios_debug_build": "passed",
+    "android_debug_build": "passed",
+    "git_diff_check": "passed"
+  },
+  "deployment": {
+    "performed": false,
+    "real_provider_calls": false,
+    "new_debug_installed_on_phone": false,
+    "app_store_release": false,
+    "pending_migrations": [
+      "20261001035112_production_billing_security.sql",
+      "20261001140622_ai_provider_system_parameters.sql"
+    ],
+    "confirmed_missing_server_secrets": [
+      "GEMINI_API_KEY",
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "REVENUECAT_SECRET_API_KEY"
+    ],
+    "user_credential_choice": "User will add existing keys in Supabase Secrets",
+    "remaining_acceptance": [
+      "Qualified live primary and backup model calls",
+      "Verified Apple sandbox billing with real App Store products; Test Store cannot unlock production Pro",
+      "Updated public privacy page",
+      "Coordinated migration/functions/client rollout"
+    ]
+  },
+  "source_sha256": {
+    "backend/supabase/functions/_shared/ai-config.ts": "fedf2ca2ed93acff4112341dfbc5dba37e5deb0e29be0427a2916c270c69ab52",
+    "backend/supabase/functions/_shared/ai-providers.ts": "ed59d77360ffd1c746f2786e919ea328551cd9fafa0bf72dc24d91ddb8392040",
+    "backend/supabase/functions/_shared/ai-router.ts": "fd7a6205de2a1d50297b72e55673c76a1f03acd1c9524c7fad3879fecf5a0eab",
+    "backend/supabase/functions/_shared/ai-router_test.ts": "4171ce9f6cc2d835d8968b4367f0dac43747aa57a709b5e4204d2e1464a10f8c",
+    "backend/supabase/functions/_shared/ai-schema.ts": "33ae070b0b5fcff76e927eb32467724a9fd51697468ea5ae25d1404bcc586e09",
+    "backend/supabase/functions/ai-config/index.ts": "b19822c4a7c1cad39de4bbbb9c60925ed273e453555b731945bf96a73cc69bdf",
+    "backend/supabase/functions/ai-recommend/index.ts": "693709bd64ed082dbcb207b7ddb8768a0cd484566de3c996ab90648588d49c25",
+    "backend/supabase/functions/groups-propose/index.ts": "24f2bd33436fdac641b23f37b49bdfeda538eb38fe7d6fd3bb1ea9dff0ea0d6a",
+    "backend/supabase/migrations/20261001140622_ai_provider_system_parameters.sql": "b1b3d5fa3528cc299d6afac0df162c74cbc19d2ff5335b23559e215b3e1e73ee",
+    "backend/ai-providers.example.json": "ff99f94694de58934a15d2f47fffa4c3d2cdc67383d1a02c7e1e346c0cbe8a73",
+    "backend/AI_PROVIDERS.md": "b30d32b9b8ef0a38f6c799bc5cd219415cb1224e7e7a3cdba8c5480c614e7e3a"
+  },
+  "debug_artifacts": [
+    {
+      "path": "/private/tmp/lunch-ai-provider-ios/Build/Products/Debug-iphoneos/LunchApp.app/LunchApp",
+      "sha256": "d9f71b714094f9fb9bc87ef579bbe3a4b4511aaa30ff702a6761d055c72e8963"
+    },
+    {
+      "path": "/private/tmp/lunch-ai-provider-ios/Build/Products/Debug-iphoneos/LunchApp.app/LunchApp.debug.dylib",
+      "sha256": "430153ab99206d42139b68a0c294639ae645a80470b2503c286cd81a150f9919"
+    },
+    {
+      "path": "/Users/rayding/galway/what_we_have_for_lunch/androidApp/build/outputs/apk/debug/androidApp-debug.apk",
+      "sha256": "1c3184310057271255d014d0d7c8fadc2ac1d70232c831a55d5e877c3d38ec03"
+    }
+  ]
+}

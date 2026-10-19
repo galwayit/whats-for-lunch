@@ -1,0 +1,99 @@
+{
+  "review_date": "2026-10-06",
+  "timezone": "Australia/Melbourne",
+  "verdict": "not_ready_for_submission",
+  "scope": "Read-only source, local checks, existing Debug artifact and live provider dashboards. No account changes, purchases, deployment or submission.",
+  "git_head": "22c32c1",
+  "working_tree": "Substantial pre-existing uncommitted work; HEAD is not an artifact identity.",
+  "release": {
+    "bundle_id": "au.iapp.lunch",
+    "team_id": "RYM9BD2B27",
+    "minimum_ios": "18.0",
+    "installed_xcode": "27.0 (27A266a)",
+    "production_plist_present": false,
+    "firebase_plist_present": false,
+    "debug_revenuecat_store": "test_store",
+    "archive_attempted": false
+  },
+  "app_store_connect": {
+    "app_id": "6808090102",
+    "version": "1.0",
+    "status": "Prepare for Submission",
+    "testflight_builds": 0,
+    "selected_build": false,
+    "subscription_groups": 0,
+    "inspected_screenshot_panel_count": 0,
+    "review_contact_present": false,
+    "review_notes_present": false,
+    "description_mismatch": "Unlimited AI claimed; implementation free 1 / Pro 10 per UTC day.",
+    "paid_agreement": "New, unsigned",
+    "free_agreement": "Active",
+    "banking_tax": "Not independently verified",
+    "membership_renewal": "2027-04-08",
+    "age_rating": "13+ most regions, regional and older-OS variants",
+    "privacy_data_types": 13,
+    "privacy_attestation": "Not proven",
+    "eu_trader_status": "non-trader; owner should reassess intended EU commercial distribution"
+  },
+  "revenuecat": {
+    "project_id": "66f64377",
+    "store_configuration": "Test Store only"
+  },
+  "supabase": {
+    "project_ref": "cswdcbmywzzisovsgwac",
+    "active_application_functions": 17,
+    "auth_providers_enabled": [
+      "Apple",
+      "Google",
+      "Email"
+    ],
+    "email_confirmation_enabled": true,
+    "custom_smtp": false,
+    "confirmation_template": "Default ConfirmationURL link",
+    "missing_secret_names": [
+      "REVENUECAT_PRO_PRODUCT_IDS",
+      "REVENUECAT_ALLOW_APPLE_SANDBOX",
+      "APPLE_CLIENT_ID",
+      "APPLE_TEAM_ID",
+      "APPLE_KEY_ID",
+      "APPLE_SIGN_IN_PRIVATE_KEY",
+      "FCM_SERVICE_ACCOUNT_JSON"
+    ]
+  },
+  "source_findings": [
+    "Unknown allergens can receive full compatibility despite unverified venue data",
+    "Shared group text lacks reporting/blocking/moderation",
+    "Location denial maps to generic service error without manual area fallback",
+    "Apple deletion requires absent revocation configuration",
+    "Native email flow expects numeric OTP while hosted default email supplies a link"
+  ],
+  "fresh_checks": {
+    "backend_tests_passed": 107,
+    "backend_format_types": "passed",
+    "release_configuration_tests_passed": 12,
+    "web_invitation_suite": "passed",
+    "release_preflight": "failed_missing_production_plist"
+  },
+  "previous_checks": {
+    "same_day_tests_passed": 490,
+    "rerun_in_this_audit": false,
+    "feature_manifest_files_matching": 21,
+    "feature_manifest_files_changed": 0,
+    "scope": "Matching manifest is feature-specific, not a hash of the entire project"
+  },
+  "public_access": {
+    "privacy_terms_support": "Rendered successfully in Chrome",
+    "simple_http_probes": "Cloudflare 403",
+    "apple_aasa_cdn": "HTTP 200, correct app identity and invitation path"
+  },
+  "outstanding_live_acceptance": [
+    "Exact signed Release archive",
+    "Apple sandbox subscriptions and backend entitlement transitions",
+    "Delivered email signup/reset",
+    "Apple token revocation and account deletion",
+    "Push delivery",
+    "Current AI primary/backup availability",
+    "Physical device permission, accessibility and adverse-network flows"
+  ],
+  "sensitive_material": "No secret values, credentials, customer records or payment details included."
+}

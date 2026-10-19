@@ -1,0 +1,51 @@
+[
+  {
+    "path": "/privacy/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "path": "/terms/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "path": "/support/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "path": "/.well-known/apple-app-site-association",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "browser_verification": {
+      "privacy": "Rendered in Chrome; active AI providers and consent/deletion explained",
+      "terms": "Rendered in Chrome; Free 1 / Pro 10 per UTC day",
+      "support": "Rendered in Chrome; support contact and deletion/subscription guidance"
+    },
+    "raw_http_note": "Default Python HTTP client received Cloudflare 1010; this does not establish browser or Apple CDN unavailability"
+  },
+  {
+    "apple_cdn_status": 200,
+    "body": {
+      "applinks": {
+        "details": [
+          {
+            "appIDs": [
+              "RYM9BD2B27.au.iapp.lunch"
+            ],
+            "components": [
+              {
+                "/": "/i/*",
+                "comment": "Lunch invitation links"
+              }
+            ]
+          }
+        ]
+      },
+      "webcredentials": {
+        "apps": [
+          "RYM9BD2B27.au.iapp.lunch"
+        ]
+      }
+    }
+  }
+]

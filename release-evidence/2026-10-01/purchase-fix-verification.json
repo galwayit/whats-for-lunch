@@ -1,0 +1,75 @@
+{
+  "verified_at": "2026-10-01T22:45:12.484785+10:00",
+  "issue": "Successful Test Store purchase silently stayed Free; failed payment displayed unrelated generic server error.",
+  "revenuecat": {
+    "project_id": "66f64377",
+    "entitlement_identifier": "pro",
+    "entitlement_id": "entlb7911d8790",
+    "attached_test_store_products": [
+      "monthly",
+      "yearly"
+    ],
+    "prior_entitlement_preserved": "what_s_for_lunch_pro",
+    "screenshot": "revenuecat-pro-products-fixed.jpg",
+    "actual_app_store_products_configured": false
+  },
+  "behaviour": {
+    "active_pro_purchase": "success state",
+    "purchase_without_pro": "restore/support guidance, stays Free",
+    "store_failure": "purchase-specific safe message",
+    "purchase_cancelled": "quiet cancellation",
+    "payment_pending": "pending guidance, stays Free"
+  },
+  "automated_tests": {
+    "shared": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "android": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "ios_simulator": {
+    "test_build": "passed",
+    "test_run": "incomplete",
+    "reason": "Runner stalled before reporting results; first tool call timed out and second run was stopped. Simulator was shut down. No iOS test-pass claim.",
+    "result_bundles": [
+      "/private/tmp/lunch-purchase-regression-ios.xcresult",
+      "/private/tmp/lunch-purchase-regression-ios-retry.xcresult"
+    ]
+  },
+  "iphone": {
+    "device_name": "Ray’s iPhone",
+    "bundle_id": "au.iapp.lunch",
+    "version": "1.0.0",
+    "build": "2",
+    "configuration": "Debug",
+    "signature_verified": true,
+    "debug_entitlement_verified": true,
+    "google_client_ids_verified": true,
+    "supabase_project_verified": true,
+    "billing_mode": "RevenueCat Test Store",
+    "app_path": "/private/tmp/lunch-remediation-ios/Build/Products/Debug-iphoneos/LunchApp.app",
+    "executable_sha256": "fe977a8f2e091bfed4ca0feb7fa9b70deb60daa303e95f5980420629d4f66193",
+    "debug_dylib_sha256": "d2dced9ed3de2b59ae2024411b5ec5e9a43cc97edbc3f990354d69ec8f93c05c",
+    "install_succeeded": true,
+    "installed_version_verified": true,
+    "launch_succeeded": true,
+    "process_id": 12804,
+    "launch_arguments": []
+  },
+  "logs": {
+    "kotlin": "/private/tmp/lunch-purchase-regression-kotlin.log",
+    "android_final": "/private/tmp/lunch-purchase-regression-android-final.log",
+    "device_build": "/private/tmp/lunch-purchase-fix-device-build.log"
+  },
+  "manual_purchase_retest": "Pending owner testing on the installed build",
+  "production_backend_deployed": false,
+  "real_apple_payment_verified": false,
+  "app_store_published": false
+}

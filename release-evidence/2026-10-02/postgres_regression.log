@@ -1,0 +1,49 @@
+PASS every migration applies to PostgreSQL 17
+PASS 30 simultaneous free requests spend exactly one allowance
+PASS another account cannot refund a reservation
+PASS failed AI call refunds its own reservation
+PASS duplicate refund does not decrement twice
+PASS refunded request ID cannot be reused
+PASS a fresh request can use the refunded allowance
+PASS usage remains correct after refund and retry
+PASS valid billing snapshot applies
+PASS refund removes access
+PASS older purchase cannot overwrite newer refund
+PASS duplicate webhook event cannot change state
+PASS event ledger is idempotent
+PASS upstream capacity cap holds under simultaneous calls
+PASS anon cannot execute reserve_ai_request(uuid,uuid,integer)
+PASS anon cannot execute refund_ai_request(uuid,uuid)
+PASS anon cannot execute apply_revenuecat_snapshot(jsonb,timestamptz,text)
+PASS anon cannot execute reserve_upstream_request(text,integer)
+PASS authenticated cannot execute reserve_ai_request(uuid,uuid,integer)
+PASS authenticated cannot execute refund_ai_request(uuid,uuid)
+PASS authenticated cannot execute apply_revenuecat_snapshot(jsonb,timestamptz,text)
+PASS authenticated cannot execute reserve_upstream_request(text,integer)
+PASS unrelated account cannot read a group
+PASS host can read their group without recursive RLS
+PASS anon cannot SELECT system_parameters
+PASS anon cannot INSERT system_parameters
+PASS anon cannot UPDATE system_parameters
+PASS anon cannot DELETE system_parameters
+PASS anon cannot SELECT system_parameter_history
+PASS anon cannot INSERT system_parameter_history
+PASS anon cannot UPDATE system_parameter_history
+PASS anon cannot DELETE system_parameter_history
+PASS anon cannot reserve AI provider capacity
+PASS authenticated cannot SELECT system_parameters
+PASS authenticated cannot INSERT system_parameters
+PASS authenticated cannot UPDATE system_parameters
+PASS authenticated cannot DELETE system_parameters
+PASS authenticated cannot SELECT system_parameter_history
+PASS authenticated cannot INSERT system_parameter_history
+PASS authenticated cannot UPDATE system_parameter_history
+PASS authenticated cannot DELETE system_parameter_history
+PASS authenticated cannot reserve AI provider capacity
+PASS AI starts disabled until provider verification
+PASS runtime parameter edits preserve history
+PASS primary provider cap holds under concurrency
+PASS backup respects the combined daily AI ceiling
+PASS rejected reservations do not consume global capacity
+PASS null limits cannot bypass AI capacity validation
+All PostgreSQL regression checks passed; disposable database: lunch_test_db314f2d816640db9ed2577cc8dbd821

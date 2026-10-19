@@ -1,0 +1,57 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "process",
+      "launch",
+      "--device",
+      "00008101-000D44620111001E",
+      "--terminate-existing",
+      "--json-output",
+      "release-evidence/2026-10-08/redesign-device/iphone-launch.json",
+      "au.iapp.lunch"
+    ],
+    "commandType" : "devicectl.device.process.launch",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "642.16"
+  },
+  "result" : {
+    "deviceIdentifier" : "EECC81E4-36CE-57D9-924B-7210DEB4C166",
+    "launchOptions" : {
+      "activatedWhenStarted" : true,
+      "arguments" : [
+
+      ],
+      "environmentVariables" : {
+        "TERM" : "dumb"
+      },
+      "platformSpecificOptions" : {
+
+      },
+      "startStopped" : false,
+      "terminateExistingInstances" : true,
+      "user" : {
+        "active" : true
+      }
+    },
+    "process" : {
+      "auditToken" : [
+        4294967295,
+        501,
+        501,
+        501,
+        501,
+        20134,
+        0,
+        53264
+      ],
+      "executable" : "file:///private/var/containers/Bundle/Application/BFC24F3B-8AB3-4CB3-BEBB-A34B9EF16C3D/LunchApp.app/LunchApp",
+      "processIdentifier" : 20134
+    }
+  }
+}

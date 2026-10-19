@@ -1,0 +1,14 @@
+[
+  {
+    "endpoint": "groups-safety",
+    "httpStatus": 400,
+    "errorCode": "BAD_REQUEST",
+    "expectedStatus": 400
+  },
+  {
+    "endpoint": "invitations",
+    "httpStatus": 400,
+    "errorCode": "BAD_REQUEST",
+    "expectedStatus": 400
+  }
+]

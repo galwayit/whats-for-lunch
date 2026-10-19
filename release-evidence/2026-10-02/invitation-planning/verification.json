@@ -1,0 +1,76 @@
+{
+  "verified_at_utc": "2026-10-01T15:23:38.152785+00:00",
+  "scope": [
+    "full-screen app routes and error backgrounds",
+    "generated iOS and Android app icon",
+    "host name, per-person budget and payment details",
+    "guest place/time suggestions with host review"
+  ],
+  "tests": {
+    "shared": {
+      "tests": 141,
+      "failures": 0,
+      "errors": 0
+    },
+    "android": {
+      "tests": 32,
+      "failures": 0,
+      "errors": 0
+    },
+    "backend": {
+      "passed": 85,
+      "failed": 0
+    },
+    "ios_unit": {
+      "passed": 9,
+      "failed": 0
+    },
+    "ios_ui": {
+      "passed": 2,
+      "failed": 0
+    },
+    "postgres": {
+      "passed": 76,
+      "failed": 0
+    },
+    "web_script_fixture": "passed; no external requests"
+  },
+  "builds": {
+    "ios": {
+      "status": "signed Debug build passed",
+      "bundle_id": "au.iapp.lunch",
+      "version": "1.0.0",
+      "build": "2",
+      "binary_sha256": "b653c53a49149cdd293b7effb8c65c82a070ba7bf8829fe87831f58d915a722e",
+      "path": "/private/tmp/lunch-ai-provider-ios/Build/Products/Debug-iphoneos/LunchApp.app"
+    },
+    "android": {
+      "status": "Debug APK build passed",
+      "sha256": "8d5c566ef0fd1d26c1877c10f80e690b68eaf96489fe826448acd9445aa55682",
+      "path": "/Users/rayding/galway/what_we_have_for_lunch/androidApp/build/outputs/apk/debug/androidApp-debug.apk"
+    }
+  },
+  "ios_test_results": {
+    "unit": "/Users/rayding/Library/Developer/XcodeBuildMCP/workspaces/what_we_have_for_lunch-79b85cd66aeb/result-bundles/test_sim_2026-10-01T15-13-12-182Z_pid54175_65f0675b.xcresult",
+    "ui": "/Users/rayding/Library/Developer/XcodeBuildMCP/workspaces/what_we_have_for_lunch-79b85cd66aeb/result-bundles/test_sim_2026-10-01T15-17-34-553Z_pid54175_457138d2.xcresult"
+  },
+  "source_sha256": {
+    "backend/supabase/migrations/20261001144342_group_invitation_planning.sql": "54f3f00cb0993a043bdeb29c019265405e4a3659c5d10eec360552f529a1b96f",
+    "iosApp/LunchApp/App/RoutePresenter.swift": "9dc97f9eb595810ceaec616ad55d23ca1b51adb564859da8a9b5c6e8d7dd5d77",
+    "backend/web/invite/index.html": "8285499c830240c56c93534a37a812ce15fedfe7a9d0039d780a207e46bb37b1"
+  },
+  "deployment": {
+    "invitation_migration_applied": false,
+    "edge_functions_deployed": false,
+    "website_published": false,
+    "updated_iphone_installed": true,
+    "app_store_published": false
+  },
+  "limitations": [
+    "Tests used fictional local data and an isolated PostgreSQL container; no real invitations sent.",
+    "Chrome displayed the local invitation details but interactive browser control timed out; web submission logic was instead tested with the real page script in a fictional DOM/API fixture.",
+    "A combined Xcode UI/unit run stalled after UI tests passed; separate unit and UI reruns completed successfully.",
+    "Name-only Supabase metadata check found REVENUECAT_SECRET_API_KEY, GEMINI_API_KEY and OPENAI_API_KEY absent. Billing key is needed for the pending coordinated paid-backend rollout. AI keys are separately needed for AI place recommendations."
+  ],
+  "iphone_installation_evidence": "iphone-debug-install.json"
+}

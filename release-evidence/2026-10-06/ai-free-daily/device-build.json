@@ -1,0 +1,14 @@
+{
+  "appPath": "/private/tmp/lunch-ray-debug-20261006-chains-photos/Build/Products/Debug-iphoneos/LunchApp.app",
+  "identity": {
+    "CFBundleIdentifier": "au.iapp.lunch",
+    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleVersion": "5"
+  },
+  "sha256": {
+    "Info.plist": "50d225918866f98ae072eba1c9330b5d5125c73dde402e9a36358cdd80904aa0",
+    "LunchApp": "e4318c97b8c32ea3daef6ac055167222942070581836016f05673b32335823fa",
+    "LunchApp.debug.dylib": "86b538bf5ae7089594f1acd52ee8dc99ec21fc381402cacd27b16b06932a4c93",
+    "_CodeSignature/CodeResources": "6baa2f866bbfcc041cc14659d611aa87491b736e784dcc25269b19cc134555cd"
+  }
+}

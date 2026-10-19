@@ -1,0 +1,136 @@
+Configuration 'desktopTestRuntimeClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'desktopMainAnnotationProcessor' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'desktopMainCompileClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinCompilerPluginClasspathDesktopMain' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinBuildToolsApiClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'desktopCompileClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseDialectClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseMigrationEnv' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseIntellijEnv' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'desktopTestAnnotationProcessor' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'desktopTestCompileClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinCompilerPluginClasspathDesktopTest' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'androidApis' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'androidJdkImage' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'debugAnnotationProcessorClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'debugCompileClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'debugRuntimeClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinCompilerPluginClasspathAndroidDebug' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+> Task :androidApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :androidApp:preBuild UP-TO-DATE
+> Task :androidApp:preDebugBuild UP-TO-DATE
+> Task :androidApp:generateDebugBuildConfig UP-TO-DATE
+> Task :androidApp:generateDebugResValues UP-TO-DATE
+> Task :androidApp:generateDebugResources UP-TO-DATE
+> Task :androidApp:packageDebugResources UP-TO-DATE
+> Task :androidApp:parseDebugLocalResources UP-TO-DATE
+> Task :androidApp:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :androidApp:extractDeepLinksDebug UP-TO-DATE
+> Task :androidApp:javaPreCompileDebug UP-TO-DATE
+> Task :androidApp:preDebugUnitTestBuild UP-TO-DATE
+> Task :androidApp:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:generateCommonMainLunchDatabaseInterface UP-TO-DATE
+> Task :shared:compileKotlinDesktop UP-TO-DATE
+> Task :shared:compileDesktopMainJava NO-SOURCE
+> Task :shared:desktopProcessResources NO-SOURCE
+> Task :shared:processDesktopMainResources SKIPPED
+> Task :shared:desktopMainClasses UP-TO-DATE
+> Task :shared:desktopJar UP-TO-DATE
+> Task :shared:desktopTestProcessResources UP-TO-DATE
+> Task :shared:processDesktopTestResources SKIPPED
+> Task :shared:preBuild UP-TO-DATE
+> Task :shared:preDebugBuild UP-TO-DATE
+> Task :shared:writeDebugAarMetadata UP-TO-DATE
+> Task :shared:generateDebugResValues UP-TO-DATE
+> Task :shared:generateDebugResources UP-TO-DATE
+> Task :shared:packageDebugResources UP-TO-DATE
+> Task :shared:extractDeepLinksDebug UP-TO-DATE
+> Task :shared:processDebugManifest UP-TO-DATE
+> Task :shared:compileDebugLibraryResources UP-TO-DATE
+> Task :shared:parseDebugLocalResources UP-TO-DATE
+> Task :shared:generateDebugRFile UP-TO-DATE
+> Task :shared:compileDebugKotlinAndroid UP-TO-DATE
+> Task :shared:javaPreCompileDebug UP-TO-DATE
+> Task :shared:compileDebugJavaWithJavac NO-SOURCE
+> Task :shared:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :shared:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :shared:processDebugJavaRes UP-TO-DATE
+> Task :androidApp:checkDebugAarMetadata UP-TO-DATE
+> Task :androidApp:mapDebugSourceSetPaths UP-TO-DATE
+> Task :androidApp:mergeDebugResources UP-TO-DATE
+> Task :androidApp:processDebugMainManifest UP-TO-DATE
+> Task :androidApp:processDebugManifest UP-TO-DATE
+> Task :androidApp:processDebugManifestForPackage UP-TO-DATE
+> Task :androidApp:processDebugResources UP-TO-DATE
+> Task :shared:compileTestKotlinDesktop
+> Task :shared:compileDesktopTestJava NO-SOURCE
+> Task :shared:desktopTestClasses
+> Task :androidApp:compileDebugKotlin
+> Task :androidApp:compileDebugJavaWithJavac UP-TO-DATE
+> Task :androidApp:processDebugJavaRes UP-TO-DATE
+> Task :androidApp:bundleDebugClassesToCompileJar
+> Task :androidApp:bundleDebugClassesToRuntimeJar
+> Task :shared:desktopTest
+> Task :androidApp:compileDebugUnitTestKotlin
+> Task :androidApp:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :androidApp:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :androidApp:testDebugUnitTest
+
+BUILD SUCCESSFUL in 52s
+45 actionable tasks: 8 executed, 37 up-to-date

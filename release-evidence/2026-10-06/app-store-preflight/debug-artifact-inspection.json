@@ -1,0 +1,43 @@
+{
+  "kind": "Debug device artifact, not an App Store archive",
+  "info": {
+    "CFBundleIdentifier": "au.iapp.lunch",
+    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleVersion": "5",
+    "MinimumOSVersion": "18.0",
+    "DTSDKName": "iphoneos27.0",
+    "DTXcode": "2700",
+    "CFBundleIcons": {
+      "CFBundlePrimaryIcon": {
+        "CFBundleIconFiles": [
+          "AppIcon60x60"
+        ],
+        "CFBundleIconName": "AppIcon"
+      }
+    }
+  },
+  "privacy_manifests": [
+    "PrivacyInfo.xcprivacy",
+    "Firebase_FirebaseCore.bundle/PrivacyInfo.xcprivacy",
+    "GTMSessionFetcher_GTMSessionFetcherCore.bundle/PrivacyInfo.xcprivacy",
+    "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy",
+    "nanopb_nanopb.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-NSData.bundle/PrivacyInfo.xcprivacy",
+    "Firebase_FirebaseInstallations.bundle/PrivacyInfo.xcprivacy",
+    "Firebase_FirebaseCoreInternal.bundle/PrivacyInfo.xcprivacy",
+    "AppAuth_AppAuth.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-Logger.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-Reachability.bundle/PrivacyInfo.xcprivacy",
+    "Firebase_FirebaseMessaging.bundle/PrivacyInfo.xcprivacy",
+    "AppAuth_AppAuthCore.bundle/PrivacyInfo.xcprivacy",
+    "GoogleDataTransport_GoogleDataTransport.bundle/PrivacyInfo.xcprivacy",
+    "Promises_FBLPromises.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-Network.bundle/PrivacyInfo.xcprivacy",
+    "RevenueCat_RevenueCat.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-UserDefaults.bundle/PrivacyInfo.xcprivacy",
+    "GoogleUtilities_GoogleUtilities-Environment.bundle/PrivacyInfo.xcprivacy",
+    "GTMAppAuth_GTMAppAuth.bundle/PrivacyInfo.xcprivacy",
+    "GoogleSignIn_GoogleSignInSwift.bundle/PrivacyInfo.xcprivacy"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "backend/supabase/functions/_shared/apple.ts": "42409a19da7a677df609093491c7ca786a3b74ce8b6bc9c33000043d6f0b6307",
+  "backend/supabase/functions/_shared/billing.ts": "543830e88876918fd9585fc70bce9a456ffb53aa61ea50aebf9da4e8580b87c7",
+  "backend/supabase/functions/_shared/group-planning.ts": "8d0a8a99e0cb48c30b1f996de4c5aabc31d57866ecc87c80e25185e9240a1fe7",
+  "backend/supabase/functions/_shared/notify.ts": "7efe6f2087ca02b2e2aaa6e5560d599ab66b577eb02b4c5b273a3f406d3342ea",
+  "backend/supabase/functions/_shared/places.ts": "4d7dee987646b814835eba2cf7e4112954fa326e2e5f51682f4296e3b0e52eb5",
+  "backend/supabase/functions/account-delete/index.ts": "62ac50f6089a4297bc40166c6475e5def88876d68412facc55552552d6e8d49f",
+  "iosApp/LunchApp/Core/Engines/SwiftRecommendationEngine.swift": "74318df04e43e9651ee377ac0ef2044dc9dca90d1f554e9e1bff252723126417",
+  "iosApp/LunchApp/Core/KotlinLunchCore.swift": "d950c5e0538969295df5d638f5d2651eeeb64faed39fbb9f671488bf9e21f31b",
+  "iosApp/LunchApp/Features/Auth/SignInViewModel.swift": "2854105580144b727ae541e1d03f57d9a2d8bf289b23001d29876fdc371799c0",
+  "iosApp/LunchApp/Features/Home/HomeViewModel.swift": "fca7d1831784e827ea46a34b530774a7d3a95aee20b106eedc91bd68e15cd096",
+  "iosApp/LunchApp/Features/Shared/LoadState.swift": "b3d2f2f0167b1e95f207bcaee6a0923313c96dfedaa5a77d7c624db9f25a9f28",
+  "iosApp/scripts/copy_runtime_config.sh": "90e8affce41962fd05b5073b075a67dfe12ba25239d682f1b9e53f957315c118",
+  "iosApp/scripts/validate_release_config.py": "f16c653dfcae4d8344d2c4070e87b18541e661e39be0a0b1ceaf840192a36de1",
+  "shared/src/commonMain/kotlin/au/iapp/lunch/core/engine/RecommendationEngineImpl.kt": "75d7439c68a3a0e6519162aa2d6edda588552a31aa7abe9164721b91eac15979"
+}

@@ -1,0 +1,5 @@
+// Temporary, local test-runner signing. The application keeps its own team.
+LUNCH_TEAM_LunchApp = RYM9BD2B27
+LUNCH_TEAM_LunchAppTests = RYM9BD2B27
+LUNCH_TEAM_LunchAppUITests = 8976Q989K4
+DEVELOPMENT_TEAM = $(LUNCH_TEAM_$(TARGET_NAME))

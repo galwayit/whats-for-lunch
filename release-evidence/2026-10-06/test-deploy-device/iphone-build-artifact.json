@@ -1,0 +1,15 @@
+{
+  "CFBundleIdentifier": "au.iapp.lunch",
+  "CFBundleShortVersionString": "1.0.0",
+  "CFBundleVersion": "3",
+  "CFBundleIcons": {
+    "CFBundlePrimaryIcon": {
+      "CFBundleIconFiles": [
+        "AppIcon60x60"
+      ],
+      "CFBundleIconName": "AppIcon"
+    }
+  },
+  "binary_sha256": "25b6e97eb1dcbf1527732c34f6f821ee80bf2bb0a2abafbad4431be0466000f7",
+  "app_path": "/private/tmp/lunch-ray-debug-20261006/Build/Products/Debug-iphoneos/LunchApp.app"
+}

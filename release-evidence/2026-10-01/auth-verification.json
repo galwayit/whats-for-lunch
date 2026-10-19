@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-01",
+  "status": "native_google_configured_device_qualification_and_email_activation_pending",
+  "ios": {
+    "status": "SUCCEEDED",
+    "durationMs": 122627,
+    "counts": {
+      "passed": 101,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "simulator"
+  },
+  "shared": {
+    "passed": 137,
+    "failed": 0
+  },
+  "android_unit": {
+    "passed": 54,
+    "failed": 0
+  },
+  "android_instrumentation": {
+    "passed": 2,
+    "failed": 0,
+    "mode": "preview core, fictional accounts",
+    "device": "Pixel 9a API 36 temporary data image"
+  },
+  "configuration": {
+    "passed": 12,
+    "failed": 0
+  },
+  "provider_state": {
+    "supabase_project": "cswdcbmywzzisovsgwac",
+    "google_project": "whats-for-lunch-509417",
+    "google_oauth": "Web, iOS and Android debug clients created; external consent app in Testing; branding incomplete",
+    "email": "disabled; custom SMTP and hosted email settings still pending",
+    "google_supabase": "enabled; actual Web/iOS/Android debug client IDs saved, Web first; nonce checks on; email required",
+    "google_scopes": [
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ],
+    "google_test_users": [
+      "ray@getbillabee.com",
+      "ray2ding@gmail.com"
+    ],
+    "google_public_config": "../../config/google-oauth.json",
+    "google_web_client_secret": "not downloaded, stored or entered; native ID-token flow does not require it"
+  },
+  "live_oauth_verified": false,
+  "live_email_delivery_verified": false,
+  "provider_settings_saved": true,
+  "app_store_submitted": false,
+  "evidence": {
+    "ios_xcresult": "/private/tmp/lunch-auth-ios-final2.xcresult",
+    "kotlin_log": "/private/tmp/lunch-auth-final.log",
+    "android_ui_log": "auth-android-ui-tests.txt",
+    "android_screenshot": "auth-android-signin-preview.png",
+    "ios_screenshot": "auth-ios-signin-preview.jpg",
+    "google_policy": "google-auth-policy-review.jpg",
+    "ios_ui_xcresult": "/private/tmp/lunch-auth-ios-ui5.xcresult",
+    "ios_ui_log": "auth-ios-ui-tests.txt",
+    "ios_verification_screenshot": "auth-ios-verification-preview.png",
+    "google_clients": "google-oauth-clients-created.jpg",
+    "google_supabase": "supabase-google-enabled.jpg",
+    "google_test_users": "google-test-users-saved.jpg",
+    "google_scopes": "google-signin-scopes-saved.jpg",
+    "google_live_provider_check": "google-provider-live-check.json"
+  },
+  "limitations": [
+    "Successful Google login on actual iOS and Android devices is not yet verified",
+    "Android production Google OAuth client needs the actual Play App Signing certificate",
+    "Google consent app remains in Testing; the Audience page requires Branding completion before publication",
+    "SMTP credentials, sender/domain verification, templates and hosted email settings remain pending",
+    "Apple-linked deletion on Android still needs native Apple reauthentication on iOS or support handling",
+    "Paid store setup, server deployment and signed release qualification remain pending"
+  ],
+  "ios_ui": {
+    "status": "SUCCEEDED",
+    "passed": 2,
+    "failed": 0,
+    "mode": "preview core, fictional accounts",
+    "device": "iPhone 17 Pro iOS 26.5 simulator"
+  },
+  "google_activation_check": {
+    "google_enabled": true,
+    "email_enabled": false,
+    "invalid_id_token_status": 400,
+    "invalid_id_token_error": "invalid request",
+    "invalid_id_token_message": "Bad ID token",
+    "real_google_sign_in_tested": false
+  },
+  "google_config_followup": {
+    "date": "2026-10-01",
+    "ios_simulator_build": "SUCCEEDED",
+    "ios_launch_mode": "preview core; does not test real authentication",
+    "ios_build_log": "/Users/rayding/Library/Developer/XcodeBuildMCP/workspaces/what_we_have_for_lunch-79b85cd66aeb/logs/build_run_sim_2026-10-01T06-15-13-767Z_pid54175_80e67b14.log",
+    "compiled_ios_client_ids_match": true,
+    "compiled_ios_callback_scheme_matches": true,
+    "compiled_android_debug_server_client_id_matches": true,
+    "public_client_ids": {
+      "projectId": "whats-for-lunch-509417",
+      "googleServerClientId": "52984609044-tcno2jm34ve7v05umri16hvdoalfpp2v.apps.googleusercontent.com",
+      "googleIosClientId": "52984609044-hhqngdbo0iea1k7f54bgi9mlnfusbps1.apps.googleusercontent.com",
+      "googleAndroidDebugClientId": "52984609044-9okqqiiu3e6qs8gih5ujik4li6t05e8i.apps.googleusercontent.com",
+      "androidDebugSha1": "CB:3A:6F:4F:7F:F3:F4:48:1E:F5:84:79:00:C7:4E:E4:9D:35:A4:05"
+    },
+    "full_auth_test_suites_rerun_after_public_id_change": false,
+    "android_debug_build": "SUCCEEDED",
+    "android_build_log": "/private/tmp/lunch-google-config-android-build-final.log",
+    "google_branding_remaining": "Home, privacy and terms URLs are blank; authorised domains currently contain only the Supabase host"
+  }
+}

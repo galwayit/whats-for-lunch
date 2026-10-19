@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-06T00:20:53.917991+00:00",
+  "endpoint": "https://cswdcbmywzzisovsgwac.supabase.co/functions/v1/ai-recommend",
+  "mode": "unauthenticated validation only; fictional candidates; stops before AI or quota calls",
+  "cases": [
+    {
+      "case": "excluded_hungry_jacks",
+      "status": 400,
+      "expectedStatus": 400,
+      "response": {
+        "error": {
+          "code": "BAD_REQUEST",
+          "message": "candidates is empty"
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": "excluded_burger_king",
+      "status": 400,
+      "expectedStatus": 400,
+      "response": {
+        "error": {
+          "code": "BAD_REQUEST",
+          "message": "candidates is empty"
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": "allowed_hungry_jacks",
+      "status": 401,
+      "expectedStatus": 401,
+      "response": {
+        "error": {
+          "code": "SIGN_IN_REQUIRED",
+          "message": "Sign in to use this feature"
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": "independent_not_excluded",
+      "status": 401,
+      "expectedStatus": 401,
+      "response": {
+        "error": {
+          "code": "SIGN_IN_REQUIRED",
+          "message": "Sign in to use this feature"
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": "mixed_keeps_independent",
+      "status": 401,
+      "expectedStatus": 401,
+      "response": {
+        "error": {
+          "code": "SIGN_IN_REQUIRED",
+          "message": "Sign in to use this feature"
+        }
+      },
+      "passed": true
+    }
+  ]
+}

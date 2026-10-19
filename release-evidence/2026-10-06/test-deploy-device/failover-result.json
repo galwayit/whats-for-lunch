@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-05T23:34:53.509Z",
+  "status": "ok",
+  "valid_recommendation": true,
+  "attempts": [
+    {
+      "provider": "google",
+      "model": "gemini-3.8-flash",
+      "attempt": 1,
+      "route_role": "primary",
+      "tokens": 0,
+      "latency_ms": 291,
+      "ok": false,
+      "error": "http_402"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "attempt": 2,
+      "route_role": "backup",
+      "tokens": 359,
+      "latency_ms": 2831,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

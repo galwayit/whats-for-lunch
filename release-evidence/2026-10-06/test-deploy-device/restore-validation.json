@@ -1,0 +1,1 @@
+{"restore": "passed", "pending_migrations": "passed", "before": {"groups": 1, "rsvps": 1, "entitlements": 2, "configuration_history": 1}, "after": {"groups": 1, "rsvps": 1, "entitlements": 2, "configuration_history": 1}, "test_database": "lunch_restore_2e36b7aba58048c18bbf236fd0fd866e"}

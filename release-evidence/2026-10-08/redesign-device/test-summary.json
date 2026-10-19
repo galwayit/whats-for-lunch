@@ -1,0 +1,26 @@
+{
+  "result": "All 156 unique device tests passed across the final full and targeted runs",
+  "device": "Ray\u2019s iPhone 12 Pro",
+  "osVersion": "27.0.1",
+  "fullRun": {
+    "build": "8",
+    "passed": 154,
+    "failed": 2,
+    "summary": "build8-test-summary.json"
+  },
+  "resolvedFailures": {
+    "build": "9",
+    "passed": 2,
+    "failed": 0,
+    "summary": "auth-final-test-summary.json"
+  },
+  "deviceUnitTests": 145,
+  "deviceUITests": 11,
+  "configurationTests": 15,
+  "finalAppBuild": "9",
+  "sameBinaryFullSuite": false,
+  "finalChangeScope": [
+    "Sign-in scrolling dismisses the keyboard immediately",
+    "Authentication UI test scrolling avoids relying on stale keyboard accessibility state"
+  ]
+}

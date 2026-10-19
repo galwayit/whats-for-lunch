@@ -1,0 +1,41 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "325A9499-AF4D-4D20-BE0C-5F33CB865878.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Place picker full-screen error_0_4DA0E2DF-806C-4C1C-9278-F9389E35C17D.png",
+        "timestamp" : 1790867887.029
+      }
+    ],
+    "testIdentifier" : "InvitationPlanningUITests/testFailedPlacePickerKeepsHeaderAtTopOfFullScreen()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/InvitationPlanningUITests/testFailedPlacePickerKeepsHeaderAtTopOfFullScreen"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "A81E73A5-FD57-43F1-9765-504D95FA6147.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Guest suggestion awaiting host_0_2556B753-AA64-4F61-A6E8-35A8C3F02524.png",
+        "timestamp" : 1790867898.595
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "24652AF0-070A-4C37-948D-A9F4DDC7BD24.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Invitation details and three choices_0_309E0B4E-B6DF-43CE-A69C-3CF399668CA0.png",
+        "timestamp" : 1790867891.853
+      }
+    ],
+    "testIdentifier" : "InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation"
+  }
+]

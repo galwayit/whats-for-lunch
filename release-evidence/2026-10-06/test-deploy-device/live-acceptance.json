@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-10-05T23:47:30.849Z",
+  "status": "ok",
+  "checks": {
+    "disclosure": {
+      "http": 200,
+      "providers": [
+        "Google Gemini",
+        "OpenAI"
+      ]
+    },
+    "consent_guard": {
+      "http": 403,
+      "code": "AI_CONSENT_REQUIRED"
+    },
+    "recommendation": {
+      "http": 200,
+      "valid": true
+    },
+    "daily_limit": {
+      "http": 402,
+      "code": "AI_DAILY_LIMIT"
+    },
+    "paid_gate": {
+      "http": 403,
+      "code": "HOST_REQUIRES_PRO"
+    },
+    "attempts": [
+      {
+        "provider": "openai",
+        "model": "gpt-6-luna",
+        "ok": true,
+        "error": null,
+        "route_role": "primary"
+      }
+    ]
+  },
+  "fixture_removed": true
+}

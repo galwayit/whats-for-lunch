@@ -1,0 +1,56 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.4/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration 'skieRuntimeForIosArm64CompileKlibraries' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'iosArm64CompileKlibraries' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'iosArm64DebugFrameworkExport' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinCompilerClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'skieCompilerPlugin' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'skieSubPlugin' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'kotlinCompilerPluginClasspathIosArm64Main' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseDialectClasspath' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseMigrationEnv' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'LunchDatabaseIntellijEnv' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:downloadKotlinNativeDistribution UP-TO-DATE
+> Task :shared:generateCommonMainLunchDatabaseInterface UP-TO-DATE
+> Task :shared:skieProcessSwiftSourcesIosArm64 UP-TO-DATE
+> Task :shared:compileKotlinIosArm64 UP-TO-DATE
+> Task :shared:skieCreateSkieDirectoriesDebugFrameworkIosArm64 UP-TO-DATE
+> Task :shared:skieCreateConfigurationDebugFrameworkIosArm64
+> Task :shared:skieUnpackSwiftSourcesDebugFrameworkIosArm64 UP-TO-DATE
+> Task :shared:linkDebugFrameworkIosArm64 UP-TO-DATE
+> Task :shared:skieUploadAnalyticsDebugFrameworkIosArm64
+
+BUILD SUCCESSFUL in 7s
+10 actionable tasks: 3 executed, 7 up-to-date

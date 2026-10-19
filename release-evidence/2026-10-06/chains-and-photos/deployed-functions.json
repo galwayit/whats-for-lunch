@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "ai-recommend",
+    "status": "ACTIVE",
+    "version": 10,
+    "verify_jwt": false,
+    "updated_at": 1791245983686
+  },
+  {
+    "slug": "groups-propose",
+    "status": "ACTIVE",
+    "version": 10,
+    "verify_jwt": true,
+    "updated_at": 1791246011178
+  }
+]

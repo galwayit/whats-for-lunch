@@ -1,0 +1,19 @@
+{
+  "configuration": "Debug",
+  "appPath": "/private/tmp/lunch-ray-redesign-20261008/Build/Products/Debug-iphoneos/LunchApp.app",
+  "identity": {
+    "CFBundleIdentifier": "au.iapp.lunch",
+    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleVersion": "6",
+    "UIAppFonts": [
+      "BricolageGrotesque-Bold.ttf",
+      "BricolageGrotesque-ExtraBold.ttf"
+    ]
+  },
+  "sha256": {
+    "Info.plist": "76b01a13dca3c03caa5051ffe54cbf8a3ee1ffe97a1cee8cf0e53172ffb033f0",
+    "LunchApp": "e9ad3cd7eb684166940db42c490a9239761c9a4743f349c4cff80456e2a37119",
+    "LunchApp.debug.dylib": "0994659d318285a11747fd5db034698233eec4198b0ed451d6e6d005eb70ddea",
+    "Assets.car": "c3bcde67befd221a7e87126bacc6e60df6a7896c1324c73fa74959f1ad2efbf0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-10-05T23:56:04.182958+00:00",
+  "project": "cswdcbmywzzisovsgwac",
+  "method": "Read-only SQL of AI parameters and aggregate usage; secret listing printed only whether the global quota override exists. No new inference requests.",
+  "ai_enabled": true,
+  "primary": {"provider": "openai", "model_free": "gpt-6-luna", "model_pro": "gpt-6-luna", "daily_request_limit": 200, "max_output_tokens": 2048, "timeout_ms": 10000},
+  "backup": {"provider": "google", "model_free": "gemini-3.8-flash", "model_pro": "gemini-3.8-flash", "daily_request_limit": 400, "max_output_tokens": 2048, "timeout_ms": 10000},
+  "inactive_profile": {"provider": "claude", "model": "claude-haiku-4-5"},
+  "AI_DAILY_REQUEST_LIMIT_override_present": false,
+  "effective_global_daily_attempt_limit_from_code_default": 500,
+  "user_daily_limits_from_code": {"free": 1, "pro": 10, "reset_timezone": "UTC", "group_calls_share_pro_allowance": true},
+  "last_30_days_retained_ai_requests": {"attempts": 4, "model": "gemini-2.5-flash", "ok": false, "total_tokens": 0, "first_at": "2026-09-23T03:22:20.841238+00:00", "last_at": "2026-10-01T13:52:43.47324+00:00"},
+  "interpretation": "No retained successful current-model production cohort for estimating typical input/output usage. Earlier acceptance-test records were removed during fixture cleanup. Four failed historical records with zero tokens do not establish zero provider charges.",
+  "latest_saved_provider_probe": {"source": "../test-deploy-device/provider-results.json", "checked_at": "2026-10-05T23:31:35.067Z", "openai": {"status": "ok", "total_tokens": 354, "latency_ms": 4633}, "google": {"status": "failed", "reason": "http_402"}, "representative_of_normal_20_candidate_request": false}
+}

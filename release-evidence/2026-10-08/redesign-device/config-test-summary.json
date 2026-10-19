@@ -1,0 +1,6 @@
+{
+  "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s iosApp/scripts -p 'test_*.py'",
+  "tests": 15,
+  "result": "passed",
+  "durationSeconds": 0.321
+}

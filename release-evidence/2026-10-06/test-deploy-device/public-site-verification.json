@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://lunch.iapp.au/i/TESTONLY",
+    "http": 200,
+    "sha256": "8285499c830240c56c93534a37a812ce15fedfe7a9d0039d780a207e46bb37b1",
+    "invitation_scripts_match": true
+  },
+  {
+    "url": "https://lunch.iapp.au/privacy/",
+    "http": 200,
+    "sha256": "8011065a17ec8d6343506cbb5a5856c03db8d79b219ac53c11108e0025a7d093",
+    "openai_disclosed": true
+  },
+  {
+    "url": "https://lunch.iapp.au/.well-known/apple-app-site-association",
+    "http": 200,
+    "sha256": "88203e7e801500de7a3679356f9da240da7dddd7b28be6e4a8034d59fdf840ac",
+    "team_bundle_matches": true
+  }
+]

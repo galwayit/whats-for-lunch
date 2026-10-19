@@ -1,0 +1,35 @@
+/private/tmp/lunch-maintenance-20261006/supabase/functions/invitations-respond/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/account-delete/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/places-details/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/push-register/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/revenuecat-webhook/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/places-photo/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-create/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-propose/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-confirm/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/ai-config/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-cancel/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-suggestions/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/invitations/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/ai-recommend/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/invitations-suggest/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/groups-update/index.ts
+/private/tmp/lunch-maintenance-20261006/supabase/functions/places-nearby/index.ts
+Checked 17 files
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/account-delete/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/ai-config/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/ai-recommend/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-cancel/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-confirm/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-create/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-propose/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-suggestions/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/groups-update/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/invitations-respond/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/invitations-suggest/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/invitations/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/places-details/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/places-nearby/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/places-photo/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/push-register/index.ts
+Check file:///private/tmp/lunch-maintenance-20261006/supabase/functions/revenuecat-webhook/index.ts

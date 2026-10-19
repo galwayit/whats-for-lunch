@@ -1,0 +1,47 @@
+{
+  "installed_at_utc": "2026-10-01T23:48:48.715512+00:00",
+  "device_name": "Ray’s iPhone",
+  "device_model": "iPhone 12 Pro",
+  "configuration": "Debug",
+  "artifact": {
+    "bundle_id": "au.iapp.lunch",
+    "version": "1.0.0",
+    "build": "2",
+    "debuggable": true,
+    "team": "RYM9BD2B27",
+    "icon": "AppIcon",
+    "binary_sha256": "b653c53a49149cdd293b7effb8c65c82a070ba7bf8829fe87831f58d915a722e",
+    "artifact_path": "/private/tmp/lunch-ai-provider-ios/Build/Products/Debug-iphoneos/LunchApp.app",
+    "signature_verified": true
+  },
+  "installation": {
+    "status": "success",
+    "method": "in-place app installation; no uninstall or data reset",
+    "installed_app": {
+      "appClip": false,
+      "builtByDeveloper": true,
+      "bundleIdentifier": "au.iapp.lunch",
+      "bundleVersion": "2",
+      "containerAccessible": true,
+      "defaultApp": false,
+      "hidden": false,
+      "internalApp": false,
+      "name": "What We Have For Lunch",
+      "removable": true,
+      "url": "file:///private/var/containers/Bundle/Application/69A60ACE-C791-4B00-92D6-2A8E0A88AC1B/LunchApp.app/",
+      "version": "1.0.0"
+    }
+  },
+  "launch": {
+    "status": "success",
+    "process_id": 1952,
+    "arguments": []
+  },
+  "verification": "Build and signature verified; installed bundle/version and normal launch confirmed using devicectl. No manual device flow claimed.",
+  "backend_rollout_completed": false,
+  "limitations": [
+    "New invitation planning and suggestion actions require the matching backend rollout.",
+    "AI availability still depends on server provider credentials and deployment."
+  ],
+  "build_log": "iphone-debug-install-build.log"
+}

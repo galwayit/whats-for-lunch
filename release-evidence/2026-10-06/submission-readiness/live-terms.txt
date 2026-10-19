@@ -1,0 +1,43 @@
+Browser tab: 1798256066, Title: "Terms of Use · What We Have for Lunch", URL: "https://lunch.iapp.au/terms/".
+1 AXWebArea Terms of Use · What We Have for Lunch, URL: lunch.iapp.au/terms/
+	2 container
+		3 link Description: What We Have for Lunch, Value: lunch.iapp.au/
+		4 container
+			5 link Description: Privacy, Value: lunch.iapp.au/privacy/
+			6 link Description: Support, Value: lunch.iapp.au/support/
+		7 container
+			8 text LEGAL
+			9 heading Terms of Use, Value: 1
+				10 text Terms of Use
+			11 text By using What We Have for Lunch, you agree to Apple’s 
+			12 link Description: Standard Licensed Application End User License Agreement, Value: apple.com/legal/internet-services/itunes/dev/stdeula/
+			13 text  and these additional terms.
+			14 heading Recommendations, Value: 2
+				15 text Recommendations
+			16 text Restaurant, pricing, opening-hour, allergen, and dietary information can be incomplete or change. Confirm important information directly with the venue. The app does not provide medical, dietary, or financial advice. Google Maps features are also subject to the 
+			17 link Description: Google Maps/Google Earth Additional Terms of Service, Value: maps.google.com/help/terms_maps/
+			18 text  and 
+			19 link Description: Google Privacy Policy, Value: policies.google.com/privacy
+			20 text .
+			21 heading Your account and content, Value: 2
+				22 text Your account and content
+			23 text You are responsible for your account activity and for content you submit. Do not use the service unlawfully, interfere with it, or submit content that infringes another person’s rights. Do not post harassment, threats, hateful or sexual content, scams, spam, or other abusive material in invitations, names or suggestions. Shared text is subject to an automated abuse filter and reports can be reviewed by support. We may remove content that violates these rules. You can report content and block a person from an invitation or group page, or contact 
+			24 link Description: support, Value: lunch.iapp.au/support/
+			25 text  for help.
+			26 heading Subscriptions, Value: 2
+				27 text Subscriptions
+			28 text Any price, billing period, trial, and renewal terms are shown before purchase. Payment is charged to your Apple account. Subscriptions renew automatically unless cancelled at least 24 hours before the current period ends. Manage or cancel them in your Apple account settings. Restore Purchases is available in the app. Lunch Pro includes up to 10 AI requests per UTC day, shared between personal and group suggestions. Free accounts can make one personal AI request per UTC day. Failed AI requests are refunded to that allowance where recorded by the service. Availability also depends on provider and service capacity. Deleting your account does not cancel your Apple subscription.
+			29 heading Availability and liability, Value: 2
+				30 text Availability and liability
+			31 text The service is provided on an “as available” basis. To the extent permitted by Australian law, we are not liable for indirect or consequential loss. Nothing in these terms excludes rights that cannot lawfully be excluded, including applicable Australian Consumer Law guarantees.
+			32 heading Contact, Value: 2
+				33 text Contact
+			34 text Questions can be sent to 
+			35 link Description: hello@iapp.au, Value: mailto:hello@iapp.au
+			36 text . Updated 6 October 2026.
+		37 text © 2026 Lei Ding · Melbourne, Australia
+	38 container grammarly-integration
+		39 text {"mode":"full","isActive":true,"isUserDisabled":false}
+	40 container grammarly-global-assistant-notch
+
+The focused UI element is 1 AXWebArea Terms of Use · What We Have for Lunch, URL: lunch.iapp.au/terms/

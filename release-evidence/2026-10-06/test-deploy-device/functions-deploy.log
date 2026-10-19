@@ -1,0 +1,188 @@
+WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+Deploying Function: places-nearby
+Deploying Function: places-details
+Deploying Function: places-photo
+Deploying Function: ai-config
+Uploading asset (places-photo): supabase/functions/places-photo/index.ts
+Uploading asset (places-nearby): supabase/functions/places-nearby/index.ts
+Uploading asset (places-details): supabase/functions/places-details/index.ts
+Uploading asset (ai-config): supabase/functions/ai-config/index.ts
+Uploading asset (places-photo): supabase/functions/_shared/supabase.ts
+Uploading asset (ai-config): supabase/functions/_shared/supabase.ts
+Uploading asset (places-nearby): supabase/functions/_shared/validate.ts
+Uploading asset (places-photo): supabase/functions/_shared/places.ts
+Uploading asset (ai-config): supabase/functions/_shared/errors.ts
+Uploading asset (places-details): supabase/functions/_shared/validate.ts
+Uploading asset (places-nearby): supabase/functions/_shared/errors.ts
+Uploading asset (places-details): supabase/functions/_shared/errors.ts
+Uploading asset (places-nearby): supabase/functions/_shared/supabase.ts
+Uploading asset (ai-config): supabase/functions/_shared/ai-config.ts
+Uploading asset (places-photo): supabase/functions/_shared/types.ts
+Uploading asset (places-details): supabase/functions/_shared/types.ts
+Uploading asset (places-nearby): supabase/functions/_shared/places.ts
+Uploading asset (ai-config): supabase/functions/_shared/types.ts
+Uploading asset (places-nearby): supabase/functions/_shared/types.ts
+Uploading asset (places-photo): supabase/functions/_shared/group-planning.ts
+Uploading asset (places-details): supabase/functions/_shared/group-planning.ts
+Uploading asset (ai-config): supabase/functions/_shared/group-planning.ts
+Uploading asset (places-nearby): supabase/functions/_shared/group-planning.ts
+Uploading asset (places-photo): supabase/functions/_shared/validate.ts
+Uploading asset (places-details): supabase/functions/_shared/supabase.ts
+Uploading asset (ai-config): supabase/functions/_shared/validate.ts
+Uploading asset (places-nearby): supabase/functions/_shared/haversine.ts
+Uploading asset (places-photo): supabase/functions/_shared/errors.ts
+Uploading asset (places-nearby): supabase/functions/_shared/nearby.ts
+Uploading asset (places-details): supabase/functions/_shared/places.ts
+Uploading asset (places-photo): supabase/functions/_shared/haversine.ts
+Uploading asset (places-details): supabase/functions/_shared/haversine.ts
+Uploading asset (places-photo): supabase/functions/_shared/budget.ts
+Uploading asset (places-details): supabase/functions/_shared/budget.ts
+Uploading asset (places-nearby): supabase/functions/_shared/budget.ts
+Deploying Function: ai-recommend
+Uploading asset (ai-recommend): supabase/functions/ai-recommend/index.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/validate.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/errors.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/types.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/group-planning.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/tier.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/billing.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/supabase.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/revenuecat-v2.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/revenuecat.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/prompt.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/auth.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/ai-access.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/quota.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/ai-schema.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/ai-router.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/ai-providers.ts
+Uploading asset (ai-recommend): supabase/functions/_shared/ai-config.ts
+Deploying Function: groups-create
+Uploading asset (groups-create): supabase/functions/groups-create/index.ts
+Uploading asset (groups-create): supabase/functions/_shared/validate.ts
+Uploading asset (groups-create): supabase/functions/_shared/errors.ts
+Uploading asset (groups-create): supabase/functions/_shared/types.ts
+Uploading asset (groups-create): supabase/functions/_shared/group-planning.ts
+Uploading asset (groups-create): supabase/functions/_shared/tier.ts
+Uploading asset (groups-create): supabase/functions/_shared/billing.ts
+Uploading asset (groups-create): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-create): supabase/functions/_shared/revenuecat-v2.ts
+Uploading asset (groups-create): supabase/functions/_shared/revenuecat.ts
+Uploading asset (groups-create): supabase/functions/_shared/invites.ts
+Uploading asset (groups-create): supabase/functions/_shared/auth.ts
+Deploying Function: groups-propose
+Uploading asset (groups-propose): supabase/functions/groups-propose/index.ts
+Uploading asset (groups-propose): supabase/functions/_shared/validate.ts
+Uploading asset (groups-propose): supabase/functions/_shared/errors.ts
+Uploading asset (groups-propose): supabase/functions/_shared/types.ts
+Uploading asset (groups-propose): supabase/functions/_shared/group-planning.ts
+Uploading asset (groups-propose): supabase/functions/_shared/tier.ts
+Uploading asset (groups-propose): supabase/functions/_shared/billing.ts
+Uploading asset (groups-propose): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-propose): supabase/functions/_shared/revenuecat-v2.ts
+Uploading asset (groups-propose): supabase/functions/_shared/revenuecat.ts
+Uploading asset (groups-propose): supabase/functions/_shared/prompt.ts
+Uploading asset (groups-propose): supabase/functions/_shared/nearby.ts
+Uploading asset (groups-propose): supabase/functions/_shared/places.ts
+Uploading asset (groups-propose): supabase/functions/_shared/haversine.ts
+Uploading asset (groups-propose): supabase/functions/_shared/budget.ts
+Uploading asset (groups-propose): supabase/functions/_shared/auth.ts
+Uploading asset (groups-propose): supabase/functions/_shared/ai-access.ts
+Uploading asset (groups-propose): supabase/functions/_shared/quota.ts
+Uploading asset (groups-propose): supabase/functions/_shared/ai-schema.ts
+Uploading asset (groups-propose): supabase/functions/_shared/ai-router.ts
+Uploading asset (groups-propose): supabase/functions/_shared/ai-providers.ts
+Uploading asset (groups-propose): supabase/functions/_shared/ai-config.ts
+Deploying Function: groups-confirm
+Uploading asset (groups-confirm): supabase/functions/groups-confirm/index.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/validate.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/errors.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/types.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/group-planning.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/notify.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/push.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/invites.ts
+Uploading asset (groups-confirm): supabase/functions/_shared/auth.ts
+Deploying Function: groups-cancel
+Uploading asset (groups-cancel): supabase/functions/groups-cancel/index.ts
+Uploading asset (groups-cancel): supabase/functions/_shared/validate.ts
+Uploading asset (groups-cancel): supabase/functions/_shared/errors.ts
+Uploading asset (groups-cancel): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-cancel): supabase/functions/_shared/auth.ts
+Deploying Function: groups-update
+Uploading asset (groups-update): supabase/functions/groups-update/index.ts
+Uploading asset (groups-update): supabase/functions/_shared/types.ts
+Uploading asset (groups-update): supabase/functions/_shared/group-planning.ts
+Uploading asset (groups-update): supabase/functions/_shared/validate.ts
+Uploading asset (groups-update): supabase/functions/_shared/errors.ts
+Uploading asset (groups-update): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-update): supabase/functions/_shared/invites.ts
+Uploading asset (groups-update): supabase/functions/_shared/auth.ts
+Deploying Function: groups-suggestions
+Uploading asset (groups-suggestions): supabase/functions/groups-suggestions/index.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/types.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/group-planning.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/validate.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/errors.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/supabase.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/invites.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/auth.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/notify.ts
+Uploading asset (groups-suggestions): supabase/functions/_shared/push.ts
+Deploying Function: invitations
+Uploading asset (invitations): supabase/functions/invitations/index.ts
+Uploading asset (invitations): supabase/functions/_shared/types.ts
+Uploading asset (invitations): supabase/functions/_shared/group-planning.ts
+Uploading asset (invitations): supabase/functions/_shared/validate.ts
+Uploading asset (invitations): supabase/functions/_shared/errors.ts
+Uploading asset (invitations): supabase/functions/_shared/supabase.ts
+Uploading asset (invitations): supabase/functions/_shared/invites.ts
+Uploading asset (invitations): supabase/functions/_shared/auth.ts
+Deploying Function: invitations-respond
+Uploading asset (invitations-respond): supabase/functions/invitations-respond/index.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/validate.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/errors.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/types.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/group-planning.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/supabase.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/notify.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/push.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/invites.ts
+Uploading asset (invitations-respond): supabase/functions/_shared/auth.ts
+Deploying Function: invitations-suggest
+Uploading asset (invitations-suggest): supabase/functions/invitations-suggest/index.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/types.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/group-planning.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/validate.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/errors.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/supabase.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/invites.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/auth.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/notify.ts
+Uploading asset (invitations-suggest): supabase/functions/_shared/push.ts
+Deploying Function: push-register
+Uploading asset (push-register): supabase/functions/push-register/index.ts
+Uploading asset (push-register): supabase/functions/_shared/validate.ts
+Uploading asset (push-register): supabase/functions/_shared/errors.ts
+Uploading asset (push-register): supabase/functions/_shared/supabase.ts
+Uploading asset (push-register): supabase/functions/_shared/auth.ts
+Deploying Function: revenuecat-webhook
+Uploading asset (revenuecat-webhook): supabase/functions/revenuecat-webhook/index.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/supabase.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/revenuecat.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/errors.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/billing.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/revenuecat-v2.ts
+Uploading asset (revenuecat-webhook): supabase/functions/_shared/auth.ts
+Deploying Function: account-delete
+Uploading asset (account-delete): supabase/functions/account-delete/index.ts
+Uploading asset (account-delete): supabase/functions/_shared/validate.ts
+Uploading asset (account-delete): supabase/functions/_shared/errors.ts
+Uploading asset (account-delete): supabase/functions/_shared/supabase.ts
+Uploading asset (account-delete): supabase/functions/_shared/apple.ts
+Uploading asset (account-delete): supabase/functions/_shared/push.ts
+Uploading asset (account-delete): supabase/functions/_shared/auth.ts
+{"project_ref":"cswdcbmywzzisovsgwac","functions":["places-nearby","places-details","places-photo","ai-config","ai-recommend","groups-create","groups-propose","groups-confirm","groups-cancel","groups-update","groups-suggestions","invitations","invitations-respond","invitations-suggest","push-register","revenuecat-webhook","account-delete"],"dashboard_url":"https://supabase.com/dashboard/project/cswdcbmywzzisovsgwac/functions","message":"Deployed Functions."}
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.117.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

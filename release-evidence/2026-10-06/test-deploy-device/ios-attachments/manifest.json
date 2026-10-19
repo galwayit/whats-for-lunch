@@ -1,0 +1,56 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "029853A6-FD44-4B60-AC15-B26D5A5AEBE5.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Email verification form_0_0FDF92C1-9983-4810-822D-77C8F42A0807.png",
+        "timestamp" : 1791242932.12
+      }
+    ],
+    "testIdentifier" : "AuthScreenUITests/testRegistrationCanVerifyEmailAndDismiss()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/AuthScreenUITests/testRegistrationCanVerifyEmailAndDismiss"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "BEAE5769-4B98-4E49-BF3B-8876B004C7CE.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Place picker full-screen error_0_914A4FA7-B04A-41F5-9AFB-1B78688B4E62.png",
+        "timestamp" : 1791242944.248
+      }
+    ],
+    "testIdentifier" : "InvitationPlanningUITests/testFailedPlacePickerKeepsHeaderAtTopOfFullScreen()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/InvitationPlanningUITests/testFailedPlacePickerKeepsHeaderAtTopOfFullScreen"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "8E0C5AA3-E3B7-4FA6-BD0A-9A2F068094B4.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Guest suggestion awaiting host_0_08CC24D6-8183-4545-8513-0C0BFD5040B0.png",
+        "timestamp" : 1791242955.568
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "AD55C649-2742-4340-9CC0-4CC9B431063A.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Invitation details and three choices_0_3C9C5ADA-DE73-4449-AAD3-9D0017C72CD9.png",
+        "timestamp" : 1791242949.008
+      }
+    ],
+    "testIdentifier" : "InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/InvitationPlanningUITests/testGuestCanSendAlternativeFromInvitation"
+  }
+]

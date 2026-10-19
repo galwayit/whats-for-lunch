@@ -1,0 +1,26 @@
+{
+  "sharedJvm": {
+    "tests": 148,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sharedAndroid": {
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "androidApp": {
+    "tests": 66,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "backend": {
+    "tests": 107,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

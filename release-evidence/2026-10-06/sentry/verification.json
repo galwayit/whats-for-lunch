@@ -1,0 +1,92 @@
+{
+  "recorded_at": "2026-10-06T01:39:11.761222+00:00",
+  "organisation": "iapp-do",
+  "project": "apple",
+  "sdk": "sentry-cocoa 9.30.0 / Sentry-Dynamic",
+  "release": "au.iapp.lunch@1.0.0+6",
+  "checks": {
+    "ios_full_suite": {
+      "passed": 142,
+      "failed": 0,
+      "xcresult": "/private/tmp/lunch-sentry-ios-tests-5.xcresult"
+    },
+    "ios_unit_suite_after_path_scrubbing": {
+      "passed": 137,
+      "failed": 0,
+      "xcresult": "/private/tmp/lunch-sentry-ios-tests-6.xcresult"
+    },
+    "configuration_and_script_tests": {
+      "passed": 15,
+      "failed": 0,
+      "rerun_after_no_sources_guard": true
+    }
+  },
+  "synthetic_event": {
+    "id": "1d040d9ff3e14207be89c89d6bbc944e",
+    "issue": "https://iapp-do.sentry.io/issues/7775603715/",
+    "environment": "development",
+    "confirmed_in_browser": true,
+    "symbolication": "Verified live: AppDiagnostics.start (AppDiagnostics.swift:60), LunchApp.makeEnvironment (LunchApp.swift:37).",
+    "prior_smoke_event": "efa751cad43648f28c7135c8ce2e115f",
+    "privacy_verification_event": "e23381d2d10b4076b0c031913fa0fccf"
+  },
+  "privacy": {
+    "sdk_content_filtering": "unit tests passed",
+    "server_ip_storage": "disabled",
+    "server_sensitive_fields": [
+      "city",
+      "subdivision",
+      "region",
+      "country_code",
+      "ip_address"
+    ],
+    "server_scrubbing_new_event_verification": "Confirmed live: Geography is [Filtered], [Filtered] ([Filtered]); no app user identity displayed.",
+    "file_path_scrubbing": "Confirmed live before symbol upload: loaded image uses its filename without simulator directory; matching UUIDs successfully symbolicated after upload."
+  },
+  "source_sha256": {
+    "iosApp/LunchApp/App/AppDiagnostics.swift": "234418e80773a19b8694b5c20f59d96ef8abed89e6e9908599b891254faabf42",
+    "iosApp/LunchApp/Config/Sentry.plist": "5bef3bcdcc93b95a1c8204708055a45ea067cae07a984fd730fe4e78dd56e3ee",
+    "iosApp/LunchApp/LunchApp.swift": "3d9fe32757f48b2ba69e4f35a8ec39f08d8fe48637f2ead317f16f384bb23a77",
+    "iosApp/LunchApp/Features/Shared/LoadState.swift": "573f33633a7d8b4c82856a3cb3a9905a0d8a97cf1ae75a265d65dd0a7385d983",
+    "iosApp/LunchApp/PrivacyInfo.xcprivacy": "19283352f5c936f93a8b6db23b3f91e2141e45fc9d884fbd2be653a4259e9003",
+    "iosApp/LunchAppTests/AppDiagnosticsTests.swift": "0aa49ba0a8f08d65927d28e02d417f77864fcaaeb0552f2541d8453bbe901fc4",
+    "iosApp/scripts/upload_sentry_symbols.sh": "11739caf83878a6256f3c65d8609b0b417f7e87ba417fa85a496fa771e3c677a",
+    "iosApp/scripts/test_sentry_symbols.py": "03df889c113f384621796fa15b82e9030b2c7f9d078329537b9aca6b835cdf15",
+    "iosApp/LunchApp.xcodeproj/project.pbxproj": "8d4f8d753320a01610975f255063b1065dd21a9c9fcd366febeaaf0196420d97",
+    "iosApp/LunchApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "e49c11da34d1eca2cbcd055ec510c1ef259780d4812f2167be7f3f9153e0ce82",
+    "backend/web/privacy/index.html": "b67c663775bc6258171eb47e6d9dff66195cc70ce6c535ed0ccd578db3bc4672"
+  },
+  "binary_uuid": "UUID: 3A26D6B9-B3AA-3D75-9780-E76C76161FD2 (arm64) /private/tmp/lunch-sentry-ios/Build/Products/Debug-iphonesimulator/LunchApp.app/LunchApp.debug.dylib",
+  "dsym_uuid": "UUID: DA732057-985F-368C-A498-6A73A752518A (arm64) /private/tmp/lunch-sentry-ios/Build/Products/Debug-iphonesimulator/LunchApp.app.dSYM/Contents/Resources/DWARF/LunchApp\nUUID: 3A26D6B9-B3AA-3D75-9780-E76C76161FD2 (arm64) /private/tmp/lunch-sentry-ios/Build/Products/Debug-iphonesimulator/LunchApp.app.dSYM/Contents/Resources/DWARF/LunchApp.debug.dylib",
+  "limitations": [
+    "No physical iPhone installation in this task",
+    "No Release archive or App Store upload in this task",
+    "Privacy-page changes are local, not published",
+    "No production native crash test yet",
+    "Android and backend SDKs are not configured"
+  ],
+  "symbol_upload_verified_at": "2026-10-06T01:45:35.721552+00:00",
+  "build_credential": {
+    "name": "Lunch iOS symbol uploads",
+    "scope": "org:ci",
+    "local_configuration": ".sentryclirc",
+    "permissions": "0600",
+    "git_ignored": true,
+    "git_tracked": false,
+    "present_in_app_bundle": false,
+    "token_id": "1148158"
+  },
+  "symbol_upload": {
+    "cli_version": "3.8.0",
+    "source_bundles_included": false,
+    "no_sources_flag": true,
+    "processing": "complete",
+    "verified_in_sentry_ui": true,
+    "debug_ids": [
+      "da732057-985f-368c-a498-6a73a752518a",
+      "3a26d6b9-b3aa-3d75-9780-e76c76161fd2",
+      "2c6ba268-ede9-38e5-82bd-927be03e1e87",
+      "7de262d6-adea-342c-b63e-6339f3036044"
+    ]
+  }
+}

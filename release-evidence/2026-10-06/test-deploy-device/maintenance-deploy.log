@@ -1,0 +1,38 @@
+WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+Deploying Function: account-delete
+Deploying Function: ai-config
+Deploying Function: ai-recommend
+Deploying Function: groups-cancel
+Uploading asset (groups-cancel): supabase/functions/groups-cancel/index.ts
+Uploading asset (account-delete): supabase/functions/account-delete/index.ts
+Uploading asset (ai-config): supabase/functions/ai-config/index.ts
+Uploading asset (ai-recommend): supabase/functions/ai-recommend/index.ts
+Deploying Function: groups-confirm
+Uploading asset (groups-confirm): supabase/functions/groups-confirm/index.ts
+Deploying Function: groups-create
+Deploying Function: groups-propose
+Uploading asset (groups-create): supabase/functions/groups-create/index.ts
+Uploading asset (groups-propose): supabase/functions/groups-propose/index.ts
+Deploying Function: groups-suggestions
+Uploading asset (groups-suggestions): supabase/functions/groups-suggestions/index.ts
+Deploying Function: groups-update
+Uploading asset (groups-update): supabase/functions/groups-update/index.ts
+Deploying Function: invitations
+Uploading asset (invitations): supabase/functions/invitations/index.ts
+Deploying Function: invitations-respond
+Uploading asset (invitations-respond): supabase/functions/invitations-respond/index.ts
+Deploying Function: invitations-suggest
+Uploading asset (invitations-suggest): supabase/functions/invitations-suggest/index.ts
+Deploying Function: places-details
+Uploading asset (places-details): supabase/functions/places-details/index.ts
+Deploying Function: places-nearby
+Uploading asset (places-nearby): supabase/functions/places-nearby/index.ts
+Deploying Function: places-photo
+Uploading asset (places-photo): supabase/functions/places-photo/index.ts
+Deploying Function: push-register
+Uploading asset (push-register): supabase/functions/push-register/index.ts
+Deploying Function: revenuecat-webhook
+Uploading asset (revenuecat-webhook): supabase/functions/revenuecat-webhook/index.ts
+{"project_ref":"cswdcbmywzzisovsgwac","functions":["account-delete","ai-config","ai-recommend","groups-cancel","groups-confirm","groups-create","groups-propose","groups-suggestions","groups-update","invitations","invitations-respond","invitations-suggest","places-details","places-nearby","places-photo","push-register","revenuecat-webhook"],"dashboard_url":"https://supabase.com/dashboard/project/cswdcbmywzzisovsgwac/functions","message":"Deployed Functions."}
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.117.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

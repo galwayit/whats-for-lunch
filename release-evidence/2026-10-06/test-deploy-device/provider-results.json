@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-05T23:31:35.067Z",
+  "configured_enabled": false,
+  "providers": {
+    "google": {
+      "status": "failed",
+      "model": "gemini-3.8-flash",
+      "reason": "http_402",
+      "latency_ms": 368
+    },
+    "openai": {
+      "status": "ok",
+      "model": "gpt-6-luna",
+      "tokens": 354,
+      "latency_ms": 4633
+    }
+  }
+}

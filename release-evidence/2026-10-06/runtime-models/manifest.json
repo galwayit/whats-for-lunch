@@ -1,0 +1,51 @@
+{
+  "project": "cswdcbmywzzisovsgwac",
+  "parameter": "ai.providers",
+  "scope": "settings tables and disabled seed only; no function or billing deployment",
+  "openai_key_update_observed": "2026-10-05T23:07:26.138Z",
+  "new_key_or_model_live_generation_tested": false,
+  "unit_tests": 103,
+  "database_assertions": {
+    "postgres-fresh.log": 48,
+    "postgres-settings-first.log": 52
+  },
+  "sql_sha256": "19a13c5d34cd38eb68f37302e11f052c542bd1059b0d8c4f8688d79b9bbcdffa",
+  "settings_table_url": "https://supabase.com/dashboard/project/cswdcbmywzzisovsgwac/editor/17772?schema=public",
+  "live_verification": {
+    "backup": "openai",
+    "client_table_access": false,
+    "enabled": false,
+    "history_entries": 1,
+    "models": [
+      {
+        "models": {
+          "free": "gemini-3.8-flash",
+          "pro": "gemini-3.8-flash"
+        },
+        "provider": "google"
+      },
+      {
+        "models": {
+          "free": "gpt-6-luna",
+          "pro": "gpt-6-luna"
+        },
+        "provider": "openai"
+      },
+      {
+        "models": {
+          "free": "claude-haiku-4-5",
+          "pro": "claude-haiku-4-5"
+        },
+        "provider": "claude"
+      }
+    ],
+    "parameter_key": "ai.providers",
+    "primary": "google",
+    "project": "cswdcbmywzzisovsgwac",
+    "quota_table": null,
+    "reservations_table": null,
+    "rls_enabled": true,
+    "service_can_read_and_update": true,
+    "updated_at": "2026-10-05T23:15:55.417146+00:00"
+  }
+}

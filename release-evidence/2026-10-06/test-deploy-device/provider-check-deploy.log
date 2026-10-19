@@ -1,0 +1,13 @@
+Uploading asset (lunch-provider-check): supabase/functions/lunch-provider-check/index.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/revenuecat.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/ai-schema.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/supabase.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/ai-config.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/types.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/group-planning.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/validate.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/errors.ts
+Uploading asset (lunch-provider-check): supabase/functions/_shared/ai-providers.ts
+{"project_ref":"cswdcbmywzzisovsgwac","functions":["lunch-provider-check"],"dashboard_url":"https://supabase.com/dashboard/project/cswdcbmywzzisovsgwac/functions","message":"Deployed Functions."}
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.117.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

@@ -1,0 +1,90 @@
+{
+  "checked_at": "2026-10-05T23:37:21.839551+00:00",
+  "results": [
+    {
+      "function": "account-delete",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "ai-config",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "ai-recommend",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-cancel",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-confirm",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-create",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-propose",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-suggestions",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "groups-update",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "invitations",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "invitations-respond",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "invitations-suggest",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "places-details",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "places-nearby",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "places-photo",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "push-register",
+      "status": 503,
+      "maintenance": true
+    },
+    {
+      "function": "revenuecat-webhook",
+      "status": 503,
+      "maintenance": true
+    }
+  ]
+}

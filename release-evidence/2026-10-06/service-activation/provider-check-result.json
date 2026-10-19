@@ -1,0 +1,54 @@
+{
+  "checked_at": "2026-10-05T15:43:50.176Z",
+  "revenuecat": {
+    "subscriptions": {
+      "status": "provider_error",
+      "http_status": 404,
+      "error_type": "resource_missing"
+    },
+    "products": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 3,
+      "products": [
+        {
+          "id": "prod8276b473c0",
+          "store_identifier": "yearly",
+          "type": "subscription"
+        },
+        {
+          "id": "prod8906ff6d15",
+          "store_identifier": "lifetime",
+          "type": "non_consumable"
+        },
+        {
+          "id": "prodf57e01282b",
+          "store_identifier": "monthly",
+          "type": "subscription"
+        }
+      ]
+    }
+  },
+  "google": {
+    "status": "ok",
+    "model": "gemini-3.8-flash",
+    "tokens": 777,
+    "latency_ms": 4102
+  },
+  "openai": {
+    "status": "failed",
+    "model": "gpt-5.4-mini",
+    "reason": "http_403",
+    "latency_ms": 2031
+  },
+  "configuration": {
+    "GOOGLE_PLACES_API_KEY": true,
+    "REVENUECAT_PRO_PRODUCT_IDS": false,
+    "REVENUECAT_ALLOW_APPLE_SANDBOX": false,
+    "APPLE_CLIENT_ID": false,
+    "APPLE_TEAM_ID": false,
+    "APPLE_KEY_ID": false,
+    "APPLE_SIGN_IN_PRIVATE_KEY": false,
+    "FCM_SERVICE_ACCOUNT_JSON": false
+  }
+}

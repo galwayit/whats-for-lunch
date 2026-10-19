@@ -1,0 +1,16 @@
+{
+  "created_at": "2026-10-05T23:39:56.542759+00:00",
+  "private_directory": "/private/tmp/lunch-predeploy-20261006",
+  "files": {
+    "schema.sql": {
+      "sha256": "ba5ebcb761f4de4750460e463f5e5ff8a8515b96949a1b8bdbb6daae50fb0f42",
+      "bytes": 19230,
+      "mode": "0o600"
+    },
+    "data.sql": {
+      "sha256": "159768a60c291e6d2b5af0353a8d9d86968f89ee28b687de374d6af4475d879c",
+      "bytes": 971556,
+      "mode": "0o600"
+    }
+  }
+}

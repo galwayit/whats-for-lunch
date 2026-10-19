@@ -1,0 +1,17 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "E3B9925E-34C2-4A45-8B17-F75F7D01AC5E",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "D9F3809C-CAAC-42A1-99EF-E2D3FFFB97F2.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Subscription prompt after one free AI request_0_9AFD0562-6FCF-4AE0-AF46-412D65646FF0.png",
+        "timestamp" : 1791247250.268
+      }
+    ],
+    "testIdentifier" : "AIFreeAllowanceUITests/testFirstFreeRequestThenSubscriptionPaywall()",
+    "testIdentifierURL" : "test://com.apple.xcode/LunchApp/LunchAppUITests/AIFreeAllowanceUITests/testFirstFreeRequestThenSubscriptionPaywall"
+  }
+]

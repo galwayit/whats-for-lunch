@@ -1,0 +1,134 @@
+{
+  "assessed_on": "2026-10-06",
+  "currency": "USD",
+  "methodology": "Forecast, not observed provider charges. Prompt size ranges use characters/4 to characters/3, not an exact tokenizer; provider framing is excluded. Operation budgets add headroom. All assumed output tokens include reasoning. OpenAI estimates conservatively price all input at the cache-write rate without also charging the base input rate. No cache-read savings, tax, FX, app-store fees, backend, Places or photos included in AI estimates.",
+  "rates_per_million_tokens": {
+    "openai": {
+      "model": "gpt-6-luna",
+      "input": 0.1,
+      "cached_input": 0.01,
+      "cache_write": 0.125,
+      "output": 0.5,
+      "source": "https://developers.openai.com/api/docs/pricing"
+    },
+    "google": {
+      "model": "gemini-3.8-flash",
+      "input": 0.75,
+      "output": 3.75,
+      "valid_through": "2026-12-31",
+      "source": "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"
+    },
+    "google_2027": {
+      "model": "gemini-3.8-flash",
+      "input": 1.5,
+      "output": 7.5,
+      "valid_from": "2027-01-01",
+      "source": "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"
+    },
+    "claude": {
+      "model": "claude-haiku-4-5",
+      "input": 1,
+      "output": 5,
+      "source": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
+    }
+  },
+  "prompt_sizes": [
+    {
+      "label": "why_this",
+      "prompt_chars": 2503,
+      "schema_chars": 889,
+      "approximate_input_tokens": [
+        848,
+        1131
+      ]
+    },
+    {
+      "label": "ask_ai",
+      "prompt_chars": 8133,
+      "schema_chars": 889,
+      "approximate_input_tokens": [
+        2256,
+        3008
+      ]
+    },
+    {
+      "label": "group_proposals",
+      "prompt_chars": 6465,
+      "schema_chars": 299,
+      "approximate_input_tokens": [
+        1691,
+        2255
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "name": "why_this",
+      "input_tokens": 1500,
+      "output_tokens_including_reasoning": 500,
+      "openai_usd_per_request": 0.0004375,
+      "openai_usd_per_1000_requests": 0.4375
+    },
+    {
+      "name": "ask_ai",
+      "input_tokens": 4000,
+      "output_tokens_including_reasoning": 1000,
+      "openai_usd_per_request": 0.001,
+      "openai_usd_per_1000_requests": 1
+    },
+    {
+      "name": "group_proposals",
+      "input_tokens": 3000,
+      "output_tokens_including_reasoning": 800,
+      "openai_usd_per_request": 0.000775,
+      "openai_usd_per_1000_requests": 0.775
+    },
+    {
+      "name": "ask_ai_at_output_cap",
+      "input_tokens": 4000,
+      "output_tokens_including_reasoning": 2048,
+      "openai_usd_per_request": 0.001524,
+      "openai_usd_per_1000_requests": 1.524
+    }
+  ],
+  "monthly": [
+    {
+      "requests": 30,
+      "openai_usd": 0.03,
+      "google_usd_if_every_request_uses_backup": 0.20249999999999999
+    },
+    {
+      "requests": 90,
+      "openai_usd": 0.09,
+      "google_usd_if_every_request_uses_backup": 0.6075
+    },
+    {
+      "requests": 300,
+      "openai_usd": 0.3,
+      "google_usd_if_every_request_uses_backup": 2.025
+    },
+    {
+      "requests": 30000,
+      "openai_usd": 30,
+      "google_usd_if_every_request_uses_backup": 202.5
+    }
+  ],
+  "comparisons_per_1000_full_asks": {
+    "openai_uncached_input": 0.9,
+    "openai_cache_write_input": 1,
+    "google_2026": 6.75,
+    "google_2027": 13.5,
+    "claude": 9,
+    "openai_plus_5_percent_google_failover": 1.3375000000000001
+  },
+  "places_example": {
+    "basis": "Global list pricing, first paid volume tier, after shared billing-account free caps; assumes one fresh Nearby Enterprise request for every full Ask AI or group action.",
+    "nearby_usd_per_request": 0.035,
+    "details_with_reviews_usd_per_request": 0.025,
+    "photo_usd_per_request": 0.007,
+    "free_monthly_events_per_relevant_sku": 1000,
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "marginal_nearby_usd_for_300_operations": 10.500000000000002,
+    "account_example_30000_nearby_requests_usd": 1015.0000000000001
+  }
+}

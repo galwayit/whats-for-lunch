@@ -1,0 +1,8 @@
+{
+  "checked_at": "2026-10-05T23:41:34.370Z",
+  "status": "failed",
+  "checks": {
+    "failed_stage": "sign_in_fixture"
+  },
+  "fixture_removed": true
+}

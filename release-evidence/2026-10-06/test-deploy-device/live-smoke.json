@@ -1,0 +1,102 @@
+{
+  "checked_at": "2026-10-05T23:46:42.373573+00:00",
+  "functions": [
+    {
+      "function": "account-delete",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "ai-config",
+      "status": 200,
+      "code": null
+    },
+    {
+      "function": "ai-recommend",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "groups-cancel",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "groups-confirm",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "groups-create",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "groups-propose",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "groups-suggestions",
+      "status": 401,
+      "code": "SIGN_IN_REQUIRED"
+    },
+    {
+      "function": "groups-update",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "invitations",
+      "status": 400,
+      "code": "BAD_REQUEST"
+    },
+    {
+      "function": "invitations-respond",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "invitations-suggest",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "places-details",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "places-nearby",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "places-photo",
+      "status": 400,
+      "code": "BAD_REQUEST"
+    },
+    {
+      "function": "push-register",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "function": "revenuecat-webhook",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    }
+  ],
+  "places_nearby": {
+    "status": 200,
+    "count": 20,
+    "error": null
+  },
+  "auth": {
+    "status": 200,
+    "email_enabled": true,
+    "google_enabled": true,
+    "apple_enabled": true,
+    "email_confirmation_required": true
+  }
+}

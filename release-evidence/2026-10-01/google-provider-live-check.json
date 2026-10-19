@@ -1,0 +1,8 @@
+{
+  "google_enabled": true,
+  "email_enabled": false,
+  "invalid_id_token_status": 400,
+  "invalid_id_token_error": "invalid request",
+  "invalid_id_token_message": "Bad ID token",
+  "real_google_sign_in_tested": false
+}

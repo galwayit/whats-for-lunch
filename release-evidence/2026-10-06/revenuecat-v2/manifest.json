@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-06",
+  "scope": "RevenueCat REST API v2 backend migration",
+  "revenuecat_project_id": "proj66f64377",
+  "supabase_project_id": "cswdcbmywzzisovsgwac",
+  "checks": {
+    "backend_make_check": "passed",
+    "backend_make_test": {
+      "passed": 102,
+      "failed": 0
+    },
+    "git_diff_check": "passed"
+  },
+  "key": {
+    "name": "Lunch Supabase backend - v2",
+    "version": "V2",
+    "state": "generated in Chrome and confirmed in RevenueCat API keys list; secret value masked",
+    "permissions": [
+      "customer_information:subscriptions:read",
+      "project_configuration:products:read"
+    ],
+    "other_permissions": "No access",
+    "issue_token": false,
+    "creation_ui_utc": "2026-10-05 15:26 UTC",
+    "evidence": "key-created-masked.jpg",
+    "stored_in_supabase_by_agent": false
+  },
+  "deployment": "not deployed",
+  "live_credential_and_purchase_verification": "not performed",
+  "files_sha256": {
+    "backend/supabase/functions/_shared/revenuecat.ts": "d41fb9de303e2b3e37c0b666ed67d14d1b06541a07b891bee94e8675d3d0372e",
+    "backend/supabase/functions/_shared/revenuecat-v2.ts": "55b17bc8411776c0b1e4c04577a4ed1e118103e7f1639dfe8dd929c6595d5142",
+    "backend/supabase/functions/_shared/billing.ts": "6f91ee7edb09f2f864f6ba9abb4338ab425f6f7ac774dac8c72999e7ee2ba61a",
+    "backend/supabase/functions/_shared/revenuecat_test.ts": "b69c1ebb8b6d4e7c78cce4e569f9becfaf4618568a4703f9bdd748e25e60ed80",
+    "backend/supabase/functions/_shared/revenuecat-v2_test.ts": "5da787b807c3be49a351422c0fec5b59b25b0c204067938f43fe22edb8fecb6c",
+    "backend/production.env.example": "92db9ea1641cfc964a348845c11666f56a1c3090386dd493e550e0ae138b3058",
+    "backend/README.md": "c29a05b116951848c21c8a5bc517a90256327110f24b0832b34b2a961c85c6b4",
+    "backend/REVENUECAT.md": "1e9a4766921d770b6290395f94b0458d7856c1a8bc1cfc3bd404df17d0dc9fe7"
+  }
+}

@@ -1,0 +1,114 @@
+Check _shared/ai-access_test.ts
+Check _shared/ai-router_test.ts
+Check _shared/apple_test.ts
+Check _shared/auth_test.ts
+Check _shared/errors_test.ts
+Check _shared/geohash_test.ts
+Check _shared/haversine_test.ts
+Check _shared/invites_test.ts
+Check _shared/places_test.ts
+Check _shared/prompt_test.ts
+Check _shared/push_test.ts
+Check _shared/quota_test.ts
+Check _shared/revenuecat_test.ts
+Check _shared/tier_test.ts
+running 1 test from ./_shared/ai-access_test.ts
+both AI endpoints reject absent, revoked and obsolete consent ... ok (554µs)
+running 21 tests from ./_shared/ai-router_test.ts
+successful primary makes one bounded call, selects tier model and never sends to backup ... ok (40ms)
+primary HTTP 401 falls back once and records both attempts ... ok (4ms)
+primary HTTP 403 falls back once and records both attempts ... ok (582µs)
+primary HTTP 404 falls back once and records both attempts ... ok (190µs)
+primary HTTP 408 falls back once and records both attempts ... ok (257µs)
+primary HTTP 429 falls back once and records both attempts ... ok (249µs)
+primary HTTP 500 falls back once and records both attempts ... ok (204µs)
+primary HTTP 503 falls back once and records both attempts ... ok (228µs)
+missing primary key can use a configured backup without reserving a primary call ... ok (3ms)
+no credentials makes no upstream calls ... ok (275µs)
+timeout aborts primary and makes one backup request ... ok (9ms)
+malformed or semantically invalid output uses backup ... ok (388µs)
+refusals and bad requests never fail over ... ok (197µs)
+both failures return safe error and never attempt a third provider ... ok (152µs)
+capacity failure never calls an upstream; database failure does not bypass budget ... ok (358µs)
+configuration rejects duplicated routes, secret values and unsafe compatible endpoints ... ok (15ms)
+provider disclosure invalidates prior consent but model changes and route swaps do not ... ok (15ms)
+OpenAI and Claude adapters use their current structured output APIs ... ok (344µs)
+compatible providers require exact operator allowlist and use their own secret ... ok (262µs)
+truncated and refused structured responses do not pass validation ... ok (267µs)
+malformed provider content blocks still allow fallback instead of throwing an internal error ... ok (248µs)
+running 3 tests from ./_shared/apple_test.ts
+Apple exchange must belong to the signed-in account and native bundle ... ok (2ms)
+Apple client assertion uses a valid ES256 signature and a five minute lifetime ... ok (51ms)
+Apple revocation only happens after a verified same-account code exchange ... ok (6ms)
+running 2 tests from ./_shared/auth_test.ts
+billing identity cannot be overridden by a client header ... ok (4ms)
+an anonymous RevenueCat id is not an authentication credential ... ok (353µs)
+running 4 tests from ./_shared/errors_test.ts
+handle answers preflight, rejects wrong methods and maps ApiError ... ok (8ms)
+handle hides unexpected errors behind a generic 500 ...
+------- post-test output -------
+[/fn] unhandled: secret detail
+----- post-test output end -----
+handle hides unexpected errors behind a generic 500 ... ok (2ms)
+readJsonObject rejects non-objects with 400 ... ok (2ms)
+readJsonObject bounds streamed bodies without Content-Length ... ok (700µs)
+running 3 tests from ./_shared/geohash_test.ts
+geohashEncode reproduces published vectors ... ok (420µs)
+geohashEncode defaults to precision 6 and rejects bad input ... ok (314µs)
+nearby points share a cell, distant points do not ... ok (69µs)
+running 3 tests from ./_shared/haversine_test.ts
+haversineKm matches known great-circle distances ... ok (852µs)
+haversineKm is zero for the same point and symmetric ... ok (150µs)
+roundKm keeps two decimals ... ok (82µs)
+running 6 tests from ./_shared/invites_test.ts
+Crockford alphabet has 32 symbols without I, L, O, U ... ok (431µs)
+isValidInviteCode accepts 8 Crockford characters only ... ok (109µs)
+normaliseInviteCode upper-cases and applies decoding aliases ... ok (67µs)
+inviteUrl tolerates a missing trailing slash ... ok (30µs)
+buildInvitation converts rows to the Kotlin JSON shape with epoch seconds ... ok (191µs)
+findMyRsvp prefers the user id, then the guest token ... ok (81µs)
+running 7 tests from ./_shared/places_test.ts
+mapPlace maps a nearby Place resource to the Restaurant JSON ... ok (694µs)
+mapPlace handles missing optional fields and drops places without id or name ... ok (113µs)
+mapPlace on a details resource fills phone, website and opening hours; reviews map ... ok (328µs)
+extractCuisineTypes reproduces the legacy labels from New API types ... ok (47µs)
+extractFeatures keeps the legacy names and order ... ok (28µs)
+photoProxyUrl, normaliseQuery and applyFilters ... ok (172µs)
+photo, provider and review source attributions survive mapping ... ok (115µs)
+running 9 tests from ./_shared/prompt_test.ts
+buildRecommendationPrompt matches the Dart snapshot ... ok (444µs)
+buildRecommendationPrompt leaves an empty line when there are no cravings ... ok (64µs)
+buildRecommendationPrompt caps the list at 20 restaurants but reports the full count ... ok (76µs)
+parseRecommendationResponse drops hallucinated place ids and keeps rank order ... ok (250µs)
+parseRecommendationResponse takes factor weights from the first recommendation only ... ok (57µs)
+parseRecommendationResponse tolerates a json code fence ... ok (88µs)
+parseRecommendationResponse rejects malformed payloads ... ok (388µs)
+stripJsonFence only strips a wrapping fence ... ok (21µs)
+group proposal prompt and parser round-trip candidates ... ok (129µs)
+running 4 tests from ./_shared/push_test.ts
+base64UrlEncode uses the URL alphabet without padding ... ok (630µs)
+pemToDer strips armour and whitespace ... ok (327µs)
+parseServiceAccount validates the secret shape without echoing it ... ok (500µs)
+signServiceAccountJwt produces a verifiable RS256 token ... ok (84ms)
+running 6 tests from ./_shared/quota_test.ts
+free tier with 0 used is allowed ... ok (388µs)
+free tier with 1 used is denied with resetsAt at next Sydney midnight ... ok (46ms)
+pro tier is always allowed ... ok (105µs)
+nextLocalMidnight handles UTC and a DST transition ... ok (429µs)
+localDay buckets by the caller's zone ... ok (485µs)
+normaliseTimeZone falls back to UTC for garbage ... ok (401µs)
+running 9 tests from ./_shared/revenuecat_test.ts
+exact Pro entitlement with a current Apple subscription grants access ... ok (2ms)
+unrelated entitlement, unknown product and missing customer fail closed ... ok (70µs)
+Test Store purchases can never unlock the production backend ... ok (116µs)
+Apple sandbox access requires explicit backend configuration ... ok (66µs)
+expiry, refunds, unknown environment and malformed expiry cannot grant permanent Pro ... ok (100µs)
+billing grace preserves access through a verified grace period ... ok (35µs)
+transfers reconcile both accounts without trusting an absent source row ... ok (191µs)
+provider failures retry rather than silently removing a paid entitlement ... ok (4ms)
+webhook secrets compare exactly ... ok (66µs)
+running 1 test from ./_shared/tier_test.ts
+tierFromRow honours is_pro and expires_at ... ok (334µs)
+
+ok | 79 passed | 0 failed (915ms)
+

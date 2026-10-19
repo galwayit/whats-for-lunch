@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-01",
+  "base_commit": "22c32c17fae86d20d106725ac9d236739081ae14",
+  "tested_uncommitted_working_tree": true,
+  "tests": {
+    "shared": {
+      "tests": 128,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "android": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ios": {
+      "tests": 95,
+      "failures": 0,
+      "xcresult": "/private/tmp/lunch-remediation-ios-tests-final.xcresult"
+    },
+    "backend": {
+      "tests": 58,
+      "failures": 0,
+      "log": "/private/tmp/lunch-remediation-backend-final.log"
+    },
+    "postgres": {
+      "checks": 24,
+      "failures": 0,
+      "log": "/private/tmp/lunch-remediation-postgres-final.log"
+    },
+    "release_config": {
+      "tests": 6,
+      "failures": 0
+    }
+  },
+  "ios_run": "Debug simulator with preview data; prices and trial are fixtures",
+  "remote_migration_dry_run": [
+    "20261001035112_production_billing_security.sql"
+  ],
+  "deployed": false,
+  "app_store_uploaded": false,
+  "app_store_submitted": false
+}

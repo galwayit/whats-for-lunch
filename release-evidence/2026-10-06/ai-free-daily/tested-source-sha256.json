@@ -1,0 +1,23 @@
+{
+  "iosApp/LunchApp/Features/AI/AIRecommendationsViewModel.swift": "a888f5bc909419a745f5af95f304b82fd22042b79d26a198ef1a4d9409b28708",
+  "iosApp/LunchApp/Features/AI/AIRecommendationsView.swift": "efea417b6a10c36ae90da38a649a412063ea994b71136fb82ac85d06e3d6e0fd",
+  "iosApp/LunchApp/Core/Preview/PreviewServices.swift": "e39c7a884034b40e7a0b7fa1662af833e4dbd29385d36b6b328e254e4532d1b1",
+  "iosApp/LunchApp/App/AppEnvironment.swift": "6c0071f0ef312cfccf0ef4ea83ace9f11634292dd7332ca82ae6824ce587abec",
+  "iosApp/LunchApp/Copy/Copy.swift": "dc977fe2806ccc3c9633bd2e82acbc49c5ca3573a21cd870ff85b984c9b10c15",
+  "iosApp/LunchAppTests/ViewModelTests.swift": "b82be4eb5587fdd68640a198133fa014900563947a06525f9a6809d6337540a1",
+  "iosApp/LunchAppUITests/AIFreeAllowanceUITests.swift": "5f4d84f2cbb06bd65a3d1c8b5e1ea9325601d60562978a50d7bf50bf8efbd962",
+  "androidApp/src/main/kotlin/au/iapp/lunch/ui/features/ai/AiRecommendationsViewModel.kt": "e23dbbaf5f1534b30d3a1cdc3a8371fa5593299e0d9d47f449107fa9fb56ad85",
+  "androidApp/src/main/kotlin/au/iapp/lunch/ui/features/ai/AiRecommendationsScreen.kt": "0f613b5f31fa219cff3e78b3d053384ecd3ea15264f37ca82cd325d95b044b08",
+  "androidApp/src/main/kotlin/au/iapp/lunch/preview/PreviewServices.kt": "2223c15d7cc54d59a1b2a858745a6b561e01f7196a8f39d56ae814bf6de9d6cb",
+  "androidApp/src/main/kotlin/au/iapp/lunch/app/AppEnvironment.kt": "34f59ea1006f13721fe918c0b3cc44e3ef24d779e8425303bb7d21d12df3c93e",
+  "androidApp/src/main/res/values/strings.xml": "dbc78172db214b5acdeef07644b021215d78b3298f67bdde66758a48be5c2475",
+  "androidApp/src/test/kotlin/au/iapp/lunch/ui/features/AiRecommendationsViewModelTest.kt": "481d981b3d0327852781390fbf7d6884577a8d45c72f78244dbe8f2753cdb4ef",
+  "shared/src/commonMain/kotlin/au/iapp/lunch/core/service/GateServiceImpl.kt": "6c4cfba825bdb69d34e18db62b6bb5f1aa5dcc24d9b1109696b81f275ff9fe00",
+  "shared/src/desktopTest/kotlin/au/iapp/lunch/core/service/GateServiceTest.kt": "d1d03633f6cdbd0f79b9f5cc011eb0931c6e00b73938169146c5ca233dbec122",
+  "shared/src/desktopTest/kotlin/au/iapp/lunch/core/service/AiRecommendationServiceTest.kt": "5dfeed47409053e7bf38c6fdf87f364abbf9530556ed218405f9dcb9b2f457ec",
+  "backend/supabase/functions/_shared/ai-access.ts": "d7d454b58d7198a740e9ca79f95ef3e42424ea07207d0c696d83e57408197734",
+  "backend/supabase/functions/_shared/ai-access_test.ts": "c260657b872ca96b9d0a6f7defab127c1cfbe2e43c01eff215c621db0b2caec4",
+  "backend/supabase/functions/_shared/quota.ts": "0109917fd8ccf89413dedc49fe696a67163e5d470068bd89756644a0ea1248c1",
+  "backend/supabase/functions/_shared/quota_test.ts": "ee35c3c2c4736c0814f2005b1493b40a29c458cb6c30cb7127b134868970b662",
+  "backend/supabase/functions/ai-recommend/index.ts": "80653b9b9c7b7a9a0dd78edd0f8e73757fc6bc970cc46526ef36e9614024d210"
+}

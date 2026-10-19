@@ -1,0 +1,8 @@
+
+au.iapp.lunch.auth.AuthScreenTest:..
+
+Time: 10.78
+
+OK (2 tests)
+
+

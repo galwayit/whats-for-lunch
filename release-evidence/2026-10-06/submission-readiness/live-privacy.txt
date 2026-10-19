@@ -1,0 +1,67 @@
+Browser tab: 1798256066, Title: "Privacy Policy · What We Have for Lunch", URL: "https://lunch.iapp.au/privacy/".
+1 AXWebArea Privacy Policy · What We Have for Lunch, URL: lunch.iapp.au/privacy/
+	2 container
+		3 link Description: What We Have for Lunch, Value: lunch.iapp.au/
+		4 link Description: Terms, Value: lunch.iapp.au/terms/
+		5 link Description: Support, Value: lunch.iapp.au/support/
+	6 container
+		7 text PRIVACY
+		8 heading Privacy Policy, Value: 1
+			9 text Privacy Policy
+		10 text We use the minimum information needed to recommend lunch options, maintain your history, and coordinate groups. We do not sell personal information or use it for cross-app advertising.
+		11 heading Information you provide, Value: 2
+			12 text Information you provide
+		13 text This can include your name, email address, food preferences and allergens, meal history and notes, favourite places, budget preferences, group invitations and responses, and any feedback you send to support. Meal photos are accessed only when you choose to add one.
+		14 heading Location and device information, Value: 2
+			15 text Location and device information
+		16 text With your permission, the app uses your approximate or precise location to find nearby restaurants. Location is requested while you use the app and is not used for advertising. We may process device and diagnostic information needed for security, reliability, purchase status, and push notifications. On iOS you can choose a suburb, town or address instead of granting location access. Apple Maps processes that search. The selected search area stays on your device until you change it; restaurant searches send its coordinates to our service and Google Maps Platform. If you request AI recommendations, that area can also be included in the data you agree to share with the disclosed AI providers.
+		17 heading Accounts, purchases, and service providers, Value: 2
+			18 text Accounts, purchases, and service providers
+		19 text Your meal journal, budget preferences, favourites, and AI history are stored locally on your device; the app does not currently offer account-based journal backup or sync. Supabase processes your sign-in account, groups and responses, notification registrations, subscription status, and service usage records. You can sign in with Google or an email address and password on iOS and Android; iOS also offers Sign in with Apple. Your chosen provider shares your account identifier and, where available, your name and email. Supabase processes email verification and password recovery; passwords are not stored in the app. Apple and RevenueCat process purchases and subscription status linked to your account. Push notifications use Apple and Google Firebase Cloud Messaging. Payment card details are handled by Apple and are not received by us. Restaurant searches send the search area and query to Google Maps Platform through our server. Google Maps content is subject to 
+		20 link Description: Google’s Privacy Policy, Value: policies.google.com/privacy
+		21 text . Saved place identifiers allow the app to retrieve current restaurant details.
+		22 heading Crash and error diagnostics, Value: 2
+			23 text Crash and error diagnostics
+		24 text The iOS app uses Sentry to help diagnose crashes, app hangs and unexpected service failures. Reports contain technical stack traces, app version and build, device model, operating system version and controlled error codes. We remove account identifiers, email addresses, request details, freeform error messages and user-interface breadcrumbs before sending reports. We do not enable session replay, screenshots or log collection, and do not intentionally send meal journals, allergens, AI prompts, passwords or location in these reports. Diagnostics are processed by Sentry in the United States under 
+		25 link Description: Sentry’s Privacy Policy, Value: sentry.io/privacy/
+		26 text . Technical records are retained according to the configured Sentry retention period and may remain after account deletion because they are not linked to the app account.
+		27 heading AI recommendations, Value: 2
+			28 text AI recommendations
+		29 text AI recommendations are optional. Before sending data, the app asks for your permission. An individual request can include your craving, budget, food preferences and allergens, a summary of recent meals, location, and nearby places. A group suggestion can include the group name, time and area, your preferences, and previous group picks. Before you agree, the app names the active main and backup AI providers and links to their privacy policies. Providers can include Google Gemini, OpenAI, Anthropic Claude, or another named AI provider. This information goes through our Supabase server to the main provider; if it cannot return a usable response, the backup may receive the same information. Adding or changing a recipient requires new permission. You can decline or withdraw AI sharing from Profile. This stops future AI requests until you agree again; it cannot recall information already processed. Service usage records contain an account identifier, time, provider, model, token count, latency, success or failure status, fallback attempts, and quota reservations. We do not intentionally store AI prompts in those server records. Recommendation history and its request context are stored in the local journal.
+		30 heading Why we use information, Value: 2
+			31 text Why we use information
+		32 content list
+			33 container
+				34 AXListMarker • 
+				35 text Provide meal recommendations, budget tools, favourites, history, and group-lunch features.
+			36 container
+				37 AXListMarker • 
+				38 text Authenticate accounts, coordinate groups, and verify or restore purchases.
+			39 container
+				40 AXListMarker • 
+				41 text Send notifications you enable and respond to support requests.
+			42 container
+				43 AXListMarker • 
+				44 text Protect the service, diagnose failures, and comply with law.
+		45 heading Invitation reports and blocking, Value: 2
+			46 text Invitation reports and blocking
+		47 text You can report shared invitation content, guest names and proposed changes, and block the person responsible. A report stores the selected reason and a copy of the reported content in a private support queue. It is not shared with the person reported or sent to an AI provider for moderation. Blocking stores account identifiers or a one-way representation of an anonymous invitation token so our server can enforce it. Anonymous blocking applies to that invitation on that device; sign in before blocking for account-wide protection across invitations and devices. Clearing browser or app data can remove anonymous protection. Contact support if you need to undo a block. Reports are kept while their group exists or until removed during account deletion. Deleting an account removes its reports, block relationships and report snapshots of its guest content. Support correspondence is handled separately so we can respond to your request.
+		48 heading Retention and deletion, Value: 2
+			49 text Retention and deletion
+		50 text You can delete your server account from Profile → Delete account. Apple sign-in may be requested again so we can revoke its authorisation. This removes the app’s account-linked server records and hosted groups. Your local meal journal remains on the device; deleting the app removes its local container. Copies in device backups or files you exported are managed separately. Deleting an app account does not cancel an Apple subscription: manage or cancel it in Apple subscription settings. Providers may retain transaction or other records under their own policies. For help, email 
+		51 link Description: hello@iapp.au, Value: mailto:hello@iapp.au?subject=Lunch%20account%20deletion
+		52 text .
+		53 heading Your choices, Value: 2
+			54 text Your choices
+		55 text You can decline or revoke location, camera, photo-library, and notification access in iOS Settings. Profile provides a free JSON export of your meal journal; Lunch Pro also provides PDF meal reports. These exports can include personal notes, so choose carefully where to share them.
+		56 heading Children, Value: 2
+			57 text Children
+		58 text The service is not directed to children under 13. If you believe a child has provided personal information, contact us so we can remove it.
+		59 heading Contact and changes, Value: 2
+			60 text Contact and changes
+		61 text Questions and privacy requests can be sent to 
+		62 link Description: hello@iapp.au, Value: mailto:hello@iapp.au
+		63 text . Material changes will be posted on this page with a revised date. Updated 6 October 2026.
+	64 text © 2026 Lei Ding · Melbourne, Australia
+
+The focused UI element is 1 AXWebArea Privacy Policy · What We Have for Lunch, URL: lunch.iapp.au/privacy/
