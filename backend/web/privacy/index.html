@@ -19,30 +19,43 @@
 
     <h2>Location and device information</h2>
     <p>With your permission, the app uses your approximate or precise location to find nearby restaurants. Location is requested while you use the app and is not used for advertising. We may process device and diagnostic information needed for security, reliability, purchase status, and push notifications.</p>
+    <p>On iOS you can choose a suburb, town or address instead of granting location access. Apple Maps processes that search. The selected search area stays on your device until you change it; restaurant searches send its coordinates to our service and Google Maps Platform. If you request AI recommendations, that area can also be included in the data you agree to share with the disclosed AI providers.</p>
 
     <h2>Accounts, purchases, and service providers</h2>
-    <p>Account and synced app data may be processed by Supabase. Sign-in may be handled by Apple or Google. Restaurant search may use Google services. Subscription status may be handled by Apple and RevenueCat. These providers process information under their own terms and privacy policies. Payment card details are handled by Apple and are not received by us.</p>
+    <p>Your meal journal, budget preferences, favourites, and AI history are stored locally on your device; the app does not currently offer account-based journal backup or sync. Supabase processes your sign-in account, groups and responses, notification registrations, subscription status, and service usage records. You can sign in with Google or an email address and password on iOS and Android; iOS also offers Sign in with Apple. Your chosen provider shares your account identifier and, where available, your name and email. Supabase processes email verification and password recovery; passwords are not stored in the app. Apple and RevenueCat process purchases and subscription status linked to your account. Push notifications use Apple and Google Firebase Cloud Messaging. Payment card details are handled by Apple and are not received by us.</p>
+    <p>Restaurant searches send the search area and query to Google Maps Platform through our server. Google Maps content is subject to <a href="https://policies.google.com/privacy">Google’s Privacy Policy</a>. Saved place identifiers allow the app to retrieve current restaurant details.</p>
+
+    <h2>Crash and error diagnostics</h2>
+    <p>The iOS app uses Sentry to help diagnose crashes, app hangs and unexpected service failures. Reports contain technical stack traces, app version and build, device model, operating system version and controlled error codes. We remove account identifiers, email addresses, request details, freeform error messages and user-interface breadcrumbs before sending reports. We do not enable session replay, screenshots or log collection, and do not intentionally send meal journals, allergens, AI prompts, passwords or location in these reports. Diagnostics are processed by Sentry in the United States under <a href="https://sentry.io/privacy/">Sentry’s Privacy Policy</a>. Technical records are retained according to the configured Sentry retention period and may remain after account deletion because they are not linked to the app account.</p>
+
+    <h2>AI recommendations</h2>
+    <p>AI recommendations are optional. Before sending data, the app asks for your permission. An individual request can include your craving, budget, food preferences and allergens, a summary of recent meals, location, and nearby places. A group suggestion can include the group name, time and area, your preferences, and previous group picks. Before you agree, the app names the active main and backup AI providers and links to their privacy policies. Providers can include Google Gemini, OpenAI, Anthropic Claude, or another named AI provider. This information goes through our Supabase server to the main provider; if it cannot return a usable response, the backup may receive the same information. Adding or changing a recipient requires new permission. You can decline or withdraw AI sharing from Profile. This stops future AI requests until you agree again; it cannot recall information already processed.</p>
+    <p>Service usage records contain an account identifier, time, provider, model, token count, latency, success or failure status, fallback attempts, and quota reservations. We do not intentionally store AI prompts in those server records. Recommendation history and its request context are stored in the local journal.</p>
 
     <h2>Why we use information</h2>
     <ul>
       <li>Provide meal recommendations, budget tools, favourites, history, and group-lunch features.</li>
-      <li>Authenticate accounts and restore synced data and purchases.</li>
+      <li>Authenticate accounts, coordinate groups, and verify or restore purchases.</li>
       <li>Send notifications you enable and respond to support requests.</li>
       <li>Protect the service, diagnose failures, and comply with law.</li>
     </ul>
 
+    <h2>Invitation reports and blocking</h2>
+    <p>You can report shared invitation content, guest names and proposed changes, and block the person responsible. A report stores the selected reason and a copy of the reported content in a private support queue. It is not shared with the person reported or sent to an AI provider for moderation. Blocking stores account identifiers or a one-way representation of an anonymous invitation token so our server can enforce it. Anonymous blocking applies to that invitation on that device; sign in before blocking for account-wide protection across invitations and devices. Clearing browser or app data can remove anonymous protection. Contact support if you need to undo a block.</p>
+    <p>Reports are kept while their group exists or until removed during account deletion. Deleting an account removes its reports, block relationships and report snapshots of its guest content. Support correspondence is handled separately so we can respond to your request.</p>
+
     <h2>Retention and deletion</h2>
-    <p>Local information remains on your device until you remove it or the app. Account data is kept while your account is active and only as long afterward as needed for security, legal, or operational obligations. You can request deletion from Profile → Delete account in the app, or email <a href="mailto:hello@iapp.au?subject=Lunch%20account%20deletion">hello@iapp.au</a>. We may need to retain limited records where legally required.</p>
+    <p>You can delete your server account from Profile → Delete account. Apple sign-in may be requested again so we can revoke its authorisation. This removes the app’s account-linked server records and hosted groups. Your local meal journal remains on the device; deleting the app removes its local container. Copies in device backups or files you exported are managed separately. Deleting an app account does not cancel an Apple subscription: manage or cancel it in Apple subscription settings. Providers may retain transaction or other records under their own policies. For help, email <a href="mailto:hello@iapp.au?subject=Lunch%20account%20deletion">hello@iapp.au</a>.</p>
 
     <h2>Your choices</h2>
-    <p>You can decline or revoke location, camera, photo-library, and notification access in iOS Settings. You can export your app data from Profile and manage or cancel subscriptions in your Apple account settings.</p>
+    <p>You can decline or revoke location, camera, photo-library, and notification access in iOS Settings. Profile provides a free JSON export of your meal journal; Lunch Pro also provides PDF meal reports. These exports can include personal notes, so choose carefully where to share them.</p>
 
     <h2>Children</h2>
     <p>The service is not directed to children under 13. If you believe a child has provided personal information, contact us so we can remove it.</p>
 
     <h2>Contact and changes</h2>
     <p>Questions and privacy requests can be sent to <a href="mailto:hello@iapp.au">hello@iapp.au</a>. Material changes will be posted on this page with a revised date.</p>
-    <p class="updated">Effective 3 September 2026.</p>
+    <p class="updated">Updated 6 October 2026.</p>
   </article></main>
   <footer class="shell">© 2026 Lei Ding · Melbourne, Australia</footer>
 </body>

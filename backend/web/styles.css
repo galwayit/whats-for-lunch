@@ -1,12 +1,18 @@
+@font-face { font-family: "Bricolage Grotesque"; font-weight: 700; font-display: swap; src: url("/fonts/BricolageGrotesque-Bold.woff2") format("woff2"); }
+@font-face { font-family: "Bricolage Grotesque"; font-weight: 800; font-display: swap; src: url("/fonts/BricolageGrotesque-ExtraBold.woff2") format("woff2"); }
+
+/* Mirrors design/tokens.json (Paprika palette). Update both together. */
 :root {
   color-scheme: light dark;
-  --ground: #fff8e7;
+  --ground: #fff6ec;
   --surface: #ffffff;
-  --text: #4d392f;
-  --muted: #76655c;
-  --primary: #2f7f3f;
-  --accent: #ff6b35;
-  --line: rgba(107, 78, 61, 0.18);
+  --text: #3a2218;
+  --muted: #7a5a48;
+  --primary: #c63d17;
+  --on-primary: #ffffff;
+  --accent: #c63d17;
+  --line: rgba(58, 34, 24, 0.16);
+  --display: "Bricolage Grotesque", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -20,7 +26,7 @@ body {
 a { color: var(--primary); }
 .shell { width: min(760px, calc(100% - 32px)); margin: 0 auto; }
 header { padding: 28px 0 12px; }
-.brand { color: var(--primary); font-size: 20px; font-weight: 800; text-decoration: none; }
+.brand { color: var(--primary); font-family: var(--display); font-size: 20px; font-weight: 800; text-decoration: none; }
 nav { float: right; display: flex; gap: 18px; }
 nav a { color: var(--muted); font-size: 14px; font-weight: 650; text-decoration: none; }
 main { padding: 28px 0 56px; }
@@ -29,26 +35,28 @@ main { padding: 28px 0 56px; }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 24px;
-  box-shadow: 0 14px 40px rgba(77, 57, 47, 0.08);
+  box-shadow: 0 14px 40px rgba(58, 34, 24, 0.08);
 }
-h1 { margin: 0 0 12px; font-size: clamp(32px, 8vw, 52px); line-height: 1.08; }
-h2 { margin: 32px 0 8px; font-size: 22px; line-height: 1.25; }
+h1 { margin: 0 0 12px; font-family: var(--display); font-weight: 800; font-size: clamp(32px, 8vw, 52px); line-height: 1.08; letter-spacing: -0.01em; }
+h2 { margin: 32px 0 8px; font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.25; }
 p, li { color: var(--muted); }
 .lead { font-size: 19px; }
 .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.button { display: inline-block; padding: 12px 18px; color: white; background: var(--primary); border-radius: 13px; font-weight: 750; text-decoration: none; }
+.button { display: inline-block; padding: 12px 18px; color: var(--on-primary); background: var(--primary); border-radius: 13px; font-weight: 750; text-decoration: none; }
 .button.secondary { color: var(--primary); background: transparent; border: 1px solid var(--line); }
 .updated { margin-top: 36px; font-size: 13px; }
 footer { padding: 0 0 36px; color: var(--muted); font-size: 13px; text-align: center; }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #17120f;
-    --surface: #241d18;
-    --text: #fff8e7;
-    --muted: #d3c8c0;
-    --primary: #83d28e;
-    --line: rgba(255, 248, 231, 0.15);
+    --ground: #1a1310;
+    --surface: #261c17;
+    --text: #f5e9dd;
+    --muted: #c4ae9c;
+    --primary: #ff8a5b;
+    --on-primary: #3a1206;
+    --accent: #ff8a5b;
+    --line: rgba(255, 255, 255, 0.14);
   }
 }

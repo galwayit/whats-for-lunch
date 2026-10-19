@@ -5,15 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lunch invitation</title>
   <meta name="description" content="You have been invited to lunch. Let the host know if you are coming.">
+  <script>
+    // Smart App Banner. Safari reads this tag while parsing, so it is written here rather than
+    // added after load. app-argument is this invite's canonical link: tapping "Open" on the
+    // banner (including right after installing from it) hands that link to the app, which opens
+    // the invitation. Keep the app id in step with data-ios-url below. Only the validated code is
+    // interpolated, never raw location text.
+    (function () {
+      var appStoreId = "6808090102";
+      var m = location.pathname.match(/\/i\/([0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{8})\/?$/);
+      var argument = m ? ", app-argument=https://lunch.iapp.au/i/" + m[1].toUpperCase() : "";
+      document.write('<meta name="apple-itunes-app" content="app-id=' + appStoreId + argument + '">');
+    })();
+  </script>
   <style>
     :root {
-      --cream: #FFF8E7;
-      --green: #2F7F3F;
-      --orange: #FF6B35;
-      --brown: #6B4E3D;
-      --brown-soft: rgba(107, 78, 61, 0.14);
+      /* Mirrors design/tokens.json (Paprika palette, light). */
+      --cream: #FFF6EC;
+      --primary: #C63D17;
+      --orange: #EC4E14;
+      --success: #2E7D4F;
+      --brown: #3A2218;
+      --brown-soft: rgba(58, 34, 24, 0.14);
       --white: #FFFFFF;
+      --display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
     }
+    @font-face { font-family: "Bricolage Grotesque"; font-weight: 700; font-display: swap; src: url("/fonts/BricolageGrotesque-Bold.woff2") format("woff2"); }
+    @font-face { font-family: "Bricolage Grotesque"; font-weight: 800; font-display: swap; src: url("/fonts/BricolageGrotesque-ExtraBold.woff2") format("woff2"); }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
     body {
@@ -31,9 +49,10 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 20px;
+      font-family: var(--display);
       font-weight: 800;
       font-size: 18px;
-      color: var(--green);
+      color: var(--primary);
     }
     header .logo {
       width: 34px; height: 34px; border-radius: 10px;
@@ -48,21 +67,21 @@
       border: 1px solid var(--brown-soft);
       border-radius: 20px;
       padding: 24px;
-      box-shadow: 0 10px 30px rgba(107, 78, 61, 0.08);
+      box-shadow: 0 10px 30px rgba(58, 34, 24, 0.08);
     }
-    h1 { font-size: 24px; margin: 0 0 4px; line-height: 1.2; }
-    .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; font-weight: 700; color: var(--orange); margin: 0 0 12px; }
+    h1 { font-family: var(--display); font-weight: 700; font-size: 24px; margin: 0 0 4px; line-height: 1.2; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; font-weight: 700; color: var(--primary); margin: 0 0 12px; }
     .muted { opacity: 0.75; font-size: 14px; margin: 0; }
     dl { margin: 18px 0 0; display: grid; grid-template-columns: 90px 1fr; gap: 8px 12px; font-size: 15px; }
     dt { font-weight: 700; }
     dd { margin: 0; }
-    .place-pending { color: var(--orange); font-weight: 600; }
+    .place-pending { color: var(--primary); font-weight: 600; }
     .attendees { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
     .attendees li {
       padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
       background: var(--cream); border: 1px solid var(--brown-soft);
     }
-    .attendees li.accepted { border-color: var(--green); color: var(--green); }
+    .attendees li.accepted { border-color: var(--success); color: var(--success); }
     .attendees li.declined { opacity: 0.55; text-decoration: line-through; }
     .actions { display: flex; gap: 12px; margin-top: 22px; }
     button {
@@ -72,18 +91,22 @@
     }
     button:active { transform: scale(0.98); }
     button:disabled { opacity: 0.6; cursor: default; }
-    .accept { background: var(--green); color: var(--white); }
+    .accept { background: var(--primary); color: var(--white); }
     .decline { background: var(--white); color: var(--brown); border: 2px solid var(--brown-soft); }
     .name-row { margin-top: 18px; display: none; }
-    .name-row label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
-    .name-row input {
+    .name-row label, #suggestion-form label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+    .name-row input, #suggestion-form input {
       width: 100%; padding: 12px 14px; border-radius: 12px; font: inherit; font-size: 16px;
       border: 2px solid var(--brown-soft); background: var(--cream); color: var(--brown);
     }
-    .name-row input:focus { outline: none; border-color: var(--green); }
-    .status { margin-top: 16px; font-weight: 700; color: var(--green); }
+    .name-row input:focus, #suggestion-form input:focus { outline: none; border-color: var(--primary); }
+    #suggestion-form { margin-top: 24px; display: grid; gap: 8px; }
+    #suggestion-form h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 20px; }
+    #suggestion-form label { margin-top: 12px; }
+    dd, #suggestion-status { overflow-wrap: anywhere; }
+    .status { margin-top: 16px; font-weight: 700; color: var(--success); }
     .status.declined { color: var(--brown); }
-    .error { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #FFE9E0; color: #9A3A1B; font-size: 14px; }
+    .error { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #FBE4EA; color: #A8123E; font-size: 14px; }
     .stores { margin-top: 28px; text-align: center; font-size: 14px; }
     .stores a {
       display: inline-block; margin: 8px 6px 0; padding: 10px 16px; border-radius: 12px;
@@ -100,10 +123,10 @@
     data-anon-key:      the Supabase anon key (public by design)
   -->
   <main id="app"
-        data-functions-url="https://YOUR-PROJECT-REF.supabase.co/functions/v1"
-        data-anon-key="YOUR-SUPABASE-ANON-KEY"
+        data-functions-url="https://cswdcbmywzzisovsgwac.supabase.co/functions/v1"
+        data-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzd2RjYm15d3p6aXNvdnNnd2FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwOTMxMjEsImV4cCI6MjEwNTY2OTEyMX0.hJgwOZ1ICiLOh-IJVBt3j1ILMOm55uJpjB63r_CBHO8"
         data-ios-url="https://apps.apple.com/app/id6808090102"
-        data-android-url="https://play.google.com/store/apps/details?id=au.iapp.lunch">
+        data-android-url="https://play.google.com/store/apps/details?id=au.iapp.guess_what.what_we_have_for_lunch">
     <header><span class="logo" aria-hidden="true">&#127860;</span> Lunch</header>
 
     <section class="card" id="loading">
@@ -119,6 +142,9 @@
       <dl>
         <dt>When</dt><dd id="when"></dd>
         <dt>Where</dt><dd id="where"></dd>
+        <dt>Budget</dt><dd id="budget"></dd>
+        <dt>Who pays</dt><dd id="payment-arrangement"></dd>
+        <dt>Payment</dt><dd id="payment-method"></dd>
         <dt>Who</dt><dd><ul class="attendees" id="attendees"></ul></dd>
       </dl>
 
@@ -131,11 +157,36 @@
         <button class="accept" id="accept">Accept</button>
         <button class="decline" id="decline">Decline</button>
       </div>
-      <p class="status hidden" id="status"></p>
+      <button class="decline" id="suggest" style="width:100%;margin-top:12px">Suggest another place or time</button>
+      <details style="margin-top:20px"><summary>Report content or block a person</summary>
+        <p>Reports go privately to Lunch support. Blocking applies to this invitation in this browser. Clearing browser storage or using another device creates a different guest identity. Use a signed-in account in the app for blocking across invitations and devices.</p>
+        <label for="safety-target">Content or person</label><select id="safety-target"></select>
+        <label for="safety-reason">Reason</label><select id="safety-reason"><option value="harassment">Harassment or threats</option><option value="hate">Hateful content</option><option value="sexual">Sexual content</option><option value="spam">Spam or scam</option><option value="other">Other concern</option></select>
+        <div class="actions"><button id="safety-report" class="decline">Send report</button><button id="safety-block" class="decline">Report and block</button></div>
+        <p id="safety-status" aria-live="polite"></p>
+      </details>
+      <p class="status hidden" id="suggestion-status" aria-live="polite"></p>
+      <section id="suggestion-form" class="hidden" aria-label="Suggest a change">
+        <h2>Suggest a change</h2>
+        <p class="muted">Suggest a place, time, or both. The host decides whether to change the plan. Your RSVP stays the same until then.</p>
+        <label for="suggestion-name">Your name</label>
+        <input id="suggestion-name" maxlength="60" autocomplete="name">
+        <label for="suggestion-place">Alternative place (optional)</label>
+        <input id="suggestion-place" maxlength="200" placeholder="Restaurant or meeting place">
+        <label for="suggestion-address">Address (optional)</label>
+        <input id="suggestion-address" maxlength="400">
+        <label for="suggestion-time">Alternative date and time (optional, your local time)</label>
+        <input id="suggestion-time" type="datetime-local">
+        <label for="suggestion-note">Note for the host (optional)</label>
+        <input id="suggestion-note" maxlength="500">
+        <div class="actions"><button id="suggestion-send" class="accept">Send suggestion</button><button id="suggestion-cancel" class="decline">Cancel</button></div>
+      </section>
+      <p class="status hidden" id="status" aria-live="polite"></p>
       <div class="error hidden" id="error"></div>
 
       <div class="stores">
         Get the app to see the pick, directions and reminders.
+        <p class="muted" id="installed-hint">Just installed it? Open this invite again, or tap Open in the banner at the top.</p>
         <div>
           <a id="ios-link" href="#">App Store</a>
           <a id="android-link" href="#">Google Play</a>
@@ -149,7 +200,7 @@
       <p class="muted" id="not-found-detail">Check the link with your host, or open it in the Lunch app.</p>
     </section>
 
-    <footer>Lunch &middot; iapp.au</footer>
+    <footer>Lunch &middot; iapp.au · <a href="/support/">Support and content safety</a></footer>
   </main>
 
   <script>
@@ -170,9 +221,11 @@
       var code = (match ? match[1] : new URLSearchParams(location.search).get("code") || "").toUpperCase();
       var tokenKey = "lunch.guestToken." + code;
       var guestToken = null;
+      var hasRsvp = false;
       try { guestToken = localStorage.getItem(tokenKey); } catch (e) { guestToken = null; }
 
       var pendingStatus = null;
+      var busy = false;
 
       function headers() {
         var h = { "apikey": anonKey, "Authorization": "Bearer " + anonKey, "Content-Type": "application/json" };
@@ -185,7 +238,16 @@
         return d.toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
       }
 
+      function rememberToken(token) {
+        if (!token || !/^[a-f0-9]{64}$/.test(token)) return;
+        guestToken = token;
+        try { localStorage.setItem(tokenKey, token); } catch (_) {}
+      }
       function render(invitation) {
+        hasRsvp = invitation.myStatus != null;
+        var target = $("safety-target"); target.innerHTML = "";
+        var hostOption = document.createElement("option"); hostOption.value = "group:" + invitation.group.id; hostOption.textContent = "Invitation / host"; target.appendChild(hostOption);
+        invitation.attendees.forEach(function (a) { var option = document.createElement("option"); option.value = "rsvp:" + a.id; option.textContent = a.displayName; target.appendChild(option); });
         var g = invitation.group;
         $("group-name").textContent = g.name;
         $("host-line").textContent = "Hosted by " + (g.hostName || "your host");
@@ -197,6 +259,18 @@
           $("where").textContent = "Host is still choosing";
           $("where").className = "place-pending";
         }
+        $("budget").textContent = g.budgetPerPersonMinor == null ? "To be confirmed" : new Intl.NumberFormat(undefined, { style: "currency", currency: g.currencyCode || "AUD" }).format(g.budgetPerPersonMinor / 100) + " per person";
+        var arrangements = { undecided: "To be confirmed", pay_own: "Everyone pays their own", split_equally: "Split equally", host_pays: "Host's treat" };
+        var methods = { undecided: "To be confirmed", at_venue: "Pay at the venue", cash: "Cash", card: "Card", bank_transfer: "Bank transfer" };
+        $("payment-arrangement").textContent = arrangements[g.paymentArrangement] || "To be confirmed";
+        $("payment-method").textContent = methods[g.paymentMethod] || "To be confirmed";
+        var suggestion = invitation.mySuggestion;
+        if (suggestion) {
+          var labels = { pending: "Waiting for the host to review", accepted: "Host applied your suggestion", declined: "Host kept the current plan", superseded: "The plan has changed — check the latest details" };
+          $("suggestion-status").textContent = (labels[suggestion.status] || "Suggestion sent") + ": " + [suggestion.placeName, suggestion.placeAddress, suggestion.scheduledAtEpochSeconds ? formatWhen(suggestion.scheduledAtEpochSeconds) : null, suggestion.note].filter(Boolean).join(" · ");
+          show("suggestion-status");
+        } else hide("suggestion-status");
+        $("suggest").disabled = !!suggestion && suggestion.status === "pending";
         var list = $("attendees");
         list.innerHTML = "";
         if (invitation.attendees.length === 0) {
@@ -210,12 +284,12 @@
           item.textContent = a.displayName;
           list.appendChild(item);
         });
-        if (invitation.myStatus) {
+        if (invitation.myStatus && invitation.myStatus !== "pending") {
           var s = $("status");
           s.textContent = invitation.myStatus === "accepted" ? "You're in. See you there!" : "You've declined. Change your mind any time.";
           s.className = "status " + invitation.myStatus;
           show("status");
-        }
+        } else { hide("status"); }
         hide("loading"); show("invite");
       }
 
@@ -238,6 +312,7 @@
           .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
           .then(function (res) {
             if (!res.ok) throw new Error(res.body && res.body.error ? res.body.error.message : "Request failed");
+            rememberToken(res.body.guestToken);
             render(res.body.invitation);
           })
           .catch(function (err) {
@@ -247,14 +322,16 @@
       }
 
       function respond(status) {
+        if (busy) return;
         var name = $("display-name").value.trim();
         // Ask for a name the first time (no guest token yet).
-        if (!guestToken && !name) {
+        if (!hasRsvp && !name) {
           pendingStatus = status;
           $("name-row").style.display = "block";
           $("display-name").focus();
           return;
         }
+        busy = true;
         hide("error");
         $("accept").disabled = true; $("decline").disabled = true;
         var payload = { code: code, status: status, displayName: name || null };
@@ -266,12 +343,57 @@
               guestToken = res.body.guestToken;
               try { localStorage.setItem(tokenKey, guestToken); } catch (e) { /* private mode */ }
             }
+            rememberToken(res.body.guestToken);
             render(res.body.invitation);
           })
           .catch(function (err) { showError(err.message); })
-          .then(function () { $("accept").disabled = false; $("decline").disabled = false; });
+          .then(function () { busy = false; $("accept").disabled = false; $("decline").disabled = false; });
       }
 
+      $("suggest").addEventListener("click", function () {
+        hide("error"); $("suggestion-name").value = $("display-name").value; show("suggestion-form"); $("suggestion-name").focus();
+      });
+      $("suggestion-cancel").addEventListener("click", function () { if (!busy) hide("suggestion-form"); });
+      $("suggestion-send").addEventListener("click", function () {
+        if (busy) return;
+        var name = $("suggestion-name").value.trim();
+        var place = $("suggestion-place").value.trim();
+        var address = $("suggestion-address").value.trim();
+        var rawTime = $("suggestion-time").value;
+        var time = rawTime ? Math.floor(new Date(rawTime).getTime() / 1000) : null;
+        if (!name && !hasRsvp) { showError("Enter your name so the host knows who suggested the change."); return; }
+        if (!place && !rawTime) { showError("Suggest a place or a time."); return; }
+        if (address && !place) { showError("Add the place name for this address."); return; }
+        if (rawTime && (!Number.isFinite(time) || time <= Date.now()/1000)) { showError("Choose a future time."); return; }
+        hide("error"); busy = true; $("suggestion-send").disabled = true;
+        fetch(functionsUrl + "/invitations-suggest", { method: "POST", headers: headers(), body: JSON.stringify({ code: code, displayName: name || null, suggestion: { placeName: place || null, placeAddress: address || null, scheduledAt: time, note: $("suggestion-note").value.trim() || null } }) })
+          .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.body && res.body.error ? res.body.error.message : "Could not send your suggestion. Try again.");
+            rememberToken(res.body.guestToken);
+            hide("suggestion-form"); render(res.body.invitation);
+          }).catch(function (err) { showError(err.message); })
+          .then(function () { busy = false; $("suggestion-send").disabled = false; });
+      });
+      function safety(action) {
+        if (busy) return;
+        busy = true; $("safety-report").disabled = true; $("safety-block").disabled = true;
+        var target = $("safety-target").value.split(":");
+        $("safety-status").textContent = "Saving…";
+        fetch(functionsUrl + "/groups-safety", { method: "POST", headers: headers(), body: JSON.stringify({ code: code, targetKind: target[0], targetId: target[1], action: action, reason: $("safety-reason").value }) })
+          .then(function (r) { return r.json().then(function (body) { if (!r.ok) throw new Error(body.error ? body.error.message : "Please retry or contact support."); return body; }); })
+          .then(function () {
+            $("safety-status").textContent = "Report sent to Lunch support.";
+            if (action === "report_block" && target[0] === "group") { hide("invite"); show("not-found"); $("not-found-detail").textContent = "Host blocked. This invitation is hidden."; }
+            else if (action === "report_block") load();
+          }).catch(function (err) { $("safety-status").textContent = err.message; })
+          .then(function () { busy = false; $("safety-report").disabled = false; $("safety-block").disabled = false; });
+      }
+      $("safety-report").addEventListener("click", function () { safety("report"); });
+      $("safety-block").addEventListener("click", function () { safety("report_block"); });
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden && !busy && $("suggestion-form").classList.contains("hidden")) load();
+      });
       $("accept").addEventListener("click", function () { respond("accepted"); });
       $("decline").addEventListener("click", function () { respond("declined"); });
       $("display-name").addEventListener("keydown", function (e) {

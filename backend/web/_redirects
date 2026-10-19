@@ -1,2 +1,4 @@
-/i/* /invite/index.html 200
-/invite/* /invite/index.html 200
+# Rewrite to /invite/ (not /invite/index.html): Pages redirects */index.html to the directory
+# URL, and a 200 rewrite onto a redirecting path silently falls back to the home page.
+/i/* /invite/ 200
+/invite/* /invite/ 200
