@@ -2,8 +2,8 @@
 //  Theme.swift
 //  LunchApp
 //
-//  Typography helpers on top of the generated Tokens: the Plus Jakarta Sans font with a
-//  system-rounded fallback, text role modifiers, the text-scale clamp, and the elevation
+//  Typography helpers on top of the generated Tokens: Bricolage Grotesque for the display roles
+//  over the system text face, text role modifiers, the text-scale clamp, and the elevation
 //  values from design/tokens.json that the generator does not emit yet.
 //
 
@@ -21,36 +21,37 @@ extension Tokens {
 // MARK: - Font
 
 enum LunchFont {
-    /// PostScript family prefix of the bundled Plus Jakarta Sans files (see Resources/Fonts/README.md).
-    static let postScriptPrefix = "PlusJakartaSans"
+    /// PostScript family prefix of the bundled Bricolage Grotesque files (see Resources/Fonts/README.md).
+    static let postScriptPrefix = "BricolageGrotesque"
 
-    /// True when the custom font files are bundled and registered through `UIAppFonts`.
-    /// Evaluated once; the stand-in is the system font with the rounded design.
-    static let isCustomFontAvailable: Bool = UIFont(name: postScriptName(for: .regular), size: UIFont.labelFontSize) != nil
+    /// True when the display font files are bundled and registered through `UIAppFonts`.
+    /// Evaluated once; without them the display roles fall back to the system font.
+    static let isCustomFontAvailable: Bool = UIFont(name: postScriptName(for: .bold), size: UIFont.labelFontSize) != nil
 
     /// The font for a text role at a concrete point size (already scaled for Dynamic Type).
-    static func font(size: CGFloat, weight: Font.Weight) -> Font {
-        if isCustomFontAvailable {
+    /// Display roles use Bricolage Grotesque; every other role uses the system text face (SF Pro),
+    /// which keeps Bold Text and the system's optical sizing for running text.
+    static func font(size: CGFloat, weight: Font.Weight, display: Bool) -> Font {
+        if display, isCustomFontAvailable {
             return .custom(postScriptName(for: weight), fixedSize: size)
         }
-        return .system(size: size, weight: weight, design: .rounded)
+        return .system(size: size, weight: weight)
     }
 
     static func font(_ role: TextRole) -> Font {
-        font(size: role.size, weight: role.fontWeight)
+        font(size: role.size, weight: role.fontWeight, display: role.display)
     }
 
-    /// The UIKit font matching `font(size:weight:)`, used for line-height maths.
-    static func uiFont(size: CGFloat, weight: Font.Weight) -> UIFont {
-        if isCustomFontAvailable, let custom = UIFont(name: postScriptName(for: weight), size: size) {
+    /// The UIKit font matching `font(size:weight:display:)`, used for line-height maths.
+    static func uiFont(size: CGFloat, weight: Font.Weight, display: Bool) -> UIFont {
+        if display, isCustomFontAvailable, let custom = UIFont(name: postScriptName(for: weight), size: size) {
             return custom
         }
-        let system = UIFont.systemFont(ofSize: size, weight: weight.uiFontWeight)
-        guard let rounded = system.fontDescriptor.withDesign(.rounded) else { return system }
-        return UIFont(descriptor: rounded, size: size)
+        return UIFont.systemFont(ofSize: size, weight: weight.uiFontWeight)
     }
 
-    /// "PlusJakartaSans-Bold" etc. Weight 800 in the tokens maps to ExtraBold.
+    /// "BricolageGrotesque-Bold" or "-ExtraBold": the only two weights the display roles use.
+    /// Weight 800 in the tokens maps to ExtraBold; anything lighter maps to Bold.
     static func postScriptName(for weight: Font.Weight) -> String {
         "\(postScriptPrefix)-\(styleName(for: weight))"
     }
@@ -58,10 +59,7 @@ enum LunchFont {
     private static func styleName(for weight: Font.Weight) -> String {
         switch weight {
         case .heavy, .black: return "ExtraBold"
-        case .bold: return "Bold"
-        case .semibold: return "SemiBold"
-        case .medium: return "Medium"
-        default: return "Regular"
+        default: return "Bold"
         }
     }
 }
@@ -126,9 +124,9 @@ struct LunchTextModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let token = role.token
-        let natural = LunchFont.uiFont(size: scaledSize, weight: token.fontWeight).lineHeight
+        let natural = LunchFont.uiFont(size: scaledSize, weight: token.fontWeight, display: token.display).lineHeight
         content
-            .font(LunchFont.font(size: scaledSize, weight: token.fontWeight))
+            .font(LunchFont.font(size: scaledSize, weight: token.fontWeight, display: token.display))
             .tracking(token.tracking)
             .lineSpacing(max(0, scaledLineHeight - natural))
             .textCase(token.uppercase ? .uppercase : nil)

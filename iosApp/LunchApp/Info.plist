@@ -32,6 +32,11 @@
 	<string>This app needs access to location to find nearby restaurants and provide personalized dining recommendations based on your location.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library to select photos of meals for logging and tracking your dining experiences.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>BricolageGrotesque-Bold.ttf</string>
+		<string>BricolageGrotesque-ExtraBold.ttf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -223,4 +223,10 @@ enum LunchFormat {
     static func currencyExact(_ amount: Double) -> String {
         amount.formatted(.currency(code: currencyCode).precision(.fractionLength(2)).locale(Locale(identifier: "en_AU")))
     }
+
+    /// Dollars and cents from a whole-cents amount, e.g. 1850 -> "$18.50". Used by the bill split
+    /// sheet, which does all its maths in cents.
+    static func currencyExact(cents: Int64) -> String {
+        currencyExact(Double(cents) / 100)
+    }
 }

@@ -10,9 +10,6 @@ import Foundation
 
 nonisolated struct SwiftRecommendationEngine: RecommendationEngine {
     static let scoreThreshold = 0.1
-    private static let dietaryScoreThreshold = 0.8
-    private static let chainIndicators = ["McDonald", "Subway", "Starbucks", "KFC", "Pizza Hut"]
-    private static let discoverChainKeywords = ["mcdonalds", "subway", "kfc", "burger king", "pizza hut", "dominos"]
 
     func compatibilityScore(restaurant: Restaurant, prefs: UserPreferences?) -> Double {
         var score = 0.0
@@ -51,6 +48,8 @@ nonisolated struct SwiftRecommendationEngine: RecommendationEngine {
         var best: Restaurant?
         var bestScore = -1.0
         for restaurant in candidates where !rejected.contains(restaurant.placeId) {
+            if prefs?.includeChains == false, RestaurantChains.matches(restaurant.name) { continue }
+            if let prefs, !matchesDietaryPreferences(restaurant, prefs: prefs) { continue }
             let score = compatibilityScore(restaurant: restaurant, prefs: prefs)
             if score > bestScore {
                 bestScore = score
@@ -165,13 +164,9 @@ nonisolated struct SwiftRecommendationEngine: RecommendationEngine {
             if let distance = restaurant.distanceFromUser, distance > prefs.maxTravelDistance { return false }
             if let rating = restaurant.rating, rating < prefs.minimumRating { return false }
             if let priceLevel = restaurant.priceLevel, prefs.budgetLevel > 0, priceLevel > prefs.budgetLevel { return false }
-            if prefs.requireDietaryVerification, !restaurant.hasVerifiedDietaryInfo {
-                let score = dietaryCompatibility(restaurant: restaurant, dietaryRestrictions: prefs.dietaryRestrictions, allergens: prefs.allergens)
-                if score < Self.dietaryScoreThreshold { return false }
-            }
+            if !matchesDietaryPreferences(restaurant, prefs: prefs) { return false }
             if !prefs.includeChains {
-                let name = restaurant.name.lowercased()
-                if Self.chainIndicators.contains(where: { name.contains($0.lowercased()) }) { return false }
+                if RestaurantChains.matches(restaurant.name) { return false }
             }
             return true
         }
@@ -179,23 +174,44 @@ nonisolated struct SwiftRecommendationEngine: RecommendationEngine {
 
     func dietaryCompatibility(restaurant: Restaurant, dietaryRestrictions: [String], allergens: [String]) -> Double {
         if dietaryRestrictions.isEmpty, allergens.isEmpty { return 1.0 }
+        // Places supplies no certified free-from evidence. Absence from a list of
+        // reported allergens must never be counted as proof that an allergen is absent.
+        if Self.hasAllergenConflict(restaurant: restaurant, allergens: allergens) { return 0 }
+        guard restaurant.hasVerifiedDietaryInfo else { return 0 }
         var score = 0.0
         let total = dietaryRestrictions.count + allergens.count
         for restriction in dietaryRestrictions {
             if restaurant.supportedDietaryRestrictions.contains(restriction) {
                 score += 1.0
-            } else if let partial = restaurant.dietaryCompatibilityScores[restriction] {
-                score += partial
+            } else if let partial = restaurant.dietaryCompatibilityScores[restriction], partial.isFinite {
+                score += min(1, max(0, partial))
             }
-        }
-        for allergen in allergens {
-            score += restaurant.allergenInfo.contains(allergen) ? 0.1 : 1.0
         }
         return total > 0 ? score / Double(total) : 1.0
     }
 
+    private func matchesDietaryPreferences(_ restaurant: Restaurant, prefs: UserPreferences) -> Bool {
+        if Self.hasAllergenConflict(restaurant: restaurant, allergens: prefs.allergens) { return false }
+        guard prefs.requireDietaryVerification else { return true }
+        if prefs.dietaryRestrictions.isEmpty && prefs.allergens.isEmpty { return true }
+        return prefs.allergens.isEmpty && restaurant.hasVerifiedDietaryInfo && prefs.dietaryRestrictions.allSatisfy { restaurant.supportedDietaryRestrictions.contains($0) }
+    }
+
+    static func hasAllergenConflict(restaurant: Restaurant, allergens: [String]) -> Bool {
+        let reported = Set(restaurant.allergenInfo.map(allergenFamily))
+        return allergens.contains { reported.contains(allergenFamily($0)) }
+    }
+
+    private static func allergenFamily(_ value: String) -> String {
+        let key = value.lowercased().replacingOccurrences(of: "-", with: "_").replacingOccurrences(of: " ", with: "_")
+        switch key {
+        case "nut", "nuts", "nut_allergy", "peanut", "peanuts", "tree_nut", "tree_nuts": return "nuts"
+        case "shellfish", "shellfish_allergy", "crustacean", "crustaceans", "mollusc", "molluscs": return "shellfish"
+        default: return key
+        }
+    }
+
     private func isChainRestaurant(_ restaurant: Restaurant) -> Bool {
-        let name = restaurant.name.lowercased()
-        return Self.discoverChainKeywords.contains(where: { name.contains($0) })
+        RestaurantChains.matches(restaurant.name)
     }
 }

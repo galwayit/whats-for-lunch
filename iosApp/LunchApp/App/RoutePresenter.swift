@@ -2,7 +2,7 @@
 //  RoutePresenter.swift
 //  LunchApp
 //
-//  Presents `AppEnvironment.routes` as nested sheets. Level n presents the route at index n and
+//  Presents app destinations as full screens. Level n presents the route at index n and
 //  attaches level n+1 to its content, so AI -> Paywall or Group -> Sign in stack naturally.
 //
 
@@ -13,8 +13,10 @@ struct RoutePresenter: ViewModifier {
     let level: Int
 
     func body(content: Content) -> some View {
-        content.sheet(item: binding) { route in
+        content.fullScreenCover(item: binding) { route in
             RouteView(route: route)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .background(Tokens.Palette.ground.ignoresSafeArea())
                 .lunchTextScaleClamped()
                 .toastHost()
                 .modifier(RoutePresenter(level: level + 1))
@@ -48,10 +50,12 @@ struct RouteView: View {
         case .groupDetail(let groupId): GroupDetailView(groupId: groupId)
         case .paywall: PaywallScreen()
         case .preferences: PreferencesView()
+        case .searchArea: SearchAreaView()
         case .signIn: SignInSheet()
         case .privacy: InfoScreen(kind: .privacy)
         case .help: InfoScreen(kind: .help)
         case .budgetSetup: BudgetSetupView()
+        case .splitBillDemo: SplitBillDemoView()
         case .invitation(let code): InvitationView(code: code)
         case .onboarding: OnboardingView()
         case .tab(let tab):

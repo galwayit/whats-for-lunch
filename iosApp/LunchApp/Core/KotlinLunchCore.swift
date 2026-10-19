@@ -55,8 +55,10 @@ final class KotlinLunchCore: LunchCoreClient {
             let supabaseUrl = config.supabaseUrl,
             let supabaseAnonKey = config.supabaseAnonKey,
             let backendBaseUrl = config.backendBaseUrl,
-            let revenueCatApiKey = config.revenueCatApiKey
+            config.revenueCatApiKey != nil || LunchConfig.allowsMissingPurchases
         else { throw CoreError.service(code: "CONFIG_MISSING", message: "Lunch.plist is incomplete") }
+        // An empty key tells the core to run without purchases (Debug only, enforced there too).
+        let revenueCatApiKey = config.revenueCatApiKey ?? ""
 
         let support = try FileManager.default.url(
             for: .applicationSupportDirectory,
@@ -82,10 +84,21 @@ final class KotlinLunchCore: LunchCoreClient {
             revenueCatApiKey: revenueCatApiKey,
             databasePath: databasePath,
             inviteLinkBase: config.inviteLinkBase,
-            isDebug: isDebug
+            isDebug: isDebug,
+            anonymousAppUserId: revenueCatApiKey.isEmpty ? debugAppUserId() : nil
         )
         let core = LunchCore.SwiftLunchCoreFactory.shared.start(config: coreConfig, location: location.external)
         return KotlinLunchCore(core: core, location: location)
+    }
+
+    /// The backend's x-app-user-id while purchases are off. Kept in user defaults so per-user
+    /// limits such as the daily AI allowance survive relaunches; a reinstall starts fresh.
+    static func debugAppUserId(defaults: UserDefaults = .standard) -> String {
+        let key = "lunch.debugAppUserId"
+        if let existing = defaults.string(forKey: key) { return existing }
+        let created = "debug-" + UUID().uuidString.lowercased()
+        defaults.set(created, forKey: key)
+        return created
     }
 }
 
@@ -94,6 +107,7 @@ final class KotlinLunchCore: LunchCoreClient {
 final class KotlinLocationProvider: NSObject, LocationProvider, CLLocationManagerDelegate {
     fileprivate let external = LunchCore.ExternalLocationProvider()
     private let manager = CLLocationManager()
+    private var searchArea: SearchArea?
 
     override init() {
         super.init()
@@ -103,6 +117,7 @@ final class KotlinLocationProvider: NSObject, LocationProvider, CLLocationManage
     }
 
     func current() async throws -> Location {
+        if let searchArea { return searchArea.location }
         guard authorizationGranted(manager.authorizationStatus) else {
             throw CoreError.service(code: "LOCATION_PERMISSION_DENIED", message: "Location permission not granted")
         }
@@ -111,6 +126,17 @@ final class KotlinLocationProvider: NSObject, LocationProvider, CLLocationManage
     }
 
     func hasPermission() async -> Bool { authorizationGranted(manager.authorizationStatus) }
+
+    func setSearchArea(_ area: SearchArea?) {
+        searchArea = area
+        if let area {
+            external.setSearchArea(latitude: area.latitude, longitude: area.longitude)
+        } else {
+            external.clearSearchArea()
+            external.clear()
+            if authorizationGranted(manager.authorizationStatus) { manager.requestLocation() }
+        }
+    }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         syncAuthorization(manager.authorizationStatus)
@@ -285,10 +311,16 @@ private final class KotlinAchievementRepository: AchievementRepository {
 private final class KotlinAiRecommendationService: AiRecommendationService {
     private let source: LunchCore.SwiftAiRecommendationService
     init(_ source: LunchCore.SwiftAiRecommendationService) { self.source = source }
-
-    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant]) async throws -> AiRecommendation {
+    func configuration() async throws -> AiConfiguration {
         try await rethrowCoreError {
-            try await self.source.recommend(cravings: cravings, maxResults: Int32(maxResults), candidates: candidates.map(\.kotlin)).app
+            let config = try await self.source.configuration()
+            return AiConfiguration(consentVersion: config.consentVersion, providers: config.providers.map { AiProviderDisclosure(name: $0.name, privacyUrl: $0.privacyUrl) })
+        }
+    }
+
+    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant], consentVersion: String) async throws -> AiRecommendation {
+        try await rethrowCoreError {
+            try await self.source.recommend(cravings: cravings, maxResults: Int32(maxResults), candidates: candidates.map(\.kotlin), consentVersion: consentVersion).app
         }
     }
     func history(userId: Int64, limit: Int) async throws -> [AiRecommendation] {
@@ -361,27 +393,51 @@ private final class KotlinAuthRepository: AuthRepository {
             try await self.source.signInWithApple(idToken: idToken, nonce: nonce, fullName: fullName).app
         }
     }
-    func signInWithGoogle(idToken: String) async throws -> AuthSession {
-        try await rethrowCoreError { try await self.source.signInWithGoogle(idToken: idToken).app }
+    func signInWithGoogle(idToken: String, nonce: String, accessToken: String?) async throws -> AuthSession {
+        try await rethrowCoreError { try await self.source.signInWithGoogle(idToken: idToken, nonce: nonce, accessToken: accessToken).app }
+    }
+    func signInWithEmail(email: String, password: String) async throws -> AuthSession {
+        try await rethrowCoreError { try await self.source.signInWithEmail(email: email, password: password).app }
+    }
+    func registerWithEmail(email: String, password: String) async throws -> Bool {
+        try await rethrowCoreError { try await self.source.registerWithEmail(email: email, password: password).boolValue }
+    }
+    func verifyEmail(email: String, code: String) async throws -> AuthSession {
+        try await rethrowCoreError { try await self.source.verifyEmail(email: email, code: code).app }
+    }
+    func resendVerification(email: String) async throws {
+        try await rethrowCoreError { try await self.source.resendVerification(email: email) }
+    }
+    func requestPasswordReset(email: String) async throws {
+        try await rethrowCoreError { try await self.source.requestPasswordReset(email: email) }
+    }
+    func resetPassword(email: String, code: String, newPassword: String) async throws -> AuthSession {
+        try await rethrowCoreError { try await self.source.resetPassword(email: email, code: code, newPassword: newPassword).app }
     }
     func signOut() async throws { try await rethrowCoreError { try await self.source.signOut() } }
-    func deleteAccount() async throws { try await rethrowCoreError { try await self.source.deleteAccount() } }
+    func deleteAccount(appleAuthorizationCode: String?) async throws { try await rethrowCoreError { try await self.source.deleteAccount(appleAuthorizationCode: appleAuthorizationCode) } }
 }
 
 private final class KotlinGroupRepository: GroupRepository {
     private let source: LunchCore.SwiftGroupRepository
     init(_ source: LunchCore.SwiftGroupRepository) { self.source = source }
+    func loadGroups() async throws -> [LunchGroup] {
+        try await rethrowCoreError { try await self.source.loadGroups().map(\.app) }
+    }
+    func loadRsvps(groupId: String) async throws -> [Rsvp] {
+        try await rethrowCoreError { try await self.source.loadRsvps(groupId: groupId).map(\.app) }
+    }
 
     func myGroups() -> AsyncStream<[LunchGroup]> {
         mappedStream(source.myGroups()) { $0.map(\.app) }
     }
-    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double) async throws -> LunchGroup {
+    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double, details: GroupDetails) async throws -> LunchGroup {
         try await rethrowCoreError {
-            try await self.source.create(name: name, scheduledAtEpochSeconds: scheduledAtEpochSeconds, area: area.kotlin, radiusKm: radiusKm).app
+            try await self.source.create(name: name, scheduledAtEpochSeconds: scheduledAtEpochSeconds, area: area.kotlin, radiusKm: radiusKm, details: details.kotlin).app
         }
     }
-    func propose(groupId: String) async throws -> [GroupProposal] {
-        try await rethrowCoreError { try await self.source.propose(groupId: groupId).map(\.app) }
+    func propose(groupId: String, consentVersion: String) async throws -> [GroupProposal] {
+        try await rethrowCoreError { try await self.source.propose(groupId: groupId, consentVersion: consentVersion).map(\.app) }
     }
     func confirmPlace(groupId: String, restaurant: Restaurant) async throws -> LunchGroup {
         try await rethrowCoreError {
@@ -395,6 +451,21 @@ private final class KotlinGroupRepository: GroupRepository {
         try await rethrowCoreError {
             try await self.source.respond(code: code, status: status.kotlin, displayName: displayName).app
         }
+    }
+    func suggest(code: String, draft: GroupSuggestionDraft, displayName: String?) async throws -> Invitation {
+        try await rethrowCoreError { try await self.source.suggest(code: code, draft: draft.kotlin, displayName: displayName).app }
+    }
+    func suggestions(groupId: String) async throws -> [GroupSuggestion] {
+        try await rethrowCoreError { try await self.source.suggestions(groupId: groupId).map(\.app) }
+    }
+    func reviewSuggestion(groupId: String, suggestionId: String, accept: Bool) async throws -> LunchGroup {
+        try await rethrowCoreError { try await self.source.reviewSuggestion(groupId: groupId, suggestionId: suggestionId, accept: accept).app }
+    }
+    func updateDetails(groupId: String, details: GroupDetails) async throws -> LunchGroup {
+        try await rethrowCoreError { try await self.source.updateDetails(groupId: groupId, details: details.kotlin).app }
+    }
+    func safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String) async throws {
+        try await rethrowCoreError { try await self.source.safetyAction(code: code, targetKind: targetKind, targetId: targetId, action: action, reason: reason) }
     }
     func rsvps(groupId: String) -> AsyncStream<[Rsvp]> {
         mappedStream(source.rsvps(groupId: groupId)) { $0.map(\.app) }

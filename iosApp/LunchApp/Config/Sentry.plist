@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Public event-ingestion DSN for iapp-do/apple, not an authentication token. -->
+    <key>dsn</key>
+    <string>https://d39c708084b0080506629d53834f86bc@o4512206561738752.ingest.us.sentry.io/4512206587035648</string>
+    <key>enabled</key>
+    <true/>
+</dict>
+</plist>

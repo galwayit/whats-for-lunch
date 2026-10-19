@@ -37,6 +37,7 @@ struct ProposalCard: View {
                 }
                 .lunchText(.bodySmall)
                 .foregroundStyle(Tokens.Palette.textSecondary)
+                GoogleMapsAttribution(restaurant: restaurant)
                 VStack(alignment: .leading, spacing: Tokens.Spacing.sm) {
                     ForEach(reasons, id: \.self) { reason in
                         HStack(alignment: .firstTextBaseline, spacing: Tokens.Spacing.sm) {

@@ -30,6 +30,7 @@ struct RecommendationCard: View {
             RestaurantPhoto(url: restaurant.photoURL)
             VStack(alignment: .leading, spacing: Tokens.Spacing.md) {
                 header
+                GoogleMapsAttribution(restaurant: restaurant)
                 reasonList
                 actions
                 footerLinks

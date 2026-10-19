@@ -72,6 +72,12 @@ nonisolated struct BudgetEntry: Hashable, Codable {
     var dateEpochSeconds: Int64
 }
 
+nonisolated struct PlaceAttribution: Hashable, Codable {
+    var name: String
+    var uri: String?
+    var photoUri: String?
+}
+
 nonisolated struct RestaurantReview: Hashable, Codable, Identifiable {
     let reviewId: String
     var authorName: String
@@ -80,6 +86,8 @@ nonisolated struct RestaurantReview: Hashable, Codable, Identifiable {
     var text: String?
     var timeEpochSeconds: Int64
     var relativeTimeDescription: String = ""
+    var authorUri: String? = nil
+    var sourceUri: String? = nil
 
     var id: String { reviewId }
 }
@@ -121,6 +129,10 @@ nonisolated struct Restaurant: Hashable, Codable, Identifiable {
     var photoReferences: [String] = []
     /// Absolute URL served by the backend for the first photo, when available.
     var photoUrl: String?
+    var googleMapsUri: String? = nil
+    var photoSourceUri: String? = nil
+    var photoAttributions: [PlaceAttribution]? = nil
+    var attributions: [PlaceAttribution]? = nil
 
     var id: String { placeId }
 
@@ -131,7 +143,10 @@ nonisolated struct Restaurant: Hashable, Codable, Identifiable {
     }
 
     /// `photoUrl` parsed for `AsyncImage`.
-    var photoURL: URL? { photoUrl.flatMap(URL.init(string:)) }
+    var photoURL: URL? {
+        guard googleMapsUri == nil || (!(photoAttributions ?? []).isEmpty && photoSourceUri != nil) else { return nil }
+        return photoUrl.flatMap(URL.init(string:))
+    }
 }
 
 nonisolated enum SortOption: String, CaseIterable, Hashable {
@@ -277,6 +292,7 @@ nonisolated struct AuthSession: Hashable {
     var userId: String
     var email: String?
     var displayName: String?
+    var requiresAppleReauthentication: Bool = false
 }
 
 /// Wire form is lowercase (`pending`, `accepted`, `declined`), matching the backend.
@@ -298,7 +314,14 @@ nonisolated struct LunchGroup: Hashable, Codable, Identifiable {
     var placeAddress: String?
     var inviteCode: String
     var createdAtEpochSeconds: Int64
+    var budgetPerPersonMinor: Int64? = nil
+    var currencyCode: String = "AUD"
+    var paymentArrangement: String = "undecided"
+    var paymentMethod: String = "undecided"
 
+    var details: GroupDetails {
+        GroupDetails(hostName: hostName, budgetPerPersonMinor: budgetPerPersonMinor, currencyCode: currencyCode, paymentArrangement: paymentArrangement, paymentMethod: paymentMethod)
+    }
     var scheduledAt: Date { Date(timeIntervalSince1970: TimeInterval(scheduledAtEpochSeconds)) }
 }
 
@@ -324,6 +347,7 @@ nonisolated struct Invitation: Hashable, Codable {
     var attendees: [Rsvp]
     var myStatus: RsvpStatus?
     var inviteUrl: String
+    var mySuggestion: GroupSuggestion? = nil
 }
 
 nonisolated struct Location: Hashable, Codable {
@@ -356,3 +380,58 @@ extension SubscriptionStatus: @unchecked Sendable {}
 extension AuthSession: @unchecked Sendable {}
 extension LunchGroup: @unchecked Sendable {}
 extension Rsvp: @unchecked Sendable {}
+
+nonisolated struct AiProviderDisclosure: Hashable {
+    let name: String
+    let privacyUrl: String
+}
+
+nonisolated struct AiConfiguration: Hashable {
+    let consentVersion: String
+    let providers: [AiProviderDisclosure]
+}
+
+nonisolated struct GroupDetails: Hashable, Codable, Sendable {
+    var hostName: String = ""
+    var budgetPerPersonMinor: Int64? = nil
+    var currencyCode: String = "AUD"
+    var paymentArrangement: String = "undecided"
+    var paymentMethod: String = "undecided"
+
+    var budgetDescription: String {
+        guard let budgetPerPersonMinor else { return "Budget: to be confirmed" }
+        return "Budget: \((Double(budgetPerPersonMinor) / 100).formatted(.currency(code: currencyCode))) per person"
+    }
+    static let arrangements = [("undecided", "To be confirmed"), ("pay_own", "Everyone pays their own"), ("split_equally", "Split equally"), ("host_pays", "Host's treat")]
+    static let methods = [("undecided", "To be confirmed"), ("at_venue", "Pay at the venue"), ("cash", "Cash"), ("card", "Card"), ("bank_transfer", "Bank transfer")]
+    var arrangementDescription: String { Self.arrangements.first { $0.0 == paymentArrangement }?.1 ?? "To be confirmed" }
+    var paymentDescription: String { Self.methods.first { $0.0 == paymentMethod }?.1 ?? "To be confirmed" }
+}
+
+nonisolated struct GroupSuggestionDraft: Sendable {
+    var placeName: String? = nil
+    var placeAddress: String? = nil
+    var scheduledAt: Int64? = nil
+    var note: String? = nil
+}
+
+nonisolated struct GroupSuggestion: Hashable, Codable, Identifiable, Sendable {
+    var id: String
+    var groupId: String
+    var displayName: String
+    var placeName: String?
+    var placeAddress: String?
+    var scheduledAtEpochSeconds: Int64?
+    var note: String?
+    var status: String
+    var createdAtEpochSeconds: Int64
+    var scheduledAt: Date? { scheduledAtEpochSeconds.map { Date(timeIntervalSince1970: Double($0)) } }
+    var statusLabel: String {
+        switch status {
+        case "accepted": "Host applied your suggestion"
+        case "declined": "Host kept the current plan"
+        case "superseded": "The plan has changed — check the latest details"
+        default: "Waiting for the host to review"
+        }
+    }
+}

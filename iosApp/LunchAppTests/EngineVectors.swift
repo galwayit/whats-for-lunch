@@ -131,15 +131,9 @@ nonisolated struct EngineVectors: Decodable {
     var level: [LevelCase]
     var toStringAsFixed1: [FixedCase]
 
-    /// The fixture lives in the shared Kotlin module; resolve it from this file's location so the
-    /// test needs no bundle resource wiring.
+    /// The test bundle includes the same fixture consumed by the shared Kotlin module.
     static func load() throws -> EngineVectors {
-        let repoRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // LunchAppTests
-            .deletingLastPathComponent() // iosApp
-            .deletingLastPathComponent() // repo
-        let url = repoRoot.appending(path: "shared/src/commonTest/resources/fixtures/engine_vectors.json")
-        return try JSONDecoder().decode(EngineVectors.self, from: Data(contentsOf: url))
+        try JSONDecoder().decode(EngineVectors.self, from: TestFixtures.data(named: "engine_vectors"))
     }
 
     func restaurant(_ placeId: String) -> Restaurant {

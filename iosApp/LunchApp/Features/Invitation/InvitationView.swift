@@ -14,6 +14,7 @@ struct InvitationView: View {
     @Environment(AppEnvironment.self) private var app
     @Environment(\.openURL) private var openURL
     @State private var model: InvitationViewModel?
+    @State private var showsSuggestion = false
     let code: String
 
     var body: some View {
@@ -71,12 +72,32 @@ struct InvitationView: View {
                                     attendees: invitation.attendees,
                                     isResponding: model.isResponding,
                                     onAccept: { Task { await model.respond(.accepted, requiresName: app.session == nil) } },
-                                    onDecline: { Task { await model.respond(.declined, requiresName: false) } }
+                                    onDecline: { Task { await model.respond(.declined, requiresName: app.session == nil) } }
                                 )
                             }
 
+                            if let suggestion = invitation.mySuggestion {
+                                LunchCard {
+                                    VStack(alignment: .leading, spacing: Tokens.Spacing.md) {
+                                        Text(suggestion.statusLabel).lunchText(.heading).foregroundStyle(Tokens.Palette.text)
+                                        SuggestionSummary(suggestion: suggestion)
+                                    }
+                                }
+                            }
+                            if invitation.mySuggestion?.status != "pending" {
+                                LunchButton(title: "Suggest another place or time", style: .secondary, isDisabled: model.isResponding, identifier: "invite_suggest_change") {
+                                    showsSuggestion = true
+                                }
+                            }
+                            LunchButton(title: "Refresh invitation", style: .secondary, isDisabled: model.isResponding) { Task { await model.load() } }
+                            if app.session?.userId != invitation.group.hostId {
+                                GroupSafetyButton(code: code, targetKind: "group", targetId: invitation.group.id, label: "Report invitation or block host") { app.dismiss() }
+                            }
+                            ForEach(invitation.attendees.filter { $0.guestUserId != app.session?.userId || app.session == nil }) { guest in
+                                GroupSafetyButton(code: code, targetKind: "rsvp", targetId: guest.id, label: "Report or block \(guest.displayName)") { Task { await model.load() } }
+                            }
                             if let error = model.actionError {
-                                Text(error == .offline ? Copy.Error.offlineBody : Copy.Error.serviceBody)
+                                Text(error.planningMessage)
                                     .lunchText(.bodySmall)
                                     .foregroundStyle(Tokens.Palette.danger)
                             }
@@ -96,6 +117,9 @@ struct InvitationView: View {
             }
         }
         .task { await model.load() }
+        .fullScreenCover(isPresented: $showsSuggestion) {
+            InvitationSuggestionSheet(model: model, requiresName: app.session == nil)
+        }
     }
 
     /// Confirmation card shown after responding. Keeps the place and time visible so the
@@ -105,6 +129,7 @@ struct InvitationView: View {
             VStack(spacing: Tokens.Spacing.md) {
                 IconView(icon: icon, size: Tokens.Size.touchTarget).foregroundStyle(Tokens.Palette.success)
                 Text(title).lunchText(.title).foregroundStyle(Tokens.Palette.text)
+                GroupPlanningSummary(group: group)
                 VStack(alignment: .leading, spacing: Tokens.Spacing.sm) {
                     if let place = group.placeName {
                         detail(icon: .restaurant, text: place)

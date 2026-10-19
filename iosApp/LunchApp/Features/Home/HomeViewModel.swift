@@ -26,7 +26,8 @@ final class HomeViewModel {
 
     private let core: LunchCoreClient
     private var rejected: Set<String> = []
-    private var rsvpObservers: [String: Task<Void, Never>] = [:]
+    private var searchRevision = 0
+    private(set) var groupsError: CoreError?
     private static let reasonCount = 3
 
     init(core: LunchCoreClient) {
@@ -37,11 +38,14 @@ final class HomeViewModel {
 
     func search(prefs: UserPreferences?) async {
         guard !isSearching else { return }
+        searchRevision += 1
+        let revision = searchRevision
         hero = .searching
         do {
             let location = try await core.location.current()
             let radius = prefs?.maxTravelDistance ?? UserPreferences().maxTravelDistance
             let nearby = try await core.restaurants.searchNearby(location: location, radiusKm: radius, query: nil, forceRefresh: false)
+            guard revision == searchRevision, !Task.isCancelled else { return }
             let candidates = core.recommendation.applyPreferenceFilters(restaurants: nearby, prefs: prefs)
             picksCount = candidates.filter { core.recommendation.compatibilityScore(restaurant: $0, prefs: prefs) > SwiftRecommendationEngine.scoreThreshold }.count
             if let best = core.recommendation.bestMatch(candidates: candidates, prefs: prefs, rejected: rejected) {
@@ -51,6 +55,7 @@ final class HomeViewModel {
                 hero = .empty
             }
         } catch {
+            guard revision == searchRevision, !Task.isCancelled else { return }
             hero = .failed(CoreError.from(error))
         }
     }
@@ -62,25 +67,25 @@ final class HomeViewModel {
     }
 
     func reset() {
+        searchRevision += 1
         rejected = []
+        picksCount = 0
         hero = .idle
     }
 
     /// Keeps `groups` and the accepted counts current for the "Lunch together" row.
     func observeGroups() async {
-        for await groups in core.groups.myGroups() {
+        guard core.auth.session != nil else { groups = []; attendingCounts = [:]; groupsError = nil; return }
+        do {
+            let groups = try await core.groups.loadGroups()
             self.groups = groups.sorted { $0.scheduledAtEpochSeconds < $1.scheduledAtEpochSeconds }
-            for group in groups where rsvpObservers[group.id] == nil {
-                rsvpObservers[group.id] = Task { [core] in
-                    for await rsvps in core.groups.rsvps(groupId: group.id) {
-                        attendingCounts[group.id] = rsvps.filter { $0.status == .accepted }.count
-                    }
-                }
+            for group in groups {
+                let replies = try await core.groups.loadRsvps(groupId: group.id)
+                attendingCounts[group.id] = replies.filter { $0.status == .accepted }.count
             }
-            for id in rsvpObservers.keys where !groups.contains(where: { $0.id == id }) {
-                rsvpObservers[id]?.cancel()
-                rsvpObservers[id] = nil
-            }
-        }
+            attendingCounts = attendingCounts.filter { id, _ in groups.contains { $0.id == id } }
+            groupsError = nil
+        } catch is CancellationError { return }
+        catch { groupsError = CoreError.from(error) }
     }
 }

@@ -54,6 +54,7 @@ struct LaunchArgumentsTests {
         #expect(LaunchArguments(["-previewCore", "-openRoute", "invitation:K7P2QX"]).openRoute == .invitation(code: "K7P2QX"))
         #expect(LaunchArguments(["-previewCore", "-openRoute", "tab:track"]).openRoute == .tab(.track))
         #expect(LaunchArguments(["-previewCore", "-openRoute", "ai"]).openRoute == .aiRecommendations(pickPlaceId: nil))
+        #expect(LaunchArguments(["-previewCore", "-openRoute", "splitBill"]).openRoute == .splitBillDemo)
     }
 
     @Test func should_ignore_open_route_when_preview_core_is_off() {

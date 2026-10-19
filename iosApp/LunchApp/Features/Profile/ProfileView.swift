@@ -12,6 +12,7 @@ import UserNotifications
 struct ProfileView: View {
     @Environment(AppEnvironment.self) private var app
     @Environment(\.openURL) private var openURL
+    @AppStorage(AIDataConsent.defaultsKey, store: AIDataConsent.defaultStore) private var aiSharingVersion = ""
     @State private var model: ProfileViewModel?
     @State private var signIn: SignInViewModel?
     @State private var showsDeleteConfirmation = false
@@ -136,6 +137,7 @@ struct ProfileView: View {
                 Text(Copy.Profile.signInTitle).lunchText(.heading).foregroundStyle(Tokens.Palette.text)
                 Text(Copy.Profile.signInBody).lunchText(.bodySmall).foregroundStyle(Tokens.Palette.textSecondary)
                 SignInButtons(model: signIn)
+                LunchButton(title: "Continue with email", style: .secondary, identifier: "profile_sign_in_email") { app.present(.signIn) }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -152,6 +154,13 @@ struct ProfileView: View {
                     } else if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
                         openURL(url)
                     }
+                }
+            }
+            if !aiSharingVersion.isEmpty {
+                listRow(icon: .autoAwesome, title: "Withdraw AI data sharing consent", identifier: "profile_revoke_ai_consent") {
+                    AIDataConsent().revoke()
+                    aiSharingVersion = ""
+                    app.showToast("AI sharing is off. You can agree again when you next ask for recommendations.")
                 }
             }
             listRow(icon: .shield, title: Copy.Profile.settingsPrivacy, identifier: "profile_privacy") { app.present(.privacy) }
@@ -174,6 +183,13 @@ struct ProfileView: View {
                 rowDivider
                 listRow(icon: .logout, title: Copy.Profile.signOut, identifier: "profile_sign_out", isLoading: model.isSigningOut) {
                     Task { _ = await model.signOut() }
+                }
+            }
+            listRow(icon: .download, title: "Export meal report (PDF) · Pro", identifier: "profile_export_pdf", isLoading: model.isExporting) {
+                guard app.isPro else { app.present(.paywall); return }
+                Task {
+                    guard let user = app.user, let url = await model.exportPDF(user: user) else { return }
+                    exportItem = ShareItem(url: url)
                 }
             }
             listRow(icon: .download, title: Copy.Profile.exportData, identifier: "profile_export", isLoading: model.isExporting) {

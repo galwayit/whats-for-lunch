@@ -69,6 +69,18 @@ final class InvitationViewModel {
         }
     }
 
+    func suggest(_ draft: GroupSuggestionDraft, requiresName: Bool) async -> Bool {
+        let name = guestName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !requiresName || !name.isEmpty else { actionError = .service(code: "NAME_REQUIRED", message: "Enter your name so the host knows who suggested the change."); return false }
+        guard !isResponding else { return false }
+        isResponding = true; actionError = nil
+        defer { isResponding = false }
+        do {
+            invitation = try await core.groups.suggest(code: code, draft: draft, displayName: name.isEmpty ? nil : name)
+            return true
+        } catch { actionError = CoreError.from(error); return false }
+    }
+
     /// Counts accepted invitations on this device and arms the one-time guest offer at the threshold.
     private func recordAcceptance() {
         let count = defaults.integer(forKey: Self.acceptedCountKey) + 1

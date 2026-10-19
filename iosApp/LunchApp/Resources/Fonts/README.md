@@ -1,20 +1,22 @@
-# Plus Jakarta Sans
+# Bricolage Grotesque
 
-Drop the static TTF files from the Plus Jakarta Sans release (OFL licensed,
-https://github.com/tokotype/PlusJakartaSans) into this folder. The Xcode project uses a
-synchronised folder, so the files are picked up automatically; `Info.plist` already lists
+The display roles (`display`, `title`, `heading` in `design/tokens.json`) are set in Bricolage
+Grotesque. Every other role uses the system text face, so there are only two files here. The
+Xcode project uses a synchronised folder, so they are bundled automatically; `Info.plist` lists
 them under `UIAppFonts`.
-
-Exact file names expected (PostScript names in brackets, used by `LunchFont`):
 
 | File | PostScript name | Token weight |
 |---|---|---|
-| `PlusJakartaSans-Regular.ttf` | `PlusJakartaSans-Regular` | 400 |
-| `PlusJakartaSans-Medium.ttf` | `PlusJakartaSans-Medium` | 500 |
-| `PlusJakartaSans-SemiBold.ttf` | `PlusJakartaSans-SemiBold` | 600 |
-| `PlusJakartaSans-Bold.ttf` | `PlusJakartaSans-Bold` | 700 |
-| `PlusJakartaSans-ExtraBold.ttf` | `PlusJakartaSans-ExtraBold` | 800 |
+| `BricolageGrotesque-Bold.ttf` | `BricolageGrotesque-Bold` | 700 |
+| `BricolageGrotesque-ExtraBold.ttf` | `BricolageGrotesque-ExtraBold` | 800 |
 
-Until the files are present `LunchFont` falls back to the system font with the rounded
-design at the same sizes and weights (`DesignSystem/Theme.swift`). No code change is
-needed after adding the files; `LunchFont.isCustomFontAvailable` flips to `true` at launch.
+Both are static instances cut from the Google Fonts variable file
+(`ofl/bricolagegrotesque`, version 1.001) at width 100 and optical size 24 with
+`fontTools.varLib.instancer`, then renamed to the PostScript names above. The same two files
+ship in the Android app as `res/font/bricolage_grotesque_*.ttf`.
+
+Licence: SIL Open Font License 1.1, in `BricolageGrotesque-OFL.txt`, which ships in the bundle
+alongside the fonts as the licence requires.
+
+If the files are missing `LunchFont.isCustomFontAvailable` is `false` and the display roles fall
+back to the system font at the same sizes and weights (`DesignSystem/Theme.swift`).

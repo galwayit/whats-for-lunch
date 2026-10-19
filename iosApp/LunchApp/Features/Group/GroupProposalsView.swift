@@ -12,6 +12,7 @@ import SwiftUI
 
 struct GroupProposalsView: View {
     @Environment(AppEnvironment.self) private var app
+    @Environment(\.openURL) private var openURL
     @State private var model: GroupProposalsViewModel?
     let groupId: String
 
@@ -29,10 +30,21 @@ struct GroupProposalsView: View {
         VStack(spacing: 0) {
             ScreenHeader(title: Copy.Group.proposalsTitle, dismissal: .back, onDismiss: { app.dismiss() })
             Group {
-                if model.isLoading {
+                if model.needsConsent {
+                    ScrollView {
+                        AIConsentCard(providers: model.aiConfiguration?.providers ?? []) {
+                            Task { await model.grantConsent() }
+                        } onDecline: {
+                            model.declineConsent()
+                            app.dismiss()
+                        } onPrivacy: {
+                            openURL(LunchConfig.privacyUrl)
+                        }.padding(Tokens.Spacing.page)
+                    }
+                } else if model.isLoading {
                     ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = model.error {
-                    ErrorStateView(error: error) { Task { await model.load() } }
+                    AIErrorStateView(error: error) { Task { await model.load() } }
                 } else if model.proposals.isEmpty {
                     EmptyState(
                         variant: .nothingHere,

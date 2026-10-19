@@ -9,22 +9,19 @@
 import SwiftUI
 
 struct RestaurantPhoto: View {
+    @Environment(\.scenePhase) private var scenePhase
     let url: URL?
     var height: CGFloat = LunchCard<EmptyView>.headerHeight
+    @State private var loadedImage: UIImage?
+    @State private var loadedURL: URL?
 
     private static let placeholderIconSize = Tokens.Size.iconDefault * 2
 
     var body: some View {
         ZStack {
-            Tokens.Palette.primarySoft
-            if let url {
-                AsyncImage(url: url) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        placeholder
-                    }
-                }
+            Tokens.Palette.surfaceRaised
+            if let url, let image = loadedURL == url ? loadedImage : RestaurantPhotoStore.shared.cachedImage(for: url) {
+                Image(uiImage: image).resizable().scaledToFill()
             } else {
                 placeholder
             }
@@ -33,6 +30,16 @@ struct RestaurantPhoto: View {
         .frame(height: height)
         .clipped()
         .accessibilityHidden(true)
+        .task(id: scenePhase == .active ? url : nil) {
+            guard scenePhase == .active else { return }
+            loadedImage = nil
+            loadedURL = nil
+            guard let url else { return }
+            let image = await RestaurantPhotoStore.shared.image(for: url)
+            guard !Task.isCancelled else { return }
+            loadedImage = image
+            loadedURL = url
+        }
     }
 
     private var placeholder: some View {

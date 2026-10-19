@@ -38,6 +38,7 @@ struct InvitationCard: View {
                     }
                     detail(icon: .schedule, text: group.scheduledAt.formatted(date: .complete, time: .shortened))
                 }
+                GroupPlanningSummary(group: group)
                 HStack(spacing: Tokens.Spacing.sm) {
                     avatarStack
                     Text(Copy.Group.inviteAttending(going.count)).lunchText(.caption).foregroundStyle(Tokens.Palette.textSecondary)

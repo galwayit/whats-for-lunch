@@ -4,7 +4,7 @@
 //
 //  @file PaywallScreen.swift
 //  @description The Lunch Pro paywall (design/screens.md section 9): both plans from the core
-//  entitlement API with the 7-day trial on yearly, restore, terms and privacy links, and the
+//  entitlement API with eligible store trial details, restore, terms and privacy links, and the
 //  "You're on Lunch Pro" success state with Done.
 //  @author AI Assistant
 //  @date 2026-09-03
@@ -34,6 +34,13 @@ struct PaywallScreen: View {
         return ZStack(alignment: .topTrailing) {
             if model.isSubscribed {
                 successState
+            } else if app.session == nil {
+                VStack(spacing: Tokens.Spacing.lg) {
+                    Text("Lunch Pro follows your account").lunchText(.title)
+                    Text("Sign in before subscribing or restoring so AI picks and group hosting unlock for the right account.").lunchText(.body)
+                    LunchButton(title: Copy.Profile.signInApple, style: .primary) { app.present(.signIn) }
+                    LunchButton(title: Copy.Paywall.terms, style: .text) { openURL(LunchConfig.termsUrl) }
+                }.padding(Tokens.Spacing.page)
             } else if case .failed(let error) = model.offerings {
                 ErrorStateView(error: error) { Task { await model.load() } }
                     .padding(.top, Tokens.Size.touchTarget + Tokens.Spacing.md)
@@ -58,14 +65,14 @@ struct PaywallScreen: View {
 
             if !model.isSubscribed { closeButton }
         }
-        .task { await model.load() }
-        .alert(Copy.Error.serviceTitle, isPresented: Binding(
+        .task(id: app.session?.userId) { if app.session != nil { await model.load() } }
+        .alert(model.errorTitle, isPresented: Binding(
             get: { model.error != nil },
             set: { if !$0 { model.error = nil } }
         )) {
             Button(Copy.Action.done) { model.error = nil }
         } message: {
-            Text(model.error == .offline ? Copy.Error.offlineBody : Copy.Error.serviceBody)
+            Text(model.errorMessage)
         }
     }
 

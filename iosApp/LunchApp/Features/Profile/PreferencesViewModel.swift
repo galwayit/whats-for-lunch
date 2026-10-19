@@ -14,6 +14,7 @@ final class PreferencesViewModel {
     var weeklyBudget: Double
     var maxTravelDistance: Double
     var includeChains: Bool
+    var requireDietaryVerification: Bool
     private(set) var dietary: Set<String>
     private(set) var allergens: Set<String>
     private(set) var isSaving = false
@@ -31,6 +32,7 @@ final class PreferencesViewModel {
         weeklyBudget = prefs.weeklyBudget
         maxTravelDistance = prefs.maxTravelDistance
         includeChains = prefs.includeChains
+        requireDietaryVerification = prefs.requireDietaryVerification
         dietary = Set(prefs.dietaryRestrictions.map(Self.key))
         allergens = Set(prefs.allergens.map(Self.key))
     }
@@ -54,6 +56,7 @@ final class PreferencesViewModel {
         prefs.weeklyBudget = weeklyBudget
         prefs.maxTravelDistance = maxTravelDistance
         prefs.includeChains = includeChains
+        prefs.requireDietaryVerification = requireDietaryVerification
         prefs.dietaryRestrictions = dietary.sorted()
         prefs.allergens = allergens.sorted()
         do {

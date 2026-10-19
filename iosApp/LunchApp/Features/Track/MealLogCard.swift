@@ -13,6 +13,7 @@ struct MealLogCard: View {
     @Bindable var model: TrackViewModel
     let onLog: () -> Void
     @FocusState private var placeFocused: Bool
+    @State private var splitModel: SplitBillViewModel?
 
     var body: some View {
         LunchCard {
@@ -22,7 +23,12 @@ struct MealLogCard: View {
                     .foregroundStyle(Tokens.Palette.text)
                 typeChips
                 placeField
-                CurrencyField(amount: $model.cost, identifier: "meal_cost_field")
+                HStack(spacing: Tokens.Spacing.sm) {
+                    CurrencyField(amount: $model.cost, identifier: "meal_cost_field")
+                    LunchButton(title: Copy.Split.open, style: .text, fillsWidth: false, identifier: "split_bill_button") {
+                        splitModel = SplitBillViewModel(prefillBillDollars: model.cost)
+                    }
+                }
                 if let impact = model.impact {
                     Text(impact.message)
                         .lunchText(.bodySmall)
@@ -39,6 +45,17 @@ struct MealLogCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .sheet(item: $splitModel) { splitModel in
+            SplitBillView(model: splitModel) { useSplitShare(splitModel) }
+        }
+    }
+
+    /// "Use my share": fills the cost field, sets the notes only if they're empty, and closes
+    /// the sheet; the user still logs the meal themselves.
+    private func useSplitShare(_ splitModel: SplitBillViewModel) {
+        guard let note = splitModel.useShareNote else { return }
+        model.applySplitShare(cost: splitModel.myShareDollars, note: note)
+        self.splitModel = nil
     }
 
     private var typeChips: some View {

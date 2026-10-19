@@ -49,6 +49,7 @@ struct PreferencesView: View {
                             .accessibilityIdentifier("preferences_weekly_slider")
                     }
                     section(Copy.Preferences.sectionLocation) {
+                        SearchAreaButton()
                         DistanceSlider(label: Copy.Preferences.distance(String(Int(model.maxTravelDistance))), value: $model.maxTravelDistance)
                     }
                     section(Copy.Preferences.sectionRestaurant) {
@@ -63,6 +64,11 @@ struct PreferencesView: View {
                     }
                     section(Copy.Preferences.sectionAllergens) {
                         DietaryChipGrid(selected: model.allergens, onlyAllergens: true) { model.toggleAllergen($0) }
+                        Toggle("Require verified dietary information", isOn: $model.requireDietaryVerification)
+                            .tint(Tokens.Palette.primary)
+                            .accessibilityIdentifier("preferences_dietary_verification")
+                        Text("Allergen-free evidence is currently unavailable. With verification required, allergy preferences may return no matches. Turning this off lets you explore unverified places; it does not establish that they are suitable. Always confirm ingredients and cross-contact risks with the venue.")
+                            .lunchText(.bodySmall).foregroundStyle(Tokens.Palette.textSecondary)
                     }
                     if let error = model.error {
                         Text(error == .offline ? Copy.Error.offlineBody : Copy.Error.serviceBody)

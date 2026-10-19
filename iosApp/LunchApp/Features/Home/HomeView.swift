@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(AppEnvironment.self) private var app
     @State private var model: HomeViewModel?
 
@@ -30,6 +31,8 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: Tokens.Spacing.lg) {
                 header
                 greeting
+                SearchAreaButton()
+                DietaryNotice()
                 if app.isPro {
                     LunchTextField(placeholder: Copy.Home.cravingPlaceholder, text: $model.craving, icon: .autoAwesome, identifier: "craving_field_home", submitLabel: .search) {
                         app.aiCravingDraft = model.craving
@@ -44,13 +47,21 @@ struct HomeView: View {
             .padding(.top, Tokens.Spacing.sm)
             .padding(.bottom, Tokens.Spacing.xl)
         }
-        .task { await model.observeGroups() }
+        .task(id: "\(scenePhase)-\(app.session?.userId ?? "guest")") {
+            guard scenePhase == .active else { return }
+            while !Task.isCancelled {
+                await model.observeGroups()
+                do { try await Task.sleep(for: .seconds(30)) } catch { return }
+            }
+        }
         .task {
             if app.shouldRunFirstSearch {
                 app.shouldRunFirstSearch = false
                 await model.search(prefs: app.user?.preferences)
             }
         }
+        .onChange(of: app.user?.preferences) { model.reset() }
+        .onChange(of: app.searchArea) { model.reset() }
     }
 
     private var header: some View {
@@ -125,6 +136,7 @@ struct HomeView: View {
             Text(Copy.Home.groupRowTitle)
                 .lunchText(.heading)
                 .foregroundStyle(Tokens.Palette.text)
+            if let error = model.groupsError { ErrorStateView(error: error) { Task { await model.observeGroups() } } }
             if model.groups.isEmpty {
                 Text(Copy.Home.groupRowEmpty)
                     .lunchText(.bodySmall)

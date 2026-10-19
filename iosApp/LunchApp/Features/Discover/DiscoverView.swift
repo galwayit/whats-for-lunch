@@ -31,9 +31,10 @@ struct DiscoverView: View {
             header(model)
             list(model)
         }
-        .task { if case .idle = model.results { await model.search(prefs: prefs) } }
         .task { if let userId = app.user?.id { await model.observeFavourites(userId: userId) } }
         .onChange(of: model.query) { model.queryChanged(prefs: prefs) }
+        .onChange(of: prefs) { model.applyFilters(prefs: prefs) }
+        .task(id: app.searchArea) { await model.search(prefs: prefs) }
         .sheet(item: $model.sheet) { sheet in
             DiscoverFilterSheet(kind: sheet, model: model)
                 .presentationDetents([.medium])
@@ -55,6 +56,8 @@ struct DiscoverView: View {
             SearchField(text: $model.query, identifier: "discover_search_field") {
                 Task { await model.search(prefs: app.user?.preferences) }
             }
+            SearchAreaButton()
+            DietaryNotice()
             HStack {
                 Text(Copy.Discover.count(count))
                     .lunchText(.bodySmall)

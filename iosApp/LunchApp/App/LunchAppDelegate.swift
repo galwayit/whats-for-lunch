@@ -42,10 +42,14 @@ final class LunchAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         Messaging.messaging().apnsToken = deviceToken
     }
 
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    /// Firebase does not promise the main thread for this callback, and the target defaults every
+    /// member to the main actor, so an off-main call would trap. Hop to the main actor instead.
+    nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken, !fcmToken.isEmpty else { return }
-        pendingFCMToken = fcmToken
-        submitPendingToken()
+        Task { @MainActor in
+            self.pendingFCMToken = fcmToken
+            self.submitPendingToken()
+        }
     }
 
     private func submitPendingToken() {

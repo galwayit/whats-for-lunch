@@ -170,7 +170,7 @@ struct ComponentGallery: View {
                     Stepper("Text size", onIncrement: { stepTextSize(1) }, onDecrement: { stepTextSize(-1) })
                         .labelsHidden()
                 }
-                Text(LunchFont.isCustomFontAvailable ? "Plus Jakarta Sans loaded" : "System rounded stand-in (fonts not bundled)")
+                Text(LunchFont.isCustomFontAvailable ? "Bricolage Grotesque loaded" : "System stand-in (display fonts not bundled)")
                     .lunchText(.caption)
                     .foregroundStyle(Tokens.Palette.textSecondary)
             }
@@ -334,7 +334,7 @@ struct ComponentGallery: View {
             }
             ProposalCard(restaurant: PreviewData.greenGardenBowls, reasons: PreviewData.reasons, index: 0) {}
             ProposalCard(restaurant: PreviewData.pastaCorner, reasons: ["Great italian cuisine", "Within your preferred distance"], index: 1, isChoosing: true) {}
-            InviteShareRow(inviteUrl: PreviewData.inviteUrl) {}
+            InviteShareRow(inviteUrl: PreviewData.inviteUrl, onShare: {}, onShowQR: {})
         }
     }
 

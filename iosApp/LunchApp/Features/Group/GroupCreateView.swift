@@ -38,6 +38,8 @@ struct GroupCreateView: View {
                         submitLabel: .next
                     )
 
+                    GroupDetailsFields(draft: $model.detailsDraft)
+
                     fieldLabel(Copy.Group.when)
                     LunchCard {
                         DatePicker("", selection: $model.scheduledAt, in: Date()...)
@@ -46,6 +48,7 @@ struct GroupCreateView: View {
                     }
 
                     fieldLabel(Copy.Group.whereLabel)
+                    SearchAreaButton()
                     LunchCard {
                         HStack(spacing: Tokens.Spacing.sm) {
                             IconView(icon: .locationOn).foregroundStyle(Tokens.Palette.primary)
@@ -74,7 +77,7 @@ struct GroupCreateView: View {
                         title: Copy.Group.propose,
                         style: .primary,
                         isLoading: model.isCreating,
-                        isDisabled: model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.area == nil,
+                        isDisabled: model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.area == nil || model.detailsDraft.value == nil,
                         identifier: "group_create_submit"
                     ) {
                         Task {
@@ -88,7 +91,7 @@ struct GroupCreateView: View {
                 .padding(.bottom, Tokens.Spacing.xl)
             }
         }
-        .task { await model.loadArea() }
+        .task(id: app.searchArea) { await model.loadArea() }
     }
 
     private func fieldLabel(_ title: String) -> some View {

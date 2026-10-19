@@ -14,8 +14,10 @@ import Testing
 @testable import LunchApp
 
 struct RecommendationEngineVectorTests {
-    let vectors = try! EngineVectors.load()
+    let vectors: EngineVectors
     let engine = SwiftRecommendationEngine()
+
+    init() throws { vectors = try EngineVectors.load() }
 
     @Test func should_match_compatibility_scores_when_compared_with_fixture() {
         for c in vectors.compatibilityScore {
@@ -69,8 +71,10 @@ struct RecommendationEngineVectorTests {
 }
 
 struct BudgetEngineVectorTests {
-    let vectors = try! EngineVectors.load()
+    let vectors: EngineVectors
     let engine = SwiftBudgetEngine()
+
+    init() throws { vectors = try EngineVectors.load() }
 
     @Test func should_match_target_experiences_when_compared_with_fixture() {
         for c in vectors.budget.targetExperiences {
@@ -117,7 +121,9 @@ struct BudgetEngineVectorTests {
 }
 
 struct AchievementEngineVectorTests {
-    let vectors = try! EngineVectors.load()
+    let vectors: EngineVectors
+
+    init() throws { vectors = try EngineVectors.load() }
 
     @Test func should_match_level_names_when_compared_with_fixture() {
         let engine = SwiftAchievementEngine()
@@ -128,7 +134,9 @@ struct AchievementEngineVectorTests {
 }
 
 struct MealDefaultsVectorTests {
-    let vectors = try! EngineVectors.load()
+    let vectors: EngineVectors
+
+    init() throws { vectors = try EngineVectors.load() }
 
     @Test func should_match_smart_meal_type_when_compared_with_fixture() {
         let defaults = SwiftMealDefaults()

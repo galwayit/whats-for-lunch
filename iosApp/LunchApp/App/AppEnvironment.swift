@@ -32,6 +32,7 @@ final class AppEnvironment {
     var mealPrefill: MealPrefill?
     /// Craving typed on Home (Pro only); the AI screen consumes it when it appears.
     var aiCravingDraft: String?
+    private(set) var searchArea: SearchArea?
 
     private var observers: [Task<Void, Never>] = []
 
@@ -42,6 +43,14 @@ final class AppEnvironment {
         hasCompletedOnboarding = core.users.hasCompletedOnboarding
         isPro = core.entitlements.isPro
         session = core.auth.session
+        searchArea = SearchArea.load()
+        core.location.setSearchArea(searchArea)
+    }
+
+    func selectSearchArea(_ area: SearchArea?) {
+        searchArea = area
+        SearchArea.save(area)
+        core.location.setSearchArea(area)
     }
 
     /// Mirrors the core's streams into observable state. Safe to call more than once.
@@ -89,11 +98,15 @@ final class AppEnvironment {
     @discardableResult
     func present(gate reason: GateReason) -> Bool {
         switch reason {
-        case .hostRequiresPro, .aiDailyLimit, .favouritesLimit, .historyWindow:
+        case .hostRequiresPro, .favouritesLimit, .historyWindow:
             present(.paywall)
             return true
         case .signInRequired:
             present(.signIn)
+            return true
+        case .aiDailyLimit:
+            guard !core.entitlements.isPro else { return false }
+            present(.paywall)
             return true
         case .ok:
             return false

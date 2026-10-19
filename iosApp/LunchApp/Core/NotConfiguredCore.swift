@@ -75,7 +75,8 @@ private final class NotConfiguredAchievements: AchievementRepository {
 }
 
 private final class NotConfiguredAi: AiRecommendationService {
-    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant]) async throws -> AiRecommendation { throw NotConfigured.error }
+    func configuration() async throws -> AiConfiguration { throw NotConfigured.error }
+    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant], consentVersion: String) async throws -> AiRecommendation { throw NotConfigured.error }
     func history(userId: Int64, limit: Int) async throws -> [AiRecommendation] { throw NotConfigured.error }
     func submitFeedback(recommendationId: String, placeId: String?, rating: Int, feedback: String?, wasSelected: Bool) async throws { throw NotConfigured.error }
     func usedToday(userId: Int64) async -> Int { 0 }
@@ -105,15 +106,25 @@ private final class NotConfiguredAuth: AuthRepository {
     var session: AuthSession? { nil }
     var sessionUpdates: AsyncStream<AuthSession?> { NotConfigured.empty() }
     func signInWithApple(idToken: String, nonce: String, fullName: String?) async throws -> AuthSession { throw NotConfigured.error }
-    func signInWithGoogle(idToken: String) async throws -> AuthSession { throw NotConfigured.error }
+    func signInWithGoogle(idToken: String, nonce: String, accessToken: String?) async throws -> AuthSession { throw NotConfigured.error }
+    func signInWithEmail(email: String, password: String) async throws -> AuthSession { throw NotConfigured.error }
+    func registerWithEmail(email: String, password: String) async throws -> Bool { throw NotConfigured.error }
+    func verifyEmail(email: String, code: String) async throws -> AuthSession { throw NotConfigured.error }
+    func resendVerification(email: String) async throws { throw NotConfigured.error }
+    func requestPasswordReset(email: String) async throws { throw NotConfigured.error }
+    func resetPassword(email: String, code: String, newPassword: String) async throws -> AuthSession { throw NotConfigured.error }
     func signOut() async throws { throw NotConfigured.error }
-    func deleteAccount() async throws { throw NotConfigured.error }
+    func deleteAccount(appleAuthorizationCode: String?) async throws { throw NotConfigured.error }
 }
 
 private final class NotConfiguredGroups: GroupRepository {
+    func suggest(code: String, draft: GroupSuggestionDraft, displayName: String?) async throws -> Invitation { throw NotConfigured.error }
+    func suggestions(groupId: String) async throws -> [GroupSuggestion] { throw NotConfigured.error }
+    func reviewSuggestion(groupId: String, suggestionId: String, accept: Bool) async throws -> LunchGroup { throw NotConfigured.error }
+    func updateDetails(groupId: String, details: GroupDetails) async throws -> LunchGroup { throw NotConfigured.error }
     func myGroups() -> AsyncStream<[LunchGroup]> { NotConfigured.empty() }
-    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double) async throws -> LunchGroup { throw NotConfigured.error }
-    func propose(groupId: String) async throws -> [GroupProposal] { throw NotConfigured.error }
+    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double, details: GroupDetails) async throws -> LunchGroup { throw NotConfigured.error }
+    func propose(groupId: String, consentVersion: String) async throws -> [GroupProposal] { throw NotConfigured.error }
     func confirmPlace(groupId: String, restaurant: Restaurant) async throws -> LunchGroup { throw NotConfigured.error }
     func invitation(code: String) async throws -> Invitation { throw NotConfigured.error }
     func respond(code: String, status: RsvpStatus, displayName: String?) async throws -> Invitation { throw NotConfigured.error }

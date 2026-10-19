@@ -124,7 +124,21 @@ nonisolated enum Copy {
         static let historyTitle = "Earlier picks"
         static let emptyTitle = "Tell us what you feel like"
         static let emptyBody = "Cravings, a cuisine, or how much time you have. We'll pick three places."
+        static let unavailableTitle = "AI recommendations unavailable"
+        static let unavailableBody = "We couldn’t generate your lunch picks. Please try again later. You can still browse nearby places."
+        static let noMatchesTitle = "No matching places nearby"
+        static let noMatchesBody = "Try a wider distance or adjust your food preferences, then ask again."
+        static let busyTitle = "AI is at capacity"
+        static let busyBody = "AI requests have reached the service limit for now. Please try again later."
         static func confidence(_ level: String) -> String { "\(level) confidence" }
+    }
+
+    enum AIConsent {
+        static let title = "Before we ask the AI"
+        static func body(providers: String) -> String { "To pick places for you, Lunch sends your craving, budget, dietary preferences, recent meals, location and nearby places through Supabase to these AI providers: \(providers). If the main provider cannot respond, the backup may receive the same data. Group suggestions also include the group name, time, search area and past places. Do not include sensitive details in cravings or group names. Requests are sent only after you agree. You can withdraw permission in Profile." }
+        static let agree = "Agree and continue"
+        static let decline = "Not now"
+        static let privacy = "How we handle your data"
     }
 
     enum Discover {
@@ -220,8 +234,8 @@ nonisolated enum Copy {
         static let chainsOn = "On"
         static let chainsOff = "Off"
         static let proFreeTitle = "Lunch Pro"
-        static let proFreeBody = "Host group lunches, unlimited AI picks, full history."
-        static let proFreeCta = "Try free for 7 days"
+        static let proFreeBody = "Host group lunches, more AI picks, full history and PDF reports."
+        static let proFreeCta = "See Lunch Pro"
         static func proActiveTitle(_ plan: String) -> String { "Lunch Pro · \(plan)" }
         static func proActiveRenews(_ date: String) -> String { "Renews \(date)" }
         static func proActiveExpires(_ date: String) -> String { "Ends \(date)" }
@@ -230,7 +244,7 @@ nonisolated enum Copy {
         static let planYearly = "Yearly"
         static let planMonthly = "Monthly"
         static let signInTitle = "Sign in"
-        static let signInBody = "Needed to host group lunches and to keep your data across devices."
+        static let signInBody = "Needed for AI picks, purchases and group hosting. Your meal journal stays on this device."
         static let signInApple = "Continue with Apple"
         static let signInGoogle = "Continue with Google"
         static let signOut = "Sign out"
@@ -241,7 +255,7 @@ nonisolated enum Copy {
         static let settingsHelp = "Help & support"
         static let exportData = "Export my data"
         static let deleteTitle = "Delete account"
-        static let deleteBody = "This removes your account, groups, and invitations from our servers. Meals stay on this device unless you delete the app."
+        static let deleteBody = "This removes your account, groups, and invitations from our servers. Meals stay on this device unless you delete the app. Apple subscriptions continue until you cancel them in Manage subscription."
         static let deleteConfirm = "Delete"
     }
 
@@ -259,44 +273,59 @@ nonisolated enum Copy {
 
     enum Paywall {
         static let title = "Lunch Pro"
-        static let subtitle = "Everything the free tier does, without the limits."
+        static let subtitle = "Make lunch plans together and get more from your meal journal."
         static let planYearly = "Yearly"
-        static func planYearlyTrial(_ price: String) -> String { "7-day free trial, then \(price) a year" }
         static let planYearlyBadge = "BEST VALUE"
         static let planMonthly = "Monthly"
         static func planMonthlyPrice(_ price: String) -> String { "\(price) a month" }
         static let benefits = [
             "Host group lunches",
-            "Unlimited AI recommendations",
+            "Up to 10 AI requests a day, including group picks",
             "Full history and insights",
-            "Backup and sync",
             "Unlimited favourites",
             "PDF export",
         ]
         static let ctaTrial = "Start free trial"
         static let ctaSubscribe = "Subscribe"
-        static func legal(store: String) -> String {
-            "Payment is charged to your \(store) account when the trial ends. The subscription renews automatically at the same price unless cancelled at least 24 hours before the end of the period. Manage or cancel any time in your \(store) subscription settings."
+        static func priceDetail(_ package: ProPackage) -> String {
+            let recurring = "\(package.localizedPrice) per \(package.periodLabel)"
+            guard package.hasFreeTrial, let trial = package.trialLabel else { return recurring }
+            return "\(trial), then \(recurring)"
         }
+        static func legal(store: String, hasTrial: Bool = false) -> String {
+            let charge = hasTrial ? "Payment is charged when the free trial ends." : "Payment is charged when you confirm the purchase."
+            return "\(charge) Your subscription renews automatically at the displayed price and duration unless cancelled at least 24 hours before the end of the current period. Manage or cancel in your \(store) subscription settings. AI allowances reset at 00:00 UTC."
+        }
+
         static let restore = "Restore purchases"
         static let terms = "Terms of Use"
         static let privacy = "Privacy Policy"
         static let proBadge = "PRO"
         static let successTitle = "You're on Lunch Pro"
-        static let successBody = "Group lunches, unlimited AI picks and your full history are unlocked."
+        static let successBody = "Group hosting, more AI picks, full history and PDF reports are unlocked."
         static let restoreNothing = "No purchases to restore"
+        static let purchaseErrorTitle = "Subscription not updated"
+        static let purchaseErrorBody = "The store couldn’t complete your request. Please try again. If you already completed a purchase, use Restore purchases."
+        static let activationTitle = "Purchase needs attention"
+        static let activationBody = "Your purchase completed, but Lunch Pro hasn’t been activated. Try Restore purchases. If it stays locked, contact support before purchasing again."
+        static let paymentPendingTitle = "Payment pending"
+        static let paymentPendingBody = "Your payment is awaiting approval. Lunch Pro will unlock once the store confirms it. You don’t need to purchase again."
+        static let offlineBody = "Couldn’t reach the store. Check your connection and try again."
+        static let signInRequiredBody = "Sign in before subscribing or restoring purchases."
+        static let purchaseNotAllowedBody = "Purchases aren’t allowed on this device or account. Check your store and Screen Time settings."
+        static let productUnavailableBody = "This plan is no longer available. Close and reopen Lunch Pro to refresh the plans."
         static let storeName = "App Store"
     }
 
     enum Gate {
         static let aiTitle = "You've used today's free AI pick"
         static func aiBody(resetTime: String) -> String {
-            "Lunch Pro makes it unlimited, with cravings and insights. Your free pick resets at \(resetTime)."
+            "Subscribe to Lunch Pro for 10 AI requests a day, shared with group suggestions. Your free request resets at \(resetTime)."
         }
         static let aiCta = "See Lunch Pro"
         static let hostTitle = "Hosting is a Lunch Pro feature"
         static let hostBody = "Create the group, pick the place, and invite friends for free."
-        static let hostCta = "Start free trial"
+        static let hostCta = "See Lunch Pro"
         static let guestOfferTitle = "Enjoyed the lunch?"
         static let guestOfferBody = "Lunch Pro lets you host the next one."
     }
@@ -323,6 +352,9 @@ nonisolated enum Copy {
         static let proposalsChoose = "Choose"
         static let detailInvite = "Invite friends"
         static let detailShare = "Share invite"
+        static let detailQR = "Show QR code" // group.detail.qr
+        static let qrTitle = "Scan to join" // group.qr.title
+        static let qrBody = "Point the other phone's camera at this code to open the invitation." // group.qr.body
         static let detailGuests = "Guests"
         static let detailReminder = "Remind everyone an hour before"
         static let detailCancel = "Cancel lunch"
@@ -352,5 +384,40 @@ nonisolated enum Copy {
         static let groupCancelled = "Lunch cancelled"
         static let cancelTitle = "Cancel this lunch?"
         static let cancelBody = "The invitation will stop working for everyone."
+    }
+
+    enum Split {
+        static let title = "Split the bill"
+        static let open = "Split bill"
+        static let groupOpen = "Split the bill"
+        static let billLabel = "BILL TOTAL"
+        static let billPlaceholder = "$0.00"
+        static let surchargeLabel = "SURCHARGE %"
+        static let surchargePlaceholder = "0"
+        static let surchargeHelp = "Public holiday or card fee, if any"
+        static let peopleLabel = "PEOPLE"
+        static let personYou = "You"
+        static func personN(_ n: Int) -> String { "Person \(n)" }
+        static let personAdjusted = "Adjusted"
+        static let personReset = "Reset"
+        static func total(_ amount: String) -> String { "Total \(amount)" }
+        static func totalSurcharge(_ amount: String, _ surcharge: String) -> String { "Total \(amount) incl. \(surcharge) surcharge" }
+        static let payidLabel = "PAY ME AT"
+        static let payidPlaceholder = "PayID, BSB and account, or cash"
+        static let payidNote = "Kept on this phone only"
+        static let share = "Share"
+        static let useShare = "Use my share"
+        static let errorNoBill = "Enter the bill total"
+        static let errorNoPeople = "Add at least one person"
+        static let errorTooMany = "Up to 50 people"
+        static let errorSurcharge = "Surcharge must be 50% or less"
+        static func errorOver(_ amount: String) -> String { "Adjusted amounts are \(amount) over the bill" }
+        static func errorUnder(_ amount: String) -> String { "\(amount) of the bill isn't covered yet" }
+        static let messagePlaceFallback = "Lunch"
+        static func messageHeader(place: String, total: String, people: Int) -> String { "\(place): bill \(total) split \(people) ways" }
+        static func messageLine(name: String, amount: String) -> String { "\(name): \(amount)" }
+        static func messagePay(_ payId: String) -> String { "Pay me at: \(payId)" }
+        static let messageFooter = "Split with What We Have For Lunch"
+        static func note(people: Int, bill: String) -> String { "Split \(people) ways, bill \(bill)" }
     }
 }

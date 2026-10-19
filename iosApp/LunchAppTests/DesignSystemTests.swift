@@ -29,10 +29,17 @@ struct DesignSystemTests {
         #expect(range.upperBound == .accessibility2)
     }
 
-    @Test func fontFallsBackToSystemWhenNotBundled() {
-        // The fonts are not bundled in this milestone; the stand-in must be in effect.
-        #expect(LunchFont.isCustomFontAvailable == false)
-        #expect(LunchFont.postScriptName(for: .heavy) == "PlusJakartaSans-ExtraBold")
+    @Test func should_load_bundled_display_font_when_app_launches() {
+        #expect(LunchFont.isCustomFontAvailable)
+        #expect(LunchFont.postScriptName(for: .heavy) == "BricolageGrotesque-ExtraBold")
+        #expect(LunchFont.postScriptName(for: .bold) == "BricolageGrotesque-Bold")
+    }
+
+    @Test func should_use_display_family_only_for_headline_roles() {
+        let displayRoles = LunchTextRole.allCases.filter { $0.token.display }
+        #expect(displayRoles == [.display, .title, .heading])
+        #expect(LunchFont.uiFont(size: 22, weight: .bold, display: true).fontName == "BricolageGrotesque-Bold")
+        #expect(LunchFont.uiFont(size: 16, weight: .medium, display: false).familyName == UIFont.systemFont(ofSize: 16).familyName)
     }
 
     @Test func testIdentifiersMatchScreensContract() {
@@ -40,6 +47,8 @@ struct DesignSystemTests {
         #expect(RecommendationCard.identifier == "recommendation_card")
         #expect(PaywallView.ctaIdentifier == "paywall_cta")
         #expect(InviteShareRow.linkIdentifier == "invite_link_text")
+        #expect(InviteShareRow.qrButtonIdentifier == "invite_qr_button")
+        #expect(InviteQRSheet.imageIdentifier == "invite_qr_image")
         #expect(RestaurantCard.identifier(index: 2) == "restaurant_card_2")
         #expect(RestaurantCard.favouriteIdentifier(index: 2, selected: false) == "favourite_button_2")
         #expect(RestaurantCard.favouriteIdentifier(index: 2, selected: true) == "favourite_button_2_selected")

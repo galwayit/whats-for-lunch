@@ -101,7 +101,8 @@ protocol AchievementRepository {
 // MARK: - Services
 
 protocol AiRecommendationService {
-    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant]) async throws -> AiRecommendation
+    func configuration() async throws -> AiConfiguration
+    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant], consentVersion: String) async throws -> AiRecommendation
     func history(userId: Int64, limit: Int) async throws -> [AiRecommendation]
     func submitFeedback(recommendationId: String, placeId: String?, rating: Int, feedback: String?, wasSelected: Bool) async throws
     /// Requests made today by this user, for the gate row copy.
@@ -134,19 +135,32 @@ protocol AuthRepository {
     var session: AuthSession? { get }
     var sessionUpdates: AsyncStream<AuthSession?> { get }
     func signInWithApple(idToken: String, nonce: String, fullName: String?) async throws -> AuthSession
-    func signInWithGoogle(idToken: String) async throws -> AuthSession
+    func signInWithGoogle(idToken: String, nonce: String, accessToken: String?) async throws -> AuthSession
+    func signInWithEmail(email: String, password: String) async throws -> AuthSession
+    func registerWithEmail(email: String, password: String) async throws -> Bool
+    func verifyEmail(email: String, code: String) async throws -> AuthSession
+    func resendVerification(email: String) async throws
+    func requestPasswordReset(email: String) async throws
+    func resetPassword(email: String, code: String, newPassword: String) async throws -> AuthSession
     func signOut() async throws
-    func deleteAccount() async throws
+    func deleteAccount(appleAuthorizationCode: String?) async throws
 }
 
 protocol GroupRepository {
+    func loadGroups() async throws -> [LunchGroup]
+    func loadRsvps(groupId: String) async throws -> [Rsvp]
     func myGroups() -> AsyncStream<[LunchGroup]>
     /// Host only. Backend verifies the Pro entitlement.
-    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double) async throws -> LunchGroup
-    func propose(groupId: String) async throws -> [GroupProposal]
+    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double, details: GroupDetails) async throws -> LunchGroup
+    func propose(groupId: String, consentVersion: String) async throws -> [GroupProposal]
     func confirmPlace(groupId: String, restaurant: Restaurant) async throws -> LunchGroup
     func invitation(code: String) async throws -> Invitation
     func respond(code: String, status: RsvpStatus, displayName: String?) async throws -> Invitation
+    func suggest(code: String, draft: GroupSuggestionDraft, displayName: String?) async throws -> Invitation
+    func suggestions(groupId: String) async throws -> [GroupSuggestion]
+    func reviewSuggestion(groupId: String, suggestionId: String, accept: Bool) async throws -> LunchGroup
+    func updateDetails(groupId: String, details: GroupDetails) async throws -> LunchGroup
+    func safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String) async throws
     func rsvps(groupId: String) -> AsyncStream<[Rsvp]>
     func cancel(groupId: String) async throws
 }
@@ -160,6 +174,11 @@ protocol PushRegistrar {
 protocol LocationProvider {
     func current() async throws -> Location
     func hasPermission() async -> Bool
+    func setSearchArea(_ area: SearchArea?)
+}
+
+extension LocationProvider {
+    func setSearchArea(_ area: SearchArea?) {}
 }
 
 protocol LunchClock {
@@ -189,4 +208,22 @@ protocol LunchCoreClient {
     var mealDefaults: MealDefaults { get }
     var clock: LunchClock { get }
     var location: LocationProvider { get }
+}
+
+// Preview and test repositories can retain their in-memory streams.
+extension GroupRepository {
+    func safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String) async throws {
+        throw CoreError.service(code: "NOT_CONFIGURED", message: "Content safety is unavailable")
+    }
+    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double) async throws -> LunchGroup {
+        try await create(name: name, scheduledAtEpochSeconds: scheduledAtEpochSeconds, area: area, radiusKm: radiusKm, details: GroupDetails())
+    }
+    func loadGroups() async throws -> [LunchGroup] {
+        for await value in myGroups() { return value }
+        throw CoreError.service(code: "GROUP_READ_FAILED", message: "Could not load your lunches. Please retry.")
+    }
+    func loadRsvps(groupId: String) async throws -> [Rsvp] {
+        for await value in rsvps(groupId: groupId) { return value }
+        throw CoreError.service(code: "GROUP_READ_FAILED", message: "Could not load replies. Please retry.")
+    }
 }

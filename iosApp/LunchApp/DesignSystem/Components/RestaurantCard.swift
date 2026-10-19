@@ -32,6 +32,7 @@ struct RestaurantCard: View {
                 RestaurantPhoto(url: restaurant.photoURL)
                     .overlay(alignment: .topTrailing) { favouriteButton.padding(Tokens.Spacing.md) }
                 details.padding(Tokens.Spacing.md)
+                GoogleMapsAttribution(restaurant: restaurant).padding(.horizontal, Tokens.Spacing.md).padding(.bottom, Tokens.Spacing.sm)
             }
             .background(Tokens.Palette.surface)
             .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.container, style: .continuous))
@@ -118,10 +119,10 @@ struct RatingLabel: View {
 
     var body: some View {
         HStack(spacing: Tokens.Spacing.xs) {
-            IconView(icon: .star, size: Self.iconSize, filled: true)
+            IconView(icon: .star, size: Self.iconSize, filled: true).foregroundStyle(Tokens.Palette.accent)
             Text(rating.formatted(.number.precision(.fractionLength(1)))).lunchText(.heading)
         }
-        .foregroundStyle(Tokens.Palette.primary)
+        .foregroundStyle(Tokens.Palette.text)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Rated \(rating.formatted(.number.precision(.fractionLength(1)))) out of 5")
     }

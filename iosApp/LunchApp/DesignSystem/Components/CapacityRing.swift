@@ -14,7 +14,7 @@ struct CapacityRing: View {
 
         var color: Color {
             switch self {
-            case .healthy: return Tokens.Palette.primary
+            case .healthy: return Tokens.Palette.success
             case .caution: return Tokens.Palette.warning
             case .over: return Tokens.Palette.danger
             }

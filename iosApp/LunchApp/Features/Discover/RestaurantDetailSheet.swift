@@ -43,6 +43,9 @@ struct RestaurantDetailSheet: View {
                     LunchButton(title: Copy.Action.directions, style: .secondary, icon: .directions) { MapsLauncher.openDirections(to: restaurant) }
                     LunchButton(title: Copy.Discover.detailOpenMaps, style: .secondary, icon: .map) { MapsLauncher.openPlace(restaurant) }
                 }
+                GoogleMapsAttribution(restaurant: restaurant)
+                Text("Dietary and allergen information may be unavailable or out of date. Confirm ingredients and cross-contact risks directly with the venue before ordering. A recommendation is not an allergy-safety assessment.")
+                    .lunchText(.bodySmall).foregroundStyle(Tokens.Palette.textSecondary)
                 reviewsSection
                 LunchButton(title: Copy.Action.logThisMeal, style: .primary, icon: .restaurantMenu, identifier: "detail_log_meal") {
                     dismiss()
@@ -71,13 +74,14 @@ struct RestaurantDetailSheet: View {
                     ForEach(list) { review in
                         VStack(alignment: .leading, spacing: Tokens.Spacing.xs) {
                             HStack {
-                                Text(review.authorName).lunchText(.label).foregroundStyle(Tokens.Palette.text)
+                                AttributionCredit(credit: PlaceAttribution(name: review.authorName, uri: review.authorUri, photoUri: review.authorPhotoUrl))
                                 Spacer()
                                 RatingLabel(rating: Double(review.rating))
                             }
                             if let text = review.text {
                                 Text(text).lunchText(.bodySmall).foregroundStyle(Tokens.Palette.textSecondary)
                             }
+                            if let uri = review.sourceUri, let url = URL(string: uri) { Link("View review on Google Maps", destination: url).font(.caption) }
                             Text(review.relativeTimeDescription).lunchText(.caption).foregroundStyle(Tokens.Palette.textSecondary)
                         }
                         .padding(Tokens.Spacing.sm + Tokens.Spacing.xs)
@@ -92,7 +96,8 @@ struct RestaurantDetailSheet: View {
     private func loadReviews() async {
         reviews = .loading
         do {
-            reviews = .loaded(try await app.core.restaurants.reviews(placeId: restaurant.placeId))
+            let fetched = try await app.core.restaurants.reviews(placeId: restaurant.placeId)
+            reviews = .loaded(restaurant.googleMapsUri == nil ? fetched : fetched.filter { $0.sourceUri != nil })
         } catch {
             reviews = .failed(CoreError.from(error))
         }

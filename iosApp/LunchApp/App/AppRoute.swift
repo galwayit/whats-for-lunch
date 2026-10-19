@@ -19,19 +19,24 @@ enum AppRoute: Hashable {
     case paywall
     // From Profile
     case preferences
+    case searchArea
     case signIn
     case privacy
     case help
     // From Track
     case budgetSetup
+    /// Not a real entry point (Track and Group detail present the sheet locally with their own
+    /// prefill); reachable only from `-openRoute splitBill` so screenshots have a way in.
+    case splitBillDemo
     // From anywhere (universal link)
     case invitation(code: String)
 }
 
 extension AppRoute {
     /// Parses the `-openRoute` launch argument. Plain names: `onboarding`, `ai`, `groupCreate`,
-    /// `paywall`, `preferences`, `signIn`, `privacy`, `help`, `budgetSetup`. Names with a value use
-    /// a colon: `tab:track`, `groupProposals:<id>`, `groupDetail:<id>`, `invitation:<code>`.
+    /// `paywall`, `preferences`, `signIn`, `privacy`, `help`, `budgetSetup`, `splitBill`. Names
+    /// with a value use a colon: `tab:track`, `groupProposals:<id>`, `groupDetail:<id>`,
+    /// `invitation:<code>`.
     nonisolated init?(launchName: String) {
         let parts = launchName.split(separator: ":", maxSplits: 1).map(String.init)
         let value = parts.count == 2 ? parts[1] : nil
@@ -41,10 +46,12 @@ extension AppRoute {
         case ("groupCreate", nil): self = .groupCreate
         case ("paywall", nil): self = .paywall
         case ("preferences", nil): self = .preferences
+        case ("searchArea", nil): self = .searchArea
         case ("signIn", nil): self = .signIn
         case ("privacy", nil): self = .privacy
         case ("help", nil): self = .help
         case ("budgetSetup", nil): self = .budgetSetup
+        case ("splitBill", nil): self = .splitBillDemo
         case ("tab", let name?):
             switch name {
             case "home": self = .tab(.home)

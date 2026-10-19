@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <!--
-  Copy to Config/Lunch.plist (git-ignored) and fill in the real values.
-  The synchronised project folder picks up Lunch.plist automatically and bundles it.
+  Copy to Config/Lunch.plist for Debug builds and to Config/Lunch.Release.plist for Release
+  builds and archives (both git-ignored), then fill in the real values. The build phase
+  "Copy runtime config" (scripts/copy_runtime_config.sh) bundles the right one as Lunch.plist.
+  Debug may use a RevenueCat Test Store key (test_...); Release must use the appl_ key.
 -->
 <dict>
 	<key>supabaseUrl</key>
@@ -14,6 +16,8 @@
 	<string>https://YOUR-PROJECT-REF.supabase.co/functions/v1</string>
 	<key>revenueCatApiKey</key>
 	<string>appl_YOUR_REVENUECAT_KEY</string>
+    <!-- Public Google OAuth IDs default to config/google-oauth.json. For another project,
+         add googleIosClientId and googleServerClientId here. Never add a client secret. -->
 	<key>inviteLinkBase</key>
 	<string>https://lunch.iapp.au/i/</string>
 </dict>

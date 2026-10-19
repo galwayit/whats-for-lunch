@@ -16,6 +16,7 @@ final class GroupCreateViewModel {
     static let radiusOptions: [Double] = [1, 2, 5]
 
     var name = ""
+    var detailsDraft: GroupDetailsDraft
     var scheduledAt = GroupCreateViewModel.nextWeekdayLunch()
     var radiusKm = 2.0
     private(set) var area: Location?
@@ -25,7 +26,10 @@ final class GroupCreateViewModel {
 
     private let core: LunchCoreClient
 
-    init(core: LunchCoreClient) { self.core = core }
+    init(core: LunchCoreClient) {
+        self.core = core
+        self.detailsDraft = GroupDetailsDraft(GroupDetails(hostName: core.auth.session?.displayName ?? core.users.current?.name ?? ""))
+    }
 
     var locationSummary: String {
         guard let area else { return isLocating ? Copy.Group.locatingArea : Copy.Group.locationRequired }
@@ -46,7 +50,7 @@ final class GroupCreateViewModel {
 
     func create() async -> LunchGroup? {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanName.isEmpty, let area, !isCreating else { return nil }
+        guard !cleanName.isEmpty, let details = detailsDraft.value, let area, !isCreating else { return nil }
         isCreating = true
         error = nil
         defer { isCreating = false }
@@ -55,7 +59,8 @@ final class GroupCreateViewModel {
                 name: cleanName,
                 scheduledAtEpochSeconds: Int64(scheduledAt.timeIntervalSince1970),
                 area: area,
-                radiusKm: radiusKm
+                radiusKm: radiusKm,
+                details: details
             )
         } catch {
             self.error = CoreError.from(error)

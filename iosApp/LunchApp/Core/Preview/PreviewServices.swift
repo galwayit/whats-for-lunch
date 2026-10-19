@@ -9,6 +9,8 @@
 import Foundation
 
 final class PreviewAiService: AiRecommendationService {
+    var aiConfiguration = AiConfiguration(consentVersion: "preview-ai-v2", providers: [AiProviderDisclosure(name: "Preview AI", privacyUrl: "https://example.com/privacy")])
+    func configuration() async throws -> AiConfiguration { aiConfiguration }
     private var pastRecommendations: [AiRecommendation] = [PreviewData.aiRecommendation]
     private let engine: RecommendationEngine
     private let gates: PreviewGateService
@@ -22,7 +24,7 @@ final class PreviewAiService: AiRecommendationService {
         self.network = network
     }
 
-    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant]) async throws -> AiRecommendation {
+    func recommend(cravings: String?, maxResults: Int, candidates: [Restaurant], consentVersion: String) async throws -> AiRecommendation {
         let decision = await gates.canRequestAi()
         guard decision.allowed else { throw CoreError.gate(decision.reason) }
         try await network.roundTrip(Self.thinkingLatency)
@@ -130,8 +132,9 @@ final class PreviewGateService: GateService {
 
     /// Checks only; `PreviewAiService` calls `recordAiUsed()` after a successful request.
     func canRequestAi() async -> GateDecision {
-        if entitlements.isPro { return .allowed }
-        return aiRequestsToday < FreeLimits.aiRequestsPerDay ? .allowed : .denied(.aiDailyLimit)
+        guard auth.session != nil else { return .denied(.signInRequired) }
+        let limit = entitlements.isPro ? 10 : FreeLimits.aiRequestsPerDay
+        return aiRequestsToday < limit ? .allowed : .denied(.aiDailyLimit)
     }
 
     func recordAiUsed() { aiRequestsToday += 1 }
@@ -164,21 +167,33 @@ final class PreviewAuthRepository: AuthRepository {
 
     func signInWithApple(idToken: String, nonce: String, fullName: String?) async throws -> AuthSession {
         try await network.roundTrip()
-        let session = AuthSession(userId: "user_ray", email: "ray@privaterelay.appleid.com", displayName: fullName ?? PreviewData.userName)
+        let session = AuthSession(userId: "user_ray", email: "ray@privaterelay.appleid.com", displayName: fullName ?? PreviewData.userName, requiresAppleReauthentication: true)
         current.send(session)
         return session
     }
 
-    func signInWithGoogle(idToken: String) async throws -> AuthSession {
+    func signInWithGoogle(idToken: String, nonce: String, accessToken: String?) async throws -> AuthSession {
         try await network.roundTrip()
         let session = AuthSession(userId: "user_ray", email: "ray@gmail.com", displayName: PreviewData.userName)
         current.send(session)
         return session
     }
 
+    func signInWithEmail(email: String, password: String) async throws -> AuthSession {
+        try await network.roundTrip()
+        let session = AuthSession(userId: "user_ray", email: email, displayName: PreviewData.userName)
+        current.send(session)
+        return session
+    }
+    func registerWithEmail(email: String, password: String) async throws -> Bool { try await network.roundTrip(); return false }
+    func verifyEmail(email: String, code: String) async throws -> AuthSession { try await signInWithEmail(email: email, password: "") }
+    func resendVerification(email: String) async throws { try await network.roundTrip() }
+    func requestPasswordReset(email: String) async throws { try await network.roundTrip() }
+    func resetPassword(email: String, code: String, newPassword: String) async throws -> AuthSession { try await signInWithEmail(email: email, password: newPassword) }
+
     func signOut() async throws { current.send(nil) }
 
-    func deleteAccount() async throws {
+    func deleteAccount(appleAuthorizationCode: String?) async throws {
         try await network.roundTrip()
         current.send(nil)
     }
@@ -192,6 +207,7 @@ final class PreviewGroupRepository: GroupRepository {
     private let auth: AuthRepository
     private let locales: PreviewLocaleResolver
     private static let proposalCount = 3
+    private var suggestionRows: [GroupSuggestion] = []
 
     init(engine: RecommendationEngine, network: PreviewNetwork, auth: AuthRepository, locales: PreviewLocaleResolver) {
         self.locales = locales
@@ -204,9 +220,9 @@ final class PreviewGroupRepository: GroupRepository {
 
     func myGroups() -> AsyncStream<[LunchGroup]> { groups.stream() }
 
-    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double) async throws -> LunchGroup {
+    func create(name: String, scheduledAtEpochSeconds: Int64, area: Location, radiusKm: Double, details: GroupDetails) async throws -> LunchGroup {
         try await network.roundTrip()
-        let hostName = auth.session?.displayName ?? PreviewData.userName
+        let hostName = details.hostName.isEmpty ? (auth.session?.displayName ?? PreviewData.userName) : details.hostName
         let group = LunchGroup(
             id: "grp_\(UUID().uuidString.prefix(6))",
             hostId: auth.session?.userId ?? "user_ray",
@@ -217,14 +233,14 @@ final class PreviewGroupRepository: GroupRepository {
             areaLongitude: area.longitude,
             radiusKm: radiusKm,
             inviteCode: String(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(6)).uppercased(),
-            createdAtEpochSeconds: Int64(Date().timeIntervalSince1970)
+            createdAtEpochSeconds: Int64(Date().timeIntervalSince1970), budgetPerPersonMinor: details.budgetPerPersonMinor, currencyCode: details.currencyCode, paymentArrangement: details.paymentArrangement, paymentMethod: details.paymentMethod
         )
         rsvpsByGroup[group.id] = Broadcast([Rsvp(id: "rsvp_\(group.id)_host", groupId: group.id, guestUserId: group.hostId, displayName: hostName, status: .accepted, respondedAtEpochSeconds: group.createdAtEpochSeconds)])
         groups.send(groups.value + [group])
         return group
     }
 
-    func propose(groupId: String) async throws -> [GroupProposal] {
+    func propose(groupId: String, consentVersion: String) async throws -> [GroupProposal] {
         try await network.roundTrip(.seconds(1))
         guard let group = groups.value.first(where: { $0.id == groupId }) else { throw Self.notFound(groupId) }
         // The group's area moves with the sample data, so proposals stay near the user too.
@@ -256,7 +272,7 @@ final class PreviewGroupRepository: GroupRepository {
         }
         let attendees = rsvpsByGroup[group.id]?.value ?? []
         let mine = auth.session.flatMap { session in attendees.first { $0.guestUserId == session.userId } }
-        return Invitation(group: group, attendees: attendees, myStatus: mine?.status, inviteUrl: LunchConfig.current.inviteUrl(code: group.inviteCode))
+        return Invitation(group: group, attendees: attendees, myStatus: mine?.status, inviteUrl: LunchConfig.current.inviteUrl(code: group.inviteCode), mySuggestion: suggestionRows.last { $0.groupId == group.id })
     }
 
     func respond(code: String, status: RsvpStatus, displayName: String?) async throws -> Invitation {
@@ -276,9 +292,37 @@ final class PreviewGroupRepository: GroupRepository {
             attendees.append(Rsvp(id: "rsvp_\(UUID().uuidString.prefix(6))", groupId: group.id, guestUserId: guestId, displayName: name, status: status, respondedAtEpochSeconds: now))
         }
         broadcast.send(attendees)
-        return Invitation(group: group, attendees: attendees, myStatus: status, inviteUrl: LunchConfig.current.inviteUrl(code: group.inviteCode))
+        return Invitation(group: group, attendees: attendees, myStatus: status, inviteUrl: LunchConfig.current.inviteUrl(code: group.inviteCode), mySuggestion: suggestionRows.last { $0.groupId == group.id })
     }
 
+    func suggest(code: String, draft: GroupSuggestionDraft, displayName: String?) async throws -> Invitation {
+        var invite = try await invitation(code: code)
+        let suggestion = GroupSuggestion(id: UUID().uuidString, groupId: invite.group.id, displayName: displayName ?? auth.session?.displayName ?? "Guest", placeName: draft.placeName, placeAddress: draft.placeAddress, scheduledAtEpochSeconds: draft.scheduledAt, note: draft.note, status: "pending", createdAtEpochSeconds: Int64(Date().timeIntervalSince1970))
+        suggestionRows.append(suggestion)
+        invite.mySuggestion = suggestion
+        return invite
+    }
+    func suggestions(groupId: String) async throws -> [GroupSuggestion] { suggestionRows.filter { $0.groupId == groupId } }
+    func reviewSuggestion(groupId: String, suggestionId: String, accept: Bool) async throws -> LunchGroup {
+        guard let index = suggestionRows.firstIndex(where: { $0.id == suggestionId && $0.groupId == groupId }), var group = groups.value.first(where: { $0.id == groupId }) else { throw Self.notFound(groupId) }
+        suggestionRows[index].status = accept ? "accepted" : "declined"
+        let suggestion = suggestionRows[index]
+        if accept {
+            if let time = suggestion.scheduledAtEpochSeconds { group.scheduledAtEpochSeconds = time }
+            if let place = suggestion.placeName { group.placeName = place; group.placeAddress = suggestion.placeAddress; group.placeId = nil }
+            let pending = rsvpsByGroup[groupId]?.value.map { row -> Rsvp in var row = row; row.status = .pending; return row } ?? []
+            rsvpsByGroup[groupId]?.send(pending)
+        }
+        groups.send(groups.value.map { $0.id == groupId ? group : $0 })
+        return group
+    }
+    func updateDetails(groupId: String, details: GroupDetails) async throws -> LunchGroup {
+        guard var group = groups.value.first(where: { $0.id == groupId }) else { throw Self.notFound(groupId) }
+        group.hostName = details.hostName; group.budgetPerPersonMinor = details.budgetPerPersonMinor
+        group.currencyCode = details.currencyCode; group.paymentArrangement = details.paymentArrangement; group.paymentMethod = details.paymentMethod
+        groups.send(groups.value.map { $0.id == groupId ? group : $0 })
+        return group
+    }
     func rsvps(groupId: String) -> AsyncStream<[Rsvp]> {
         if rsvpsByGroup[groupId] == nil { rsvpsByGroup[groupId] = Broadcast([]) }
         return rsvpsByGroup[groupId]?.stream() ?? AsyncStream { $0.finish() }

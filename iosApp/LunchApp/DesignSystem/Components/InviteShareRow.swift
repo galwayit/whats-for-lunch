@@ -3,7 +3,8 @@
 //  LunchApp
 //
 //  The group's invite link (id invite_link_text) with a Share invite action that the screen
-//  wires to the system share sheet.
+//  wires to the system share sheet, and a Show QR code action next to it that the screen wires
+//  to the QR sheet (InviteQRSheet).
 //
 
 import SwiftUI
@@ -11,8 +12,10 @@ import SwiftUI
 struct InviteShareRow: View {
     let inviteUrl: String
     let onShare: () -> Void
+    let onShowQR: () -> Void
 
     static let linkIdentifier = "invite_link_text"
+    static let qrButtonIdentifier = "invite_qr_button"
     private static let iconSize = Tokens.Size.iconDefault - Tokens.Spacing.xs
 
     var body: some View {
@@ -33,7 +36,10 @@ struct InviteShareRow: View {
                 .padding(Tokens.Spacing.sm + Tokens.Spacing.xs)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Tokens.Palette.surfaceRaised, in: RoundedRectangle(cornerRadius: Tokens.Radius.toast, style: .continuous))
-                LunchButton(title: Copy.Group.detailShare, style: .primary, icon: .share, action: onShare)
+                HStack(spacing: Tokens.Spacing.sm) {
+                    LunchButton(title: Copy.Group.detailShare, style: .primary, icon: .share, action: onShare)
+                    LunchButton(title: Copy.Group.detailQR, style: .secondary, identifier: Self.qrButtonIdentifier, action: onShowQR)
+                }
             }
         }
     }
@@ -41,6 +47,6 @@ struct InviteShareRow: View {
 
 #Preview("Invite share") {
     LunchPreview {
-        InviteShareRow(inviteUrl: PreviewData.inviteUrl) {}
+        InviteShareRow(inviteUrl: PreviewData.inviteUrl, onShare: {}, onShowQR: {})
     }
 }

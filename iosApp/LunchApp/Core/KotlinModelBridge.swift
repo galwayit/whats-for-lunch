@@ -130,7 +130,8 @@ extension RestaurantReview {
             rating: Int32(rating),
             text: text,
             timeEpochSeconds: timeEpochSeconds,
-            relativeTimeDescription: relativeTimeDescription
+            relativeTimeDescription: relativeTimeDescription,
+            authorUri: authorUri, sourceUri: sourceUri
         )
     }
 }
@@ -144,7 +145,8 @@ extension LunchCore.RestaurantReview {
             rating: Int(rating),
             text: text,
             timeEpochSeconds: timeEpochSeconds,
-            relativeTimeDescription: relativeTimeDescription
+            relativeTimeDescription: relativeTimeDescription,
+            authorUri: authorUri, sourceUri: sourceUri
         )
     }
 }
@@ -184,7 +186,9 @@ extension Restaurant {
             lastVerifiedEpochSeconds: lastVerifiedEpochSeconds.map { LunchCore.KotlinLong(longLong: $0) },
             photoReference: photoReference,
             photoReferences: photoReferences,
-            photoUrl: photoUrl
+            photoUrl: photoUrl,
+            googleMapsUri: googleMapsUri, photoSourceUri: photoSourceUri,
+            photoAttributions: (photoAttributions ?? []).map(\.kotlin), attributions: (attributions ?? []).map(\.kotlin)
         )
     }
 }
@@ -224,7 +228,10 @@ extension LunchCore.Restaurant {
             lastVerifiedEpochSeconds: lastVerifiedEpochSeconds?.int64Value,
             photoReference: photoReference,
             photoReferences: photoReferences,
-            photoUrl: photoUrl
+            photoUrl: photoUrl,
+            googleMapsUri: googleMapsUri, photoSourceUri: photoSourceUri,
+            photoAttributions: photoAttributions.isEmpty ? nil : photoAttributions.map(\.app),
+            attributions: attributions.isEmpty ? nil : attributions.map(\.app)
         )
     }
 }
@@ -316,7 +323,7 @@ extension LunchCore.SubscriptionStatus {
 }
 
 extension LunchCore.AuthSession {
-    var app: AuthSession { AuthSession(userId: userId, email: email, displayName: displayName) }
+    var app: AuthSession { AuthSession(userId: userId, email: email, displayName: displayName, requiresAppleReauthentication: requiresAppleReauthentication) }
 }
 
 extension Location {
@@ -344,7 +351,11 @@ extension LunchCore.LunchGroup {
             placeName: placeName,
             placeAddress: placeAddress,
             inviteCode: inviteCode,
-            createdAtEpochSeconds: createdAtEpochSeconds
+            createdAtEpochSeconds: createdAtEpochSeconds,
+            budgetPerPersonMinor: budgetPerPersonMinor?.int64Value,
+            currencyCode: currencyCode,
+            paymentArrangement: paymentArrangement,
+            paymentMethod: paymentMethod
         )
     }
 }
@@ -388,7 +399,7 @@ extension LunchCore.GroupProposal {
 
 extension LunchCore.Invitation {
     var app: Invitation {
-        Invitation(group: group.app, attendees: attendees.map(\.app), myStatus: myStatus?.app, inviteUrl: inviteUrl)
+        Invitation(group: group.app, attendees: attendees.map(\.app), myStatus: myStatus?.app, inviteUrl: inviteUrl, mySuggestion: mySuggestion?.app)
     }
 }
 
@@ -415,4 +426,21 @@ func rethrowCoreError<T>(_ operation: () async throws -> T) async throws -> T {
     do { return try await operation() }
     catch is CancellationError { throw CancellationError() }
     catch { throw appCoreError(error) }
+}
+
+extension PlaceAttribution {
+    var kotlin: LunchCore.PlaceAttribution { LunchCore.PlaceAttribution(name: name, uri: uri, photoUri: photoUri) }
+}
+extension LunchCore.PlaceAttribution {
+    var app: PlaceAttribution { PlaceAttribution(name: name, uri: uri, photoUri: photoUri) }
+}
+
+extension GroupDetails {
+    var kotlin: LunchCore.GroupDetails { LunchCore.GroupDetails(hostName: hostName, budgetPerPersonMinor: budgetPerPersonMinor.map { KotlinLong(longLong: $0) }, currencyCode: currencyCode, paymentArrangement: paymentArrangement, paymentMethod: paymentMethod) }
+}
+extension GroupSuggestionDraft {
+    var kotlin: LunchCore.GroupSuggestionDraft { LunchCore.GroupSuggestionDraft(placeName: placeName, placeAddress: placeAddress, scheduledAt: scheduledAt.map { KotlinLong(longLong: $0) }, note: note) }
+}
+extension LunchCore.GroupSuggestion {
+    var app: GroupSuggestion { GroupSuggestion(id: id, groupId: groupId, displayName: displayName, placeName: placeName, placeAddress: placeAddress, scheduledAtEpochSeconds: scheduledAtEpochSeconds?.int64Value, note: note, status: status, createdAtEpochSeconds: createdAtEpochSeconds) }
 }

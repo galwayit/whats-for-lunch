@@ -8,6 +8,7 @@
 //
 
 import SwiftUI
+import GoogleSignIn
 
 @main
 struct LunchApp: App {
@@ -20,7 +21,9 @@ struct LunchApp: App {
                 .environment(app)
                 .lunchTextScaleClamped()
                 .background(Tokens.Palette.ground.ignoresSafeArea())
-                .onOpenURL { url in app.open(url: url) }
+                .onOpenURL { url in
+                    if !GIDSignIn.sharedInstance.handle(url) { app.open(url: url) }
+                }
                 .task {
                     appDelegate.pushRegistrar = app.core.push
                     app.start()
@@ -31,6 +34,7 @@ struct LunchApp: App {
     }
 
     static func makeEnvironment(_ arguments: LaunchArguments) -> AppEnvironment {
+        AppDiagnostics.start(arguments: arguments)
         if arguments.usesPreviewCore || FeatureFlags.previewCoreByDefault {
             return AppEnvironment(core: PreviewLunchCore(options: PreviewCoreOptions(arguments: arguments)), isCoreLinked: true)
         }
@@ -40,6 +44,7 @@ struct LunchApp: App {
         do {
             return AppEnvironment(core: try KotlinLunchCore.make(config: .current), isCoreLinked: true)
         } catch {
+            AppDiagnostics.record(.unknown("Core startup failed"), operation: "startCore")
             assertionFailure("Could not start LunchCore: \(error)")
             return AppEnvironment(core: NotConfiguredCore(), isCoreLinked: false)
         }

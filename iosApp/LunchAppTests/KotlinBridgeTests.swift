@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import LunchApp
 
@@ -62,5 +63,29 @@ struct KotlinBridgeTests {
             backendBaseUrl: "https://example.supabase.co/functions/v1",
             revenueCatApiKey: "appl_test"
         ).isComplete)
+    }
+
+    @Test
+    func should_start_without_revenuecat_only_when_missing_purchases_are_allowed() {
+        let backendOnly = LunchConfig(
+            supabaseUrl: "https://example.supabase.co",
+            supabaseAnonKey: "anon",
+            backendBaseUrl: "https://example.supabase.co/functions/v1"
+        )
+
+        #expect(backendOnly.isComplete(allowingMissingPurchases: true))
+        #expect(!backendOnly.isComplete(allowingMissingPurchases: false))
+        #expect(LunchConfig.allowsMissingPurchases, "tests run the Debug configuration")
+    }
+
+    @Test
+    func should_keep_the_same_debug_user_id_when_asked_twice() throws {
+        let defaults = try #require(UserDefaults(suiteName: "KotlinBridgeTests.debugAppUserId"))
+        defaults.removePersistentDomain(forName: "KotlinBridgeTests.debugAppUserId")
+
+        let first = KotlinLunchCore.debugAppUserId(defaults: defaults)
+
+        #expect(first == KotlinLunchCore.debugAppUserId(defaults: defaults))
+        #expect(first.wholeMatch(of: /debug-[0-9a-f-]{36}/) != nil, "matches the backend's x-app-user-id pattern")
     }
 }

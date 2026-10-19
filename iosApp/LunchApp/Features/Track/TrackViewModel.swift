@@ -79,6 +79,13 @@ final class TrackViewModel {
         cost = prefill.cost
     }
 
+    /// From the split sheet's "Use my share": fills the cost field, and the notes only if they're
+    /// still empty.
+    func applySplitShare(cost: Double, note: String) {
+        self.cost = cost
+        if notes.isEmpty { notes = note }
+    }
+
     func refreshWeekly(user: UserProfile) async {
         let now = core.clock.nowEpochSeconds()
         let start = core.budget.weekStart(epochSeconds: now, timeZoneId: timeZoneId)

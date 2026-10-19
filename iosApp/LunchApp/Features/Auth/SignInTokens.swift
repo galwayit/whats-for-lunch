@@ -9,6 +9,7 @@
 import AuthenticationServices
 import CryptoKit
 import UIKit
+import GoogleSignIn
 
 /// What `AuthRepository.signInWithApple` needs: the identity token, the raw nonce it was
 /// requested with, and the name Apple shares on first sign-in.
@@ -16,13 +17,20 @@ nonisolated struct AppleCredential: Equatable {
     let idToken: String
     let nonce: String
     let fullName: String?
+    var authorizationCode: String? = nil
+}
+
+nonisolated struct GoogleCredential: Equatable {
+    let idToken: String
+    let nonce: String
+    var accessToken: String? = nil
 }
 
 /// Source of provider tokens. The view model only ever sees strings; SDK types stay here.
 protocol SignInTokenProvider {
     var supportedProviders: [SignInProvider] { get }
     func appleCredential() async throws -> AppleCredential
-    func googleIdToken() async throws -> String
+    func googleCredential() async throws -> GoogleCredential
 }
 
 enum SignInTokens {
@@ -43,20 +51,49 @@ struct PreviewSignInTokens: SignInTokenProvider {
         AppleCredential(idToken: "preview", nonce: "preview", fullName: nil)
     }
 
-    func googleIdToken() async throws -> String { "preview" }
+    func googleCredential() async throws -> GoogleCredential { GoogleCredential(idToken: "preview", nonce: "preview") }
 }
 
 struct SystemSignInTokens: SignInTokenProvider {
-    /// Error code surfaced while the GoogleSignIn SDK and its OAuth client id are not in the project.
+    /// Setup errors are kept out of user-visible SDK diagnostics.
     static let googleUnavailableCode = "GOOGLE_SIGN_IN_UNAVAILABLE"
-    let supportedProviders: [SignInProvider] = [.apple]
+    let supportedProviders: [SignInProvider] = [.apple, .google]
 
     func appleCredential() async throws -> AppleCredential {
         try await AppleSignInCoordinator().signIn()
     }
 
-    func googleIdToken() async throws -> String {
-        throw CoreError.service(code: Self.googleUnavailableCode, message: "GoogleSignIn SDK is not linked")
+    func googleCredential() async throws -> GoogleCredential {
+        guard let client = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String,
+              let server = Bundle.main.object(forInfoDictionaryKey: "GIDServerClientID") as? String,
+              !client.isEmpty, !server.isEmpty else {
+            throw CoreError.service(code: Self.googleUnavailableCode, message: "Google sign-in is unavailable. Try email.")
+        }
+        guard var presenting = UIApplication.shared.connectedScenes
+            .filter({ $0.activationState == .foregroundActive })
+            .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController }).first else {
+            throw CoreError.unknown("No sign-in presentation window")
+        }
+        while let next = presenting.presentedViewController { presenting = next }
+        let nonce = AppleSignInCoordinator.randomNonce()
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: client, serverClientID: server)
+        do {
+            let result = try await GIDSignIn.sharedInstance.signIn(
+                withPresenting: presenting, hint: nil, additionalScopes: nil,
+                nonce: AppleSignInCoordinator.sha256(nonce)
+            )
+            guard let idToken = result.user.idToken?.tokenString else {
+                throw CoreError.unknown("Google returned no identity token")
+            }
+            // Supabase owns the session. The Google SDK need not retain a second signed-in account.
+            let accessToken = result.user.accessToken.tokenString
+            GIDSignIn.sharedInstance.signOut()
+            return GoogleCredential(idToken: idToken, nonce: nonce, accessToken: accessToken)
+        } catch {
+            if (error as NSError).domain == kGIDSignInErrorDomain,
+               (error as NSError).code == GIDSignInError.canceled.rawValue { throw CancellationError() }
+            throw error
+        }
     }
 }
 
@@ -88,7 +125,8 @@ final class AppleSignInCoordinator: NSObject, ASAuthorizationControllerDelegate,
             return
         }
         let name = credential.fullName.map { PersonNameComponentsFormatter().string(from: $0) } ?? ""
-        resume(.success(AppleCredential(idToken: idToken, nonce: nonce, fullName: name.isEmpty ? nil : name)))
+        let code = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
+        resume(.success(AppleCredential(idToken: idToken, nonce: nonce, fullName: name.isEmpty ? nil : name, authorizationCode: code)))
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
@@ -110,12 +148,12 @@ final class AppleSignInCoordinator: NSObject, ASAuthorizationControllerDelegate,
         continuation = nil
     }
 
-    private static func randomNonce() -> String {
+    fileprivate static func randomNonce() -> String {
         let alphabet = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._")
         return String((0..<32).map { _ in alphabet[Int.random(in: 0..<alphabet.count)] })
     }
 
-    private static func sha256(_ input: String) -> String {
+    fileprivate static func sha256(_ input: String) -> String {
         SHA256.hash(data: Data(input.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 }

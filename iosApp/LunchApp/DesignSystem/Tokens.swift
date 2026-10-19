@@ -3,56 +3,58 @@ import SwiftUI
 
 public enum Tokens {
     public enum Palette {
-        /// Screen background. One value; Discover's #FDFAF3 is retired.
-        public static let ground = Color(light: (1.0000, 0.9725, 0.9059, 1.0000), dark: (0.0784, 0.1176, 0.0863, 1.0000))
+        /// Screen background. Warm cream; espresso in dark, never green-black.
+        public static let ground = Color(light: (1.0000, 0.9647, 0.9255, 1.0000), dark: (0.1020, 0.0745, 0.0627, 1.0000))
         /// Cards, inputs, sheets.
-        public static let surface = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.1020, 0.1686, 0.1176, 1.0000))
-        /// Nested cards, tab bar.
-        public static let surfaceRaised = Color(light: (0.9922, 0.9804, 0.9529, 1.0000), dark: (0.1333, 0.2196, 0.1647, 1.0000))
+        public static let surface = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.1490, 0.1098, 0.0902, 1.0000))
+        /// Nested cards, tab bar, tags.
+        public static let surfaceRaised = Color(light: (1.0000, 0.9412, 0.8784, 1.0000), dark: (0.2000, 0.1490, 0.1216, 1.0000))
         /// Body text.
-        public static let text = Color(light: (0.2902, 0.2078, 0.1529, 1.0000), dark: (0.9176, 0.8941, 0.8471, 1.0000))
+        public static let text = Color(light: (0.2275, 0.1333, 0.0941, 1.0000), dark: (0.9608, 0.9137, 0.8667, 1.0000))
         /// Captions, hints, unselected tabs.
-        public static let textSecondary = Color(light: (0.5451, 0.4353, 0.2784, 1.0000), dark: (0.7098, 0.6588, 0.5608, 1.0000))
+        public static let textSecondary = Color(light: (0.4784, 0.3529, 0.2824, 1.0000), dark: (0.7686, 0.6824, 0.6118, 1.0000))
         /// Text on primary fills.
-        public static let textOnPrimary = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.0549, 0.1020, 0.0627, 1.0000))
-        /// Text on the action fill.
-        public static let textOnAction = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (1.0000, 1.0000, 1.0000, 1.0000))
-        /// Structure, selected states, primary buttons.
-        public static let primary = Color(light: (0.1843, 0.4980, 0.2471, 1.0000), dark: (0.3725, 0.7569, 0.4471, 1.0000))
-        /// Tinted fills (10% / 14%).
-        public static let primarySoft = Color(light: (0.1843, 0.4980, 0.2471, 0.1020), dark: (0.3725, 0.7569, 0.4471, 0.1412))
+        public static let textOnPrimary = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.2275, 0.0706, 0.0235, 1.0000))
+        /// Text on the action fill. Large bold labels only in light (3.7:1).
+        public static let textOnAction = Color(light: (1.0000, 1.0000, 1.0000, 1.0000), dark: (0.1647, 0.0549, 0.0118, 1.0000))
+        /// Paprika. Structure, selected states, primary buttons.
+        public static let primary = Color(light: (0.7765, 0.2392, 0.0902, 1.0000), dark: (1.0000, 0.5412, 0.3569, 1.0000))
+        /// Tinted fills (10% / 16%).
+        public static let primarySoft = Color(light: (0.7765, 0.2392, 0.0902, 0.1020), dark: (1.0000, 0.5412, 0.3569, 0.1608))
         /// The Hungry button and the paywall button only.
-        public static let action = Color(light: (1.0000, 0.4196, 0.2078, 1.0000), dark: (1.0000, 0.5412, 0.3608, 1.0000))
+        public static let action = Color(light: (0.9255, 0.3059, 0.0784, 1.0000), dark: (1.0000, 0.4196, 0.2078, 1.0000))
         /// Rings and glows around the action.
-        public static let actionSoft = Color(light: (1.0000, 0.4196, 0.2078, 0.1216), dark: (1.0000, 0.5412, 0.3608, 0.1608))
-        /// Positive badges.
-        public static let success = Color(light: (0.1804, 0.4902, 0.1961, 1.0000), dark: (0.4353, 0.8118, 0.5020, 1.0000))
+        public static let actionSoft = Color(light: (0.9255, 0.3059, 0.0784, 0.1216), dark: (1.0000, 0.4196, 0.2078, 0.1608))
+        /// Saffron. Rating stars; decorative, always next to the rating number.
+        public static let accent = Color(light: (0.8510, 0.5412, 0.0000, 1.0000), dark: (1.0000, 0.7569, 0.3294, 1.0000))
+        /// Positive badges and a healthy budget. The only green in the palette.
+        public static let success = Color(light: (0.1804, 0.4902, 0.3098, 1.0000), dark: (0.4980, 0.8196, 0.6078, 1.0000))
         /// Caution badges.
-        public static let warning = Color(light: (0.7216, 0.3255, 0.0000, 1.0000), dark: (1.0000, 0.6902, 0.4039, 1.0000))
-        /// Errors, destructive actions.
-        public static let danger = Color(light: (0.7176, 0.1098, 0.1098, 1.0000), dark: (1.0000, 0.5412, 0.5020, 1.0000))
+        public static let warning = Color(light: (0.6588, 0.3529, 0.0000, 1.0000), dark: (1.0000, 0.7216, 0.4078, 1.0000))
+        /// Errors, destructive actions. Berry, so it never reads as the paprika brand colour.
+        public static let danger = Color(light: (0.6588, 0.0706, 0.2431, 1.0000), dark: (1.0000, 0.5608, 0.6588, 1.0000))
         /// Neutral information badges.
-        public static let info = Color(light: (0.1059, 0.3686, 0.5412, 1.0000), dark: (0.4863, 0.7686, 0.9608, 1.0000))
-        /// Card borders, dividers (14% / 10%).
-        public static let hairline = Color(light: (0.4196, 0.3059, 0.2392, 0.1412), dark: (1.0000, 1.0000, 1.0000, 0.1020))
+        public static let info = Color(light: (0.1216, 0.3725, 0.5451, 1.0000), dark: (0.5490, 0.7843, 0.9490, 1.0000))
+        /// Card borders, dividers (14% / 12%).
+        public static let hairline = Color(light: (0.2275, 0.1333, 0.0941, 0.1412), dark: (1.0000, 1.0000, 1.0000, 0.1216))
         /// Focused borders, strong dividers.
-        public static let hairlineStrong = Color(light: (0.4196, 0.3059, 0.2392, 0.2784), dark: (1.0000, 1.0000, 1.0000, 0.2196))
+        public static let hairlineStrong = Color(light: (0.2275, 0.1333, 0.0941, 0.2784), dark: (1.0000, 1.0000, 1.0000, 0.2392))
         /// Behind sheets and dialogs.
-        public static let scrim = Color(light: (0.2431, 0.1686, 0.1255, 0.6000), dark: (0.0000, 0.0000, 0.0000, 0.6510))
+        public static let scrim = Color(light: (0.1647, 0.0941, 0.0627, 0.6000), dark: (0.0000, 0.0000, 0.0000, 0.6510))
     }
 
     public enum `Type` {
-        public static let family = "Plus Jakarta Sans"
+        public static let family = "Bricolage Grotesque"
         public static let textScaleMin: CGFloat = 0.8
         public static let textScaleMax: CGFloat = 2.0
-        public static let display = TextRole(size: 32, weight: 800, lineHeight: 38, tracking: -0.5, uppercase: false)
-        public static let title = TextRole(size: 22, weight: 700, lineHeight: 28, tracking: 0, uppercase: false)
-        public static let heading = TextRole(size: 17, weight: 700, lineHeight: 22, tracking: 0, uppercase: false)
-        public static let body = TextRole(size: 16, weight: 500, lineHeight: 24, tracking: 0.15, uppercase: false)
-        public static let bodySmall = TextRole(size: 14, weight: 400, lineHeight: 20, tracking: 0.25, uppercase: false)
-        public static let caption = TextRole(size: 13, weight: 500, lineHeight: 18, tracking: 0.2, uppercase: false)
-        public static let label = TextRole(size: 11, weight: 700, lineHeight: 16, tracking: 1.2, uppercase: true)
-        public static let button = TextRole(size: 16, weight: 700, lineHeight: 20, tracking: 0.1, uppercase: false)
+        public static let display = TextRole(size: 32, weight: 800, lineHeight: 38, tracking: -0.5, uppercase: false, display: true)
+        public static let title = TextRole(size: 22, weight: 700, lineHeight: 28, tracking: -0.2, uppercase: false, display: true)
+        public static let heading = TextRole(size: 17, weight: 700, lineHeight: 22, tracking: 0, uppercase: false, display: true)
+        public static let body = TextRole(size: 16, weight: 500, lineHeight: 24, tracking: 0.15, uppercase: false, display: false)
+        public static let bodySmall = TextRole(size: 14, weight: 400, lineHeight: 20, tracking: 0.25, uppercase: false, display: false)
+        public static let caption = TextRole(size: 13, weight: 500, lineHeight: 18, tracking: 0.2, uppercase: false, display: false)
+        public static let label = TextRole(size: 11, weight: 700, lineHeight: 16, tracking: 1.2, uppercase: true, display: false)
+        public static let button = TextRole(size: 16, weight: 700, lineHeight: 20, tracking: 0.1, uppercase: false, display: false)
     }
 
     public enum Spacing {
@@ -106,6 +108,8 @@ public enum Tokens {
 
 public struct TextRole {
     public let size: CGFloat; public let weight: Int; public let lineHeight: CGFloat; public let tracking: CGFloat; public let uppercase: Bool
+    /// True for roles set in the bundled display family; false for the system text face.
+    public let display: Bool
     public var fontWeight: Font.Weight {
         switch weight { case 800: return .heavy; case 700: return .bold; case 600: return .semibold; case 500: return .medium; default: return .regular }
     }

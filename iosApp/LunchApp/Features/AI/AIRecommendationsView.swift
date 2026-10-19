@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AIRecommendationsView: View {
     @Environment(AppEnvironment.self) private var app
+    @Environment(\.openURL) private var openURL
     let pickPlaceId: String?
     @State private var model: AIRecommendationsViewModel?
 
@@ -38,6 +39,8 @@ struct AIRecommendationsView: View {
             ScreenHeader(title: Copy.AI.title, dismissal: .back) { app.dismiss() }
             ScrollView {
                 VStack(alignment: .leading, spacing: Tokens.Spacing.lg) {
+                    SearchAreaButton()
+                    DietaryNotice()
                     HStack(spacing: Tokens.Spacing.sm) {
                         LunchTextField(placeholder: Copy.AI.cravingPlaceholder, text: $model.craving, icon: .autoAwesome, identifier: "craving_field", submitLabel: .search) {
                             Task { await model.ask() }
@@ -46,9 +49,27 @@ struct AIRecommendationsView: View {
                             Task { await model.ask() }
                         }
                     }
+                    if model.needsSignIn {
+                        LunchButton(title: Copy.Profile.signInApple, style: .primary) { app.present(.signIn) }
+                        Text("Sign in for one free AI request a day, or use your Lunch Pro subscription.").lunchText(.bodySmall)
+                    }
+                    if model.needsConsent {
+                        AIConsentCard(providers: model.aiConfiguration?.providers ?? []) {
+                            Task { await model.grantConsent() }
+                        } onDecline: {
+                            model.declineConsent()
+                        } onPrivacy: {
+                            openURL(LunchConfig.privacyUrl)
+                        }
+                    }
                     if model.isGated {
-                        UpsellRow(title: Copy.Gate.aiTitle, message: Copy.Gate.aiBody(resetTime: model.resetTime), ctaTitle: Copy.Gate.aiCta) {
-                            app.present(.paywall)
+                        if !model.requiresSubscription {
+                            Text("You’ve used your 10 Pro AI requests today, including group suggestions. Your allowance resets at \(model.resetTime).")
+                                .lunchText(.bodySmall)
+                        } else {
+                            UpsellRow(title: Copy.Gate.aiTitle, message: Copy.Gate.aiBody(resetTime: model.resetTime), ctaTitle: Copy.Gate.aiCta) {
+                                app.present(.paywall)
+                            }
                         }
                     }
                     results(model)
@@ -60,10 +81,13 @@ struct AIRecommendationsView: View {
                 .padding(.bottom, Tokens.Spacing.xl)
             }
         }
-        .task {
+        .task(id: "\(app.isPro)-\(app.session?.userId ?? "guest")") {
             let draft = model.craving
             await model.load(userId: app.user?.id, isPro: app.isPro)
             if !draft.isEmpty, case .idle = model.state, !model.isGated { await model.ask() }
+        }
+        .onChange(of: model.requiresSubscription, initial: true) { _, needed in
+            if needed { app.present(.paywall) }
         }
     }
 
@@ -71,7 +95,7 @@ struct AIRecommendationsView: View {
     private func results(_ model: AIRecommendationsViewModel) -> some View {
         switch model.state {
         case .idle:
-            if !model.isGated {
+            if !model.isGated && !model.needsConsent {
                 EmptyState(variant: .nothingHere, title: Copy.AI.emptyTitle, message: Copy.AI.emptyBody)
             }
         case .loading:
@@ -79,7 +103,7 @@ struct AIRecommendationsView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Tokens.Spacing.xl)
         case .failed(let error):
-            ErrorStateView(error: error) { Task { await model.ask() } }
+            AIErrorStateView(error: error) { Task { await model.ask() } }
         case .loaded(let recommendation):
             VStack(alignment: .leading, spacing: Tokens.Spacing.md) {
                 LunchCard {
@@ -136,6 +160,42 @@ struct AIRecommendationsView: View {
     }
 }
 
+/// Asks before anything is sent to the configured AI providers (App Review 5.1.2(i)): what is sent, to whom,
+/// a link to the privacy policy, and the two answers.
+struct AIConsentCard: View {
+    let providers: [AiProviderDisclosure]
+    let onAgree: () -> Void
+    let onDecline: () -> Void
+    let onPrivacy: () -> Void
+
+    var body: some View {
+        LunchCard {
+            VStack(alignment: .leading, spacing: Tokens.Spacing.sm) {
+                Label {
+                    Text(Copy.AIConsent.title).lunchText(.heading).foregroundStyle(Tokens.Palette.text)
+                } icon: {
+                    IconView(icon: .autoAwesome, size: Tokens.Size.iconDefault).foregroundStyle(Tokens.Palette.primary)
+                }
+                Text(Copy.AIConsent.body(providers: providers.map(\.name).joined(separator: ", ")))
+                    .lunchText(.body)
+                    .foregroundStyle(Tokens.Palette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(providers, id: \.privacyUrl) { provider in
+                    if let url = URL(string: provider.privacyUrl) {
+                        Link("\(provider.name) privacy policy", destination: url).lunchText(.bodySmall)
+                    }
+                }
+                LunchButton(title: Copy.AIConsent.privacy, style: .text, fillsWidth: false, identifier: "ai_consent_privacy", action: onPrivacy)
+                LunchButton(title: Copy.AIConsent.agree, style: .primary, identifier: "ai_consent_agree", action: onAgree)
+                LunchButton(title: Copy.AIConsent.decline, style: .secondary, identifier: "ai_consent_decline", action: onDecline)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("ai_consent_card")
+    }
+}
+
 /// One AI result: name, rating and distance, the engine's reasons, and the two actions.
 private struct AIResultCard: View {
     let index: Int
@@ -162,6 +222,7 @@ private struct AIResultCard: View {
                     Spacer()
                     BadgeLabel(text: "#\(index + 1)")
                 }
+                GoogleMapsAttribution(restaurant: restaurant, includesPhoto: false)
                 ForEach(reasons, id: \.self) { reason in
                     Label {
                         Text(reason).lunchText(.bodySmall).foregroundStyle(Tokens.Palette.textSecondary)

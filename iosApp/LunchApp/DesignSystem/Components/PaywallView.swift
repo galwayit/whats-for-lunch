@@ -2,8 +2,8 @@
 //  PaywallView.swift
 //  LunchApp
 //
-//  Lunch Pro paywall: two plan cards (yearly preselected with the trial line and BEST VALUE),
-//  six benefits, the action-coloured CTA (id paywall_cta), the legal sentence with the store
+//  Lunch Pro paywall: store-priced plans with eligible trial details,
+//  implemented benefits, the action-coloured CTA (id paywall_cta), the legal sentence with the store
 //  name substituted, and Restore / Terms / Privacy links.
 //
 
@@ -35,10 +35,10 @@ struct PaywallView: View {
                 header
                 VStack(spacing: Tokens.Spacing.sm + Tokens.Spacing.xs) {
                     if let yearly {
-                        planCard(yearly, title: Copy.Paywall.planYearly, detail: Copy.Paywall.planYearlyTrial(yearly.localizedPrice), badge: Copy.Paywall.planYearlyBadge)
+                        planCard(yearly, title: Copy.Paywall.planYearly, detail: Copy.Paywall.priceDetail(yearly), badge: nil)
                     }
                     if let monthly {
-                        planCard(monthly, title: Copy.Paywall.planMonthly, detail: Copy.Paywall.planMonthlyPrice(monthly.localizedPrice), badge: nil)
+                        planCard(monthly, title: Copy.Paywall.planMonthly, detail: Copy.Paywall.priceDetail(monthly), badge: nil)
                     }
                 }
                 benefits
@@ -51,7 +51,7 @@ struct PaywallView: View {
                 ) {
                     if let selectedPackage { onPurchase(selectedPackage) }
                 }
-                Text(Copy.Paywall.legal(store: storeName))
+                Text(Copy.Paywall.legal(store: storeName, hasTrial: selectedPackage?.hasFreeTrial == true))
                     .lunchText(.caption)
                     .foregroundStyle(Tokens.Palette.textSecondary)
                 links
@@ -60,7 +60,7 @@ struct PaywallView: View {
         }
         .background(Tokens.Palette.ground)
         .onChange(of: [yearly?.identifier, monthly?.identifier], initial: true) { _, _ in
-            if selectedIdentifier == nil { selectedIdentifier = (yearly ?? monthly)?.identifier }
+            if selectedPackage == nil { selectedIdentifier = (yearly ?? monthly)?.identifier }
         }
     }
 

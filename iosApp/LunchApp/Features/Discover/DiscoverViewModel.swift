@@ -34,6 +34,7 @@ final class DiscoverViewModel {
     private let core: LunchCoreClient
     private var debounce: Task<Void, Never>?
     private var unfiltered: [Restaurant] = []
+    private var activePreferences: UserPreferences?
 
     init(core: LunchCoreClient) {
         self.core = core
@@ -52,22 +53,24 @@ final class DiscoverViewModel {
 
     /// Runs the search 400 ms after the last keystroke.
     func queryChanged(prefs: UserPreferences?) {
+        activePreferences = prefs
         debounce?.cancel()
         debounce = Task {
             try? await Task.sleep(nanoseconds: Self.debounceNanoseconds)
             guard !Task.isCancelled else { return }
-            await search(prefs: prefs)
+            await search(prefs: activePreferences)
         }
     }
 
     func search(prefs: UserPreferences?) async {
+        activePreferences = prefs
         results = .loading
         do {
             let location = try await core.location.current()
             let radius = maxDistanceKm ?? prefs?.maxTravelDistance ?? UserPreferences().maxTravelDistance
             let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
             unfiltered = try await core.restaurants.searchNearby(location: location, radiusKm: radius, query: trimmed.isEmpty ? nil : trimmed, forceRefresh: false)
-            applyFilters(prefs: prefs)
+            applyFilters(prefs: activePreferences)
         } catch {
             results = .failed(CoreError.from(error))
         }
@@ -75,7 +78,10 @@ final class DiscoverViewModel {
 
     /// Filters and sorts the last fetched list without another network call.
     func applyFilters(prefs: UserPreferences?) {
-        let filtered = unfiltered.filter { restaurant in
+        activePreferences = prefs
+        let eligible = core.recommendation.applyPreferenceFilters(restaurants: unfiltered, prefs: prefs)
+        let filtered = eligible.filter { restaurant in
+            if prefs?.includeChains == false, RestaurantChains.matches(restaurant.name) { return false }
             if let maxPriceLevel, let level = restaurant.priceLevel, level > maxPriceLevel { return false }
             if let maxDistanceKm, let distance = restaurant.distanceFromUser, distance > maxDistanceKm { return false }
             if let minRating, (restaurant.rating ?? 0) < minRating { return false }
