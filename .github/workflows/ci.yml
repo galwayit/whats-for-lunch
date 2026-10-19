@@ -20,6 +20,8 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
+      - name: Shared restaurant chain catalogue is in sync
+        run: python3 shared/scripts/generate_chain_catalog.py --check
       - name: Design tokens are in sync
         run: |
           python3 design/generate_tokens.py
@@ -52,15 +54,18 @@ jobs:
         run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
       - name: Build LunchCore framework for the simulator
         run: ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --no-daemon
+      - name: Release configuration security checks
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s iosApp/scripts -p 'test_*.py'
       - name: Build and test the app
         run: |
+          set -o pipefail
           # Simulator names change with every Xcode release, so resolve one at run time.
           UDID=$(xcrun simctl list devices available --json \
             | python3 -c 'import json,sys; ds=json.load(sys.stdin)["devices"]; print(next(d["udid"] for v in sorted(ds) for d in ds[v] if "iPhone" in d["name"]))')
           echo "Testing on simulator $UDID"
           xcodebuild -project iosApp/LunchApp.xcodeproj -scheme LunchApp \
             -destination "platform=iOS Simulator,id=$UDID" \
-            -configuration Debug test CODE_SIGNING_ALLOWED=NO | xcpretty || exit ${PIPESTATUS[0]}
+            -configuration Debug test CODE_SIGNING_ALLOWED=NO | xcpretty
 
   backend:
     name: Backend checks and tests
@@ -73,3 +78,16 @@ jobs:
       - name: Type check, format, test
         working-directory: backend
         run: make check && make test
+      - name: Web invitation workflow (fictional data)
+        run: node backend/tests/web_invite_test.mjs
+      - name: PostgreSQL billing, invitations, concurrency and RLS regression tests
+        run: |
+          docker run --detach --name lunch-review-postgres-ci --env POSTGRES_PASSWORD=ci-fixture-only --tmpfs /var/lib/postgresql/data postgres:17-alpine
+          for attempt in $(seq 1 30); do
+            docker exec lunch-review-postgres-ci pg_isready -U postgres && break
+            sleep 1
+          done
+          python3 backend/tests/invitation_regression.py lunch-review-postgres-ci
+      - name: Remove disposable PostgreSQL
+        if: always()
+        run: docker rm --force lunch-review-postgres-ci || true

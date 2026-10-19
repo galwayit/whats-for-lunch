@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+.sentryclirc
+sentry.properties
 *.keystore
 *.jks
 google-services.json
@@ -68,3 +70,10 @@ maestro/.maestro/
 # App configuration (generated locally)
 androidApp/src/main/assets/lunch.properties
 iosApp/LunchApp/Config/Lunch.plist
+iosApp/LunchApp/Config/Lunch.Release.plist
+
+# --- Local tool state ---
+.wrangler/
+.claude/
+supabase/.temp/
+__pycache__/
