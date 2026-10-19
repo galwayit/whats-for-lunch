@@ -4,9 +4,10 @@
  *   Proxies the photo media endpoint so the API key never reaches clients.
  */
 
+import { reserveUpstream } from "../_shared/budget.ts";
 import { ApiError, badRequest, CORS_HEADERS, ErrorCode, handle } from "../_shared/errors.ts";
 import { fetchPhoto } from "../_shared/places.ts";
-import { requireEnv } from "../_shared/supabase.ts";
+import { requireEnv, serviceClient } from "../_shared/supabase.ts";
 
 const PHOTO_NAME = /^places\/[A-Za-z0-9_-]+\/photos\/[A-Za-z0-9_-]+$/;
 
@@ -17,6 +18,7 @@ Deno.serve(handle(["GET"], async (req) => {
   const requested = Number(url.searchParams.get("maxWidth") ?? "800");
   const maxWidth = Number.isInteger(requested) ? Math.min(1600, Math.max(64, requested)) : 800;
 
+  await reserveUpstream(serviceClient(), "photos");
   const upstream = await fetchPhoto(name, maxWidth, requireEnv("GOOGLE_PLACES_API_KEY"));
   if (!upstream.ok) {
     await upstream.body?.cancel();
@@ -28,7 +30,7 @@ Deno.serve(handle(["GET"], async (req) => {
     headers: {
       ...CORS_HEADERS,
       "Content-Type": upstream.headers.get("Content-Type") ?? "image/jpeg",
-      "Cache-Control": "public, max-age=86400, s-maxage=604800",
+      "Cache-Control": "no-store",
     },
   });
 }));

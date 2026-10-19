@@ -14,6 +14,8 @@ const PLACES_BASE = "https://places.googleapis.com/v1";
 
 export const NEARBY_FIELD_MASK = [
   "places.id",
+  "places.googleMapsUri",
+  "places.attributions",
   "places.displayName",
   "places.formattedAddress",
   "places.location",
@@ -27,6 +29,8 @@ export const NEARBY_FIELD_MASK = [
 
 export const DETAILS_FIELD_MASK = [
   "id",
+  "googleMapsUri",
+  "attributions",
   "displayName",
   "formattedAddress",
   "internationalPhoneNumber",
@@ -192,6 +196,13 @@ export function mapPlace(place: any, options: MapOptions): Restaurant | null {
     photoReference: photoNames[0] ?? null,
     photoReferences: photoNames,
     photoUrl: photoNames[0] ? photoProxyUrl(photoNames[0], options.functionsBase) : null,
+    googleMapsUri: safeUri(place.googleMapsUri) ??
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${
+        encodeURIComponent(placeId)
+      }`,
+    photoSourceUri: safeUri(place.photos?.[0]?.googleMapsUri),
+    photoAttributions: mapAttributions(place.photos?.[0]?.authorAttributions),
+    attributions: mapAttributions(place.attributions),
   };
 }
 
@@ -211,6 +222,8 @@ export function mapReviews(reviews: any): RestaurantReview[] {
       authorPhotoUrl: typeof r.authorAttribution?.photoUri === "string"
         ? r.authorAttribution.photoUri
         : null,
+      authorUri: safeUri(r.authorAttribution?.uri),
+      sourceUri: safeUri(r.googleMapsUri),
       rating: typeof r.rating === "number" ? Math.round(r.rating) : 0,
       text: typeof r.text?.text === "string" ? r.text.text : null,
       timeEpochSeconds: Number.isFinite(publishTime) ? Math.floor(publishTime / 1000) : 0,
@@ -220,6 +233,28 @@ export function mapReviews(reviews: any): RestaurantReview[] {
     });
   }
   return out;
+}
+
+function safeUri(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+function mapAttributions(
+  value: unknown,
+): { name: string; uri: string | null; photoUri: string | null }[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v) =>
+    v && (typeof v.displayName === "string" || typeof v.provider === "string")
+  ).map((v) => ({
+    name: v.displayName ?? v.provider,
+    uri: safeUri(v.uri ?? v.providerUri),
+    photoUri: safeUri(v.photoUri),
+  }));
 }
 
 function optionalNumber(value: unknown): number | null {
@@ -254,6 +289,7 @@ async function placesPost(
 ): Promise<unknown> {
   const response = await fetchImpl(`${PLACES_BASE}/${path}`, {
     method: "POST",
+    signal: AbortSignal.timeout(12_000),
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": apiKey,
@@ -309,6 +345,7 @@ export async function placeDetailsRaw(
 ): Promise<unknown> {
   const response = await fetchImpl(`${PLACES_BASE}/places/${encodeURIComponent(placeId)}`, {
     headers: { "X-Goog-Api-Key": apiKey, "X-Goog-FieldMask": DETAILS_FIELD_MASK },
+    signal: AbortSignal.timeout(12_000),
   });
   if (!response.ok) {
     await response.body?.cancel();
@@ -325,7 +362,11 @@ export function fetchPhoto(
   fetchImpl: typeof fetch = fetch,
 ): Promise<Response> {
   const url = `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidthPx}`;
-  return fetchImpl(url, { headers: { "X-Goog-Api-Key": apiKey }, redirect: "follow" });
+  return fetchImpl(url, {
+    headers: { "X-Goog-Api-Key": apiKey },
+    redirect: "follow",
+    signal: AbortSignal.timeout(12_000),
+  });
 }
 
 /** Lower-cases, collapses whitespace and trims; "" when absent. */

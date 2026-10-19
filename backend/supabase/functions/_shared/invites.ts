@@ -49,7 +49,11 @@ export function groupFromRow(row: GroupRow): LunchGroup {
   return {
     id: row.id,
     hostId: row.host_id,
-    hostName: row.host_name,
+    hostName: row.host_name.trim() || "Host name not provided",
+    budgetPerPersonMinor: row.budget_per_person_minor ?? null,
+    currencyCode: row.currency_code ?? "AUD",
+    paymentArrangement: row.payment_arrangement ?? "undecided",
+    paymentMethod: row.payment_method ?? "undecided",
     name: row.name,
     scheduledAtEpochSeconds: toEpochSeconds(row.scheduled_at),
     areaLatitude: Number(row.area_lat),

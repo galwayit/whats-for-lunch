@@ -6,7 +6,9 @@
  *   (group_id, guest_token).
  */
 
+import { suggestionFromRow, type SuggestionRow } from "../_shared/group-planning.ts";
 import { getUser, guestToken } from "../_shared/auth.ts";
+import { checkSharedText, safetyContext } from "../_shared/content-safety.ts";
 import {
   ApiError,
   badRequest,
@@ -15,7 +17,7 @@ import {
   json,
   readJsonObject,
 } from "../_shared/errors.ts";
-import { buildInvitation, normaliseInviteCode } from "../_shared/invites.ts";
+import { buildInvitation, findMyRsvp, normaliseInviteCode } from "../_shared/invites.ts";
 import { notifyUsers } from "../_shared/notify.ts";
 import { requireEnv, serviceClient, unwrap } from "../_shared/supabase.ts";
 import type { GroupRow, RsvpRow, RsvpStatus } from "../_shared/types.ts";
@@ -47,6 +49,8 @@ Deno.serve(handle(["POST"], async (req) => {
   const groupRow = group as GroupRow;
 
   const user = await getUser(req);
+  checkSharedText(displayNameInput ?? user?.displayName);
+  const hidden = await safetyContext(client, groupRow.id, user?.id ?? null, guestToken(req));
   const respondedAt = new Date().toISOString();
   let issuedToken: string | null = null;
 
@@ -81,7 +85,7 @@ Deno.serve(handle(["POST"], async (req) => {
       unwrap(await client.from("rsvps").update(update).eq("id", existing.id).select("id"));
     } else {
       if (!displayNameInput) throw badRequest("displayName is required when not signed in");
-      issuedToken = newGuestToken();
+      issuedToken = existingToken ?? newGuestToken();
       unwrap(
         await client
           .from("rsvps")
@@ -113,6 +117,21 @@ Deno.serve(handle(["POST"], async (req) => {
     },
   });
 
-  const invitation = buildInvitation(groupRow, rsvps, status, requireEnv("INVITE_LINK_BASE"));
+  const invitation = buildInvitation(
+    groupRow,
+    rsvps.filter((r) => !hidden.has(r.id)),
+    status,
+    requireEnv("INVITE_LINK_BASE"),
+  );
+  const mine = findMyRsvp(rsvps, user?.id ?? null, issuedToken ?? guestToken(req));
+  if (mine) {
+    const rows = unwrap(
+      await client.from("group_suggestions").select("*").eq("group_id", groupRow.id).eq(
+        "rsvp_id",
+        mine.id,
+      ).is("moderated_at", null).order("created_at", { ascending: false }).limit(1),
+    ) as SuggestionRow[];
+    invitation.mySuggestion = rows[0] ? suggestionFromRow(rows[0]) : null;
+  }
   return json(issuedToken ? { invitation, guestToken: issuedToken } : { invitation });
 }));

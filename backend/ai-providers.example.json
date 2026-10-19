@@ -1,0 +1,41 @@
+{
+  "enabled": false,
+  "primary": "google",
+  "backup": "openai",
+  "consentRevision": "2026-10-02",
+  "providers": [
+    {
+      "id": "google",
+      "kind": "google",
+      "models": {
+        "free": "gemini-3.8-flash",
+        "pro": "gemini-3.8-flash"
+      },
+      "timeoutMs": 10000,
+      "maxOutputTokens": 2048,
+      "dailyRequestLimit": 400
+    },
+    {
+      "id": "openai",
+      "kind": "openai",
+      "models": {
+        "free": "gpt-6-luna",
+        "pro": "gpt-6-luna"
+      },
+      "timeoutMs": 10000,
+      "maxOutputTokens": 2048,
+      "dailyRequestLimit": 200
+    },
+    {
+      "id": "claude",
+      "kind": "anthropic",
+      "models": {
+        "free": "claude-haiku-4-5",
+        "pro": "claude-haiku-4-5"
+      },
+      "timeoutMs": 10000,
+      "maxOutputTokens": 2048,
+      "dailyRequestLimit": 200
+    }
+  ]
+}

@@ -18,6 +18,14 @@ Deno.serve(handle(["POST"], async (req) => {
 
   const user = await getUser(req);
   const appUserId = requireAppUserId(req, user);
+  if (body.action === "unregister") {
+    const { error } = await serviceClient().from("device_tokens").delete().eq("token", token).eq(
+      "user_id",
+      appUserId,
+    );
+    if (error) throw new Error(`database: ${error.message}`);
+    return json({ ok: true });
+  }
   const { error } = await serviceClient().from("device_tokens").upsert(
     {
       token,

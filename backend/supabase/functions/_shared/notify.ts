@@ -7,13 +7,29 @@
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { parseServiceAccount, type PushMessage, sendPushToAll } from "./push.ts";
+import { safetyContext } from "./content-safety.ts";
 
 export async function notifyUsers(
   client: SupabaseClient,
   userIds: string[],
   message: PushMessage,
 ): Promise<number> {
-  const ids = [...new Set(userIds)].filter((id) => id.length > 0);
+  let ids = [...new Set(userIds)].filter((id) => id.length > 0);
+  // Fail closed for notifications if safety cannot be verified. Delivery must not
+  // reveal blocked or moderator-hidden invitations through a push notification.
+  if (message.data?.groupId) {
+    const allowed = await Promise.all(ids.map(async (id) => {
+      try {
+        // Cancellation itself is a useful notification; still enforce blocks
+        // and moderator removal after the group has been marked cancelled.
+        await safetyContext(client, message.data.groupId, id, null, true);
+        return id;
+      } catch {
+        return null;
+      }
+    }));
+    ids = allowed.filter((id): id is string => id !== null);
+  }
   if (ids.length === 0) return 0;
   const raw = Deno.env.get("FCM_SERVICE_ACCOUNT_JSON");
   if (!raw) {

@@ -60,6 +60,11 @@ Deno.test("mapPlace maps a nearby Place resource to the Restaurant JSON", () => 
       ],
       photoUrl:
         "https://abc.supabase.co/functions/v1/places-photo?name=places%2FChIJN1t_tDeuEmsRUsoyG83frY4%2Fphotos%2FAXCi2Q5abc&maxWidth=800",
+      googleMapsUri:
+        "https://www.google.com/maps/search/?api=1&query=Trattoria%20Bridge&query_place_id=ChIJN1t_tDeuEmsRUsoyG83frY4",
+      photoSourceUri: null,
+      photoAttributions: [],
+      attributions: [],
     } satisfies Restaurant,
   );
 });
@@ -102,6 +107,8 @@ Deno.test("mapPlace on a details resource fills phone, website and opening hours
     text: "Best carbonara in the CBD.",
     timeEpochSeconds: Math.floor(Date.parse("2026-08-19T03:21:44Z") / 1000),
     relativeTimeDescription: "2 weeks ago",
+    authorUri: "https://www.google.com/maps/contrib/1",
+    sourceUri: null,
   });
   assertEquals(reviews[1].text, null);
   assertEquals(reviews[1].authorPhotoUrl, null);
@@ -157,4 +164,33 @@ Deno.test("photoProxyUrl, normaliseQuery and applyFilters", () => {
   ]);
   assertEquals(applyFilters(all, null, 4.3).map((r) => r.name), ["Trattoria Bridge"]);
   assertEquals(applyFilters(all, null, null).length, 3);
+});
+
+Deno.test("photo, provider and review source attributions survive mapping", () => {
+  const place = mapPlace({
+    id: "fixture",
+    displayName: { text: "Fictional cafe" },
+    googleMapsUri: "https://maps.google.com/fixture",
+    attributions: [{ provider: "Fixture provider", providerUri: "https://example.test/provider" }],
+    photos: [{
+      name: "places/fixture/photos/one",
+      googleMapsUri: "https://maps.google.com/photo",
+      authorAttributions: [{
+        displayName: "Fixture Author",
+        uri: "https://maps.google.com/author",
+        photoUri: "https://example.test/avatar",
+      }],
+    }],
+  }, options)!;
+  assertEquals(place.photoAttributions?.[0].name, "Fixture Author");
+  assertEquals(place.photoAttributions?.[0].uri, "https://maps.google.com/author");
+  assertEquals(place.attributions?.[0].name, "Fixture provider");
+  assertEquals(place.photoSourceUri, "https://maps.google.com/photo");
+  const reviews = mapReviews([{
+    name: "fixture-review",
+    googleMapsUri: "https://maps.google.com/review",
+    authorAttribution: { displayName: "Fixture Author", uri: "https://maps.google.com/author" },
+  }]);
+  assertEquals(reviews[0].sourceUri, "https://maps.google.com/review");
+  assertEquals(reviews[0].authorUri, "https://maps.google.com/author");
 });

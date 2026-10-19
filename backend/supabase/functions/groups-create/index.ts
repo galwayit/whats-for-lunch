@@ -5,7 +5,9 @@
  */
 
 import { requireAppUserId, requireUser } from "../_shared/auth.ts";
+import { checkSharedText } from "../_shared/content-safety.ts";
 import { handle, json, readJsonObject } from "../_shared/errors.ts";
+import { planningDetails } from "../_shared/group-planning.ts";
 import { groupFromRow } from "../_shared/invites.ts";
 import { serviceClient, unwrap } from "../_shared/supabase.ts";
 import { requirePro } from "../_shared/tier.ts";
@@ -15,6 +17,7 @@ import { requireNumber, requireString } from "../_shared/validate.ts";
 Deno.serve(handle(["POST"], async (req) => {
   const body = await readJsonObject(req);
   const name = requireString(body, "name", 80);
+  checkSharedText(name);
   const scheduledAt = requireNumber(body, "scheduledAt", 0, 4_102_444_800);
   const lat = requireNumber(body, "lat", -90, 90);
   const lng = requireNumber(body, "lng", -180, 180);
@@ -30,7 +33,7 @@ Deno.serve(handle(["POST"], async (req) => {
       .from("groups")
       .insert({
         host_id: user.id,
-        host_name: user.displayName,
+        ...planningDetails(body, user.displayName),
         name,
         scheduled_at: fromEpochSeconds(scheduledAt),
         area_lat: lat,

@@ -1,181 +1,112 @@
-# Lunch backend (Supabase)
+# Lunch backend
 
-Edge functions, Postgres migrations and the static invite page for the Lunch
-apps. The API contract is `API.md`; this file is the operator's guide.
+Supabase Edge Functions, Postgres migrations, and the public invite/support site.
+See [API.md](API.md) for the contract and [the release review](../RELEASE_READINESS_2026-10-01.md)
+for live account findings and outstanding setup.
 
-```
-backend/
-  API.md                      contract (endpoints, shapes, tables, RLS, secrets)
-  BUILD_NOTES.md              judgement calls and open items
-  Makefile                    make check | test | deploy
-  supabase/
-    config.toml               project config (auth providers, function JWT flags)
-    migrations/               0001 tables, 0002 RLS, 0003 SQL helpers
-    functions/
-      deno.json               strict TS + fmt settings
-      _shared/                pure modules + tests (deno test)
-      <function>/index.ts     one thin handler per endpoint
-  web/
-    invite/index.html         /i/<code> landing page
-    .well-known/              universal links / app links (placeholders)
-```
+## Existing project
 
-## Prerequisites
+Use the existing Sydney project `cswdcbmywzzisovsgwac`; do not create a replacement.
+On 6 October 2026, all migrations through `20261001144342` and all 17 functions
+were deployed after local regression tests and a restore check of the actual
+public/private schema backup. Existing groups and RSVPs were preserved.
+The previously provisioned settings survived the full migration.
+AI is enabled with OpenAI `gpt-6-luna` as primary and Google Gemini as backup.
+Gemini currently returns HTTP 402; its billing must be resolved before relying on
+backup availability. The live authenticated AI, consent, quota and paid-denial
+checks passed with a disposable account, which was removed afterwards.
+See [deployment evidence](../release-evidence/2026-10-06/test-deploy-device/README.md).
+Real Apple subscriptions, custom SMTP, Apple revocation and push remain separate
+release dependencies; this deployment is not App Store release qualification.
 
-- Deno 2.x (`deno --version`)
-- Supabase CLI 2.x (`brew install supabase/tap/supabase`)
-- A Supabase project (free tier is fine to start)
-- Google Cloud project with **Places API (New)** and **Generative Language API** enabled
-- RevenueCat project with a `pro` entitlement
-- Firebase project (for FCM) with a service account
+## Local checks
 
-## 1. Create and link the project
+Requires Deno 2, Supabase CLI 2, and Docker for SQL concurrency/RLS tests.
 
 ```sh
-supabase login
-supabase projects create lunch --org-id <org> --region ap-southeast-2 --db-password '<strong>'
 cd backend
-supabase link --project-ref <project-ref>
+make check
+make test
+docker run --detach --name lunch-review-postgres-local --env POSTGRES_PASSWORD=local-fixture-only --tmpfs /var/lib/postgresql/data postgres:17-alpine
+# Wait for pg_isready before testing.
+docker exec lunch-review-postgres-local pg_isready -U postgres
+python3 tests/postgres_regression.py lunch-review-postgres-local
+python3 tests/postgres_regression.py lunch-review-postgres-local --bootstrap-settings-first
+docker rm --force lunch-review-postgres-local
 ```
 
-`config.toml` already declares the functions and their `verify_jwt` flags, the
-Apple/Google auth providers (via `env(...)` placeholders) and local ports
-(API 54321, DB 54322). For local work create `backend/supabase/.env` (git-ignored):
+The SQL runner only accepts the dedicated test-container prefix and creates a new
+database each time. It tests concurrent quotas, refunds, replay, billing order,
+duplicate events, function privileges, and RLS. It never uses production credentials.
+The second run also verifies that provisioning AI settings ahead of the rollout
+preserves operator model choices and audit history when all migrations later run.
 
-```
-SUPABASE_AUTH_EXTERNAL_APPLE_CLIENT_ID=au.iapp.lunch
-SUPABASE_AUTH_EXTERNAL_APPLE_SECRET=<apple client secret jwt>
-SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<web-id>.apps.googleusercontent.com,<ios-id>.apps.googleusercontent.com,<android-id>.apps.googleusercontent.com
-SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<google oauth client secret>
-GOOGLE_PLACES_API_KEY=...
-GEMINI_API_KEY=...
-REVENUECAT_WEBHOOK_SECRET=<long random string>
-FCM_SERVICE_ACCOUNT_JSON=<single-line service account JSON>
-INVITE_LINK_BASE=https://lunch.iapp.au/i/
-```
+## Configure before deployment
 
-## 2. Apply migrations
+`production.env.example` names server configuration. Put real values in a secure,
+git-ignored environment file. The current `.env` is incomplete; deploying blank
+values does not configure working providers.
+
+- Google Places: restricted server Places key and provider API quotas.
+- AI: configure primary and backup provider keys in Supabase Secrets and runtime
+  parameters using [AI_PROVIDERS.md](AI_PROVIDERS.md). The migration seeds a disabled
+  Google/OpenAI route and a selectable Claude profile. Qualify actual model access,
+  latency, output quality and provider billing controls before enabling.
+- Apple native auth: Supabase accepts `au.iapp.lunch`. Deletion additionally needs
+  `APPLE_CLIENT_ID`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`, and a Sign in with Apple private
+  key (PKCS8 PEM, escaped newlines supported). This is a separate key purpose from
+  RevenueCat's In-App Purchase key.
+- RevenueCat: configure the real App Store app, Apple In-App Purchase key, real
+  monthly/yearly products, `pro` entitlement, and `default` offering. Provide a server
+  API v2 key with only subscription and product read scopes, `REVENUECAT_PROJECT_ID`,
+  the exact store product-ID allowlist, and the existing webhook bearer secret.
+  See [REVENUECAT.md](REVENUECAT.md) for exact permissions and verification. Public `appl_` SDK keys belong in the app; server
+  keys do not. Enable Apple sandbox explicitly for TestFlight/App Review acceptance.
+  This never enables RevenueCat Test Store entitlements.
+- Firebase: configure `au.iapp.lunch`, APNs credentials, real iOS
+  `GoogleService-Info.plist` under `iosApp/LunchApp/Config/`, and server
+  `FCM_SERVICE_ACCOUNT_JSON`. Confirm physical-device delivery after login and no
+  delivery after logout/account switching.
+- Invite base: `https://lunch.iapp.au/i/` in both backend and client configuration.
+
+The existing RevenueCat webhook points to
+`https://cswdcbmywzzisovsgwac.supabase.co/functions/v1/revenuecat-webhook`.
+Keep all lifecycle events. It now verifies current subscriber state, rather than
+granting access from event names. A TEST event checks transport only.
+
+## Coordinated deployment
+
+After backup/restore readiness and configuration have been verified:
 
 ```sh
-supabase db push            # applies supabase/migrations/* to the linked project
+cd backend
+supabase migration list
+supabase db push --dry-run --skip-vault
+# Review the exact migration and linked project before the mutations below.
+supabase secrets set --env-file /secure/path/lunch-production.env
+supabase db push --skip-vault
+make deploy-functions
 ```
 
-Each migration ends with a `down:` comment block describing how to reverse it.
-`0003` creates `generate_invite_code()`, `current_tier(text)`,
-`increment_ai_usage(text, date, int)` and `cleanup_places_cache(interval)`.
-Schedule the cleanup with pg_cron from the SQL editor:
+Release the migration and all affected functions together. Schedule a brief
+maintenance window: old and new quota writers must not overlap. The migration
+clears rebuildable Places response caches, not journals or saved place IDs. Do not
+roll back to client-selected identity or event-based Pro grants. Keep a database
+backup and fix forward if those security-sensitive paths fail.
 
-```sql
-select cron.schedule('places-cache-cleanup', '17 * * * *', $$select public.cleanup_places_cache()$$);
-```
+With controlled accounts and Apple sandbox purchases, verify purchase, restore,
+renewal, expiry, refund, transfer, duplicate/delayed webhook, sign-out, account switch,
+quota contention, Apple account deletion, and push delivery. Inspect function logs
+without recording secrets or prompts. Local tests and TEST webhooks are not proof
+that real purchases work.
 
-## 3. Set secrets
+## Static site and operations
 
-Never commit them. Either push the env file or set them one by one:
+Deploy `web/` through the existing hosting path after reviewing the updated privacy
+and terms text. See [web/README.md](web/README.md) for routes and association checks.
+Source changes do not prove the public policy or AASA file is live.
 
-```sh
-supabase secrets set --env-file supabase/.env
-# or
-supabase secrets set GOOGLE_PLACES_API_KEY=... GEMINI_API_KEY=... REVENUECAT_WEBHOOK_SECRET=... INVITE_LINK_BASE=https://lunch.iapp.au/i/
-supabase secrets set FCM_SERVICE_ACCOUNT_JSON="$(cat service-account.json | tr -d '\n')"
-```
-
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected
-by the platform automatically.
-
-## 4. Deploy functions
-
-```sh
-make check      # deno fmt --check + deno check on every module
-make test       # deno test (pure modules; no network)
-make deploy     # supabase db push + supabase functions deploy <each>
-```
-
-`make deploy-functions` loops over the thirteen functions. The JWT policy per
-function comes from `config.toml` (`verify_jwt = false` for the public ones,
-`true` for `groups-create`, `groups-propose`, `groups-confirm`, `groups-cancel`, `account-delete`).
-
-Smoke test:
-
-```sh
-curl -s "https://<ref>.supabase.co/functions/v1/places-nearby" \
-  -H "apikey: <anon>" -H "Authorization: Bearer <anon>" -H "x-app-user-id: smoke" \
-  -H "content-type: application/json" \
-  -d '{"lat":-33.87,"lng":151.21,"radiusKm":2,"query":null}' | head -c 400
-```
-
-## 5. Auth providers
-
-**Apple** (Supabase Dashboard -> Authentication -> Providers -> Apple):
-- Client IDs: the iOS bundle id `au.iapp.lunch` (native sign-in sends an id token + nonce).
-- Secret key: the client secret JWT generated from your Sign in with Apple key. It expires every 6 months; rotate it.
-- Android uses Apple's web flow via the Services ID; add that id to the client id list as well.
-
-**Google** (Providers -> Google):
-- Client IDs: web, iOS and Android OAuth client ids, comma-separated, so id tokens from every platform validate.
-- `skip_nonce_check = true` is set in `config.toml` because Google's native SDKs do not always support nonces.
-
-The same values go in `supabase/.env` under `SUPABASE_AUTH_EXTERNAL_*` for the local stack.
-
-## 6. RevenueCat webhook
-
-In the RevenueCat dashboard -> Project -> Integrations -> Webhooks:
-
-- URL: `https://<ref>.supabase.co/functions/v1/revenuecat-webhook`
-- Authorization header value: `Bearer <REVENUECAT_WEBHOOK_SECRET>` (the same string you set as the secret)
-- Events: leave all enabled. The function maps purchase/renewal events to `is_pro = true`,
-  keeps access until `expires_at` for CANCELLATION / EXPIRATION / BILLING_ISSUE, and moves
-  the row on TRANSFER. Unknown and TEST events return 200 without changes.
-
-Use the "Send test event" button after deploying; expect `{"ok":true,"updated":0,"type":"TEST"}`.
-
-## 7. Push (FCM HTTP v1)
-
-1. Firebase console -> Project settings -> Service accounts -> Generate new private key.
-2. Set the file's contents as `FCM_SERVICE_ACCOUNT_JSON` (one line).
-3. Both apps call `POST /push-register` with their FCM registration token. On iOS the
-   Firebase Messaging SDK maps the APNs token to an FCM token, so add
-   `iosApp/LunchApp/GoogleService-Info.plist` and configure the app's APNs authentication key
-   in Firebase. Never send the raw APNs token to this endpoint.
-
-The sender signs the OAuth assertion with Web Crypto; no Firebase SDK is used.
-
-## 8. Host the web folder
-
-Serve `web/` from the invite domain (e.g. `lunch.iapp.au`) with these rules:
-
-- `/i/*` -> `web/invite/index.html` (rewrite, not redirect)
-- `/.well-known/apple-app-site-association` -> served as `application/json`, no redirect
-- `/.well-known/assetlinks.json` -> served as `application/json`
-
-Before deploying, edit the `data-*` attributes on `<main>` in `invite/index.html`
-(functions URL, anon key, store links) and replace the placeholders in `.well-known/`
-(Apple Team ID, Android signing SHA-256).
-
-Example `vercel.json`:
-
-```json
-{
-  "rewrites": [{ "source": "/i/:code", "destination": "/invite/index.html" }],
-  "headers": [{ "source": "/.well-known/(.*)", "headers": [{ "key": "Content-Type", "value": "application/json" }] }]
-}
-```
-
-Example Cloudflare Pages `_redirects`: `/i/* /invite/index.html 200`.
-
-`INVITE_LINK_BASE` must match the hosted path (`https://lunch.iapp.au/i/`), and the
-apps' `CoreConfig.inviteLinkBase` must match too.
-
-## Local development (optional)
-
-`supabase start` runs the full stack in Docker (ports from `config.toml`), then
-`supabase functions serve --env-file supabase/.env` serves the functions with hot reload.
-`supabase db reset` re-applies the migrations from scratch.
-
-## Verification
-
-```sh
-make check   # Checked 46 files (fmt) + type check of every .ts
-make test    # 48 tests, all pure (prompt snapshot, parser, geohash, haversine,
-             # Places mapping, quota, RevenueCat mapping, invites, push JWT, errors)
-```
+Before charging users, establish uptime/error alerts, provider cost alerts,
+database backup/restore evidence, retention/cleanup for usage and event ledgers,
+support ownership, and a provider outage response. The verified Supabase account
+is on the Free plan; production capacity and backup capabilities remain unqualified.

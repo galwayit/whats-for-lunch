@@ -14,12 +14,15 @@ export const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Max-Age": "86400",
 };
 
-/** Error codes. The first three are mapped to gates by the clients. */
+/** Error codes. Subscription, quota and sign-in denials map to client gates. */
 export const ErrorCode = {
   AI_DAILY_LIMIT: "AI_DAILY_LIMIT",
   HOST_REQUIRES_PRO: "HOST_REQUIRES_PRO",
   SIGN_IN_REQUIRED: "SIGN_IN_REQUIRED",
   BAD_REQUEST: "BAD_REQUEST",
+  RATE_LIMITED: "RATE_LIMITED",
+  AI_CONSENT_REQUIRED: "AI_CONSENT_REQUIRED",
+  AI_UNAVAILABLE: "AI_UNAVAILABLE",
   UNAUTHORIZED: "UNAUTHORIZED",
   FORBIDDEN: "FORBIDDEN",
   NOT_FOUND: "NOT_FOUND",
@@ -35,6 +38,9 @@ const DEFAULT_STATUS: Record<ErrorCodeName, number> = {
   HOST_REQUIRES_PRO: 403,
   SIGN_IN_REQUIRED: 401,
   BAD_REQUEST: 400,
+  RATE_LIMITED: 429,
+  AI_CONSENT_REQUIRED: 403,
+  AI_UNAVAILABLE: 503,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
@@ -111,9 +117,38 @@ export function handle(allowedMethods: string[], fn: Handler): Handler {
 
 /** Reads and parses a JSON body, returning 400 on syntax errors or non-objects. */
 export async function readJsonObject(req: Request): Promise<Record<string, unknown>> {
+  const maxBytes = 64 * 1024;
+  if (Number(req.headers.get("content-length")) > maxBytes) {
+    throw badRequest("Request body is too large");
+  }
+  const reader = req.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  if (reader) {
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) {
+          await reader.cancel();
+          throw badRequest("Request body is too large");
+        }
+        chunks.push(value);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.length;
+  }
   let parsed: unknown;
   try {
-    parsed = await req.json();
+    parsed = JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     throw badRequest("Body must be valid JSON");
   }

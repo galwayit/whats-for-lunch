@@ -17,6 +17,12 @@ export const FreeLimits = {
   HISTORY_DAYS: 30,
 } as const;
 
+export interface PlaceAttribution {
+  name: string;
+  uri: string | null;
+  photoUri: string | null;
+}
+
 export interface RestaurantReview {
   reviewId: string;
   authorName: string;
@@ -25,6 +31,8 @@ export interface RestaurantReview {
   text: string | null;
   timeEpochSeconds: number;
   relativeTimeDescription: string;
+  authorUri?: string | null;
+  sourceUri?: string | null;
 }
 
 export interface Restaurant {
@@ -64,6 +72,10 @@ export interface Restaurant {
   photoReferences: string[];
   /** Absolute URL served by the backend for the first photo, when available. */
   photoUrl: string | null;
+  googleMapsUri?: string | null;
+  photoSourceUri?: string | null;
+  photoAttributions?: PlaceAttribution[];
+  attributions?: PlaceAttribution[];
 }
 
 export interface AiRecommendation {
@@ -84,6 +96,10 @@ export interface LunchGroup {
   id: string;
   hostId: string;
   hostName: string;
+  budgetPerPersonMinor?: number | null;
+  currencyCode?: string;
+  paymentArrangement?: string;
+  paymentMethod?: string;
   name: string;
   scheduledAtEpochSeconds: number;
   areaLatitude: number;
@@ -116,6 +132,7 @@ export interface Invitation {
   attendees: Rsvp[];
   myStatus: RsvpStatus | null;
   inviteUrl: string;
+  mySuggestion?: ReturnType<typeof import("./group-planning.ts").suggestionFromRow> | null;
 }
 
 /**
@@ -131,6 +148,7 @@ export interface RecommendationContext {
   location: Record<string, unknown>;
   temporal: Record<string, unknown>;
   preferenceScores: Record<string, number>;
+  includeChains?: boolean;
 }
 
 /** Database row shapes (snake_case) used by the handlers. */
@@ -138,6 +156,10 @@ export interface GroupRow {
   id: string;
   host_id: string;
   host_name: string;
+  budget_per_person_minor?: number | null;
+  currency_code?: string;
+  payment_arrangement?: string;
+  payment_method?: string;
   name: string;
   scheduled_at: string;
   area_lat: number;

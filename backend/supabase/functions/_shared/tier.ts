@@ -6,6 +6,7 @@
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { ApiError, ErrorCode } from "./errors.ts";
+import { reconcileBilling } from "./billing.ts";
 import type { EntitlementRow, Tier } from "./types.ts";
 
 export function tierFromRow(
@@ -13,17 +14,23 @@ export function tierFromRow(
   nowMs: number,
 ): Tier {
   if (!row || !row.is_pro) return "free";
-  if (row.expires_at !== null && new Date(row.expires_at).getTime() <= nowMs) return "free";
+  if (
+    row.expires_at === null || !Number.isFinite(Date.parse(row.expires_at)) ||
+    Date.parse(row.expires_at) <= nowMs
+  ) return "free";
   return "pro";
 }
 
 export async function tierFor(client: SupabaseClient, appUserId: string): Promise<Tier> {
-  const { data, error } = await client
-    .from("entitlements")
-    .select("is_pro, expires_at")
-    .eq("app_user_id", appUserId)
-    .maybeSingle();
-  if (error) throw new Error(`database: ${error.message}`);
+  // Verification on protected requests also closes the purchase-to-webhook delay.
+  // A provider outage returns a retryable error, never a fabricated entitlement.
+  await reconcileBilling(client, [appUserId]);
+  // Read the accepted snapshot: a concurrent newer webhook may have superseded ours.
+  const { data, error } = await client.from("entitlements").select("is_pro, expires_at").eq(
+    "app_user_id",
+    appUserId,
+  ).maybeSingle();
+  if (error) throw new Error("Unable to read verified entitlement");
   return tierFromRow(data, Date.now());
 }
 

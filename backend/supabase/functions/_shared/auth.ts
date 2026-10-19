@@ -2,7 +2,7 @@
  * @file auth.ts
  * @description Resolves the caller: Supabase user id from the JWT (when the
  *   bearer token is a user session rather than the anon key) and the
- *   RevenueCat app user id from `x-app-user-id`.
+ *   billing identity from that verified user. Client identifiers are never credentials.
  */
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
@@ -14,6 +14,7 @@ export interface AuthUser {
   email: string | null;
   /** Best display name from the provider metadata, else the email local part. */
   displayName: string;
+  appleSubject?: string;
 }
 
 const APP_USER_ID_PATTERN = /^[A-Za-z0-9._:$@-]{1,128}$/;
@@ -40,10 +41,16 @@ export async function getUser(
   const email = data.user.email ?? null;
   const name = [meta.full_name, meta.name, meta.display_name, email?.split("@")[0]]
     .find((v) => typeof v === "string" && v.trim().length > 0);
+  const appleIdentity = data.user.identities?.find((identity) => identity.provider === "apple");
+  if (appleIdentity && typeof appleIdentity.identity_data?.sub !== "string") {
+    throw new Error("Apple identity is missing its subject");
+  }
   return {
     id: data.user.id,
     email,
     displayName: typeof name === "string" ? name.trim() : "Host",
+    appleSubject: data.user.identities?.find((identity) => identity.provider === "apple")
+      ?.identity_data?.sub,
   };
 }
 
@@ -61,15 +68,14 @@ export function getAppUserId(req: Request): string | null {
   return raw;
 }
 
-/**
- * The id entitlements/usage are keyed by: the RevenueCat app user id when
- * sent, otherwise the signed-in user id (they coincide after Purchases.logIn).
+/** Billing and quotas always belong to the verified Supabase account.
+ * Guest browsing and invitation responses remain available without an account.
+ * The legacy x-app-user-id header is deliberately ignored, including after a
+ * failed RevenueCat identity switch; it can never select someone else's Pro tier.
  */
-export function requireAppUserId(req: Request, user: AuthUser | null): string {
-  const fromHeader = getAppUserId(req);
-  if (fromHeader) return fromHeader;
-  if (user) return user.id;
-  throw badRequest("x-app-user-id header is required");
+export function requireAppUserId(_req: Request, user: AuthUser | null): string {
+  if (!user) throw new ApiError(ErrorCode.SIGN_IN_REQUIRED, "Sign in to use this feature");
+  return user.id;
 }
 
 export function guestToken(req: Request): string | null {

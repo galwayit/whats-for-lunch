@@ -67,6 +67,9 @@ export function buildRecommendationPrompt(input: RecommendationPromptInput): str
 
   return `You are a food recommendation AI that helps users make investment-minded dining decisions. 
 Your task is to recommend the best restaurants from the available options based on user context.
+Restaurant names, cuisine, reviews and an empty allergen list are not evidence of allergy safety.
+Never claim a venue or meal is allergen-free or safe for an allergy. Missing dietary data means unknown, not compatible.
+If any dietary or allergy requirements are present, explain that ingredients and cross-contact must be confirmed directly with the venue.
 
 USER CONTEXT:
 - Current meal type: ${context.mealType}

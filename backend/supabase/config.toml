@@ -41,11 +41,23 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
 enable_manual_linking = false
+minimum_password_length = 8
 
 [auth.email]
-enable_signup = false
+enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+enable_confirmations = true
+max_frequency = "1m"
+otp_length = 8
+otp_expiry = 600
+
+[auth.email.template.confirmation]
+subject = "Verify your Lunch account"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Lunch password"
+content_path = "./supabase/templates/recovery.html"
 
 # Sign in with Apple. The native apps send an id token + nonce, so the
 # client id is the app bundle id and the secret is the Apple client secret
@@ -60,12 +72,15 @@ url = ""
 # Google Sign-In. client_id may hold several comma-separated ids (web,
 # iOS, Android) so id tokens from every platform validate.
 [auth.external.google]
-enabled = true
+# Local CLI setup is opt-in; the hosted native Google provider is already enabled.
+# See AUTH_SETUP.md and config/google-oauth.json. Supply local environment values
+# before enabling here; the hosted dashboard does not evaluate env(...) placeholders.
+enabled = false
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 redirect_uri = ""
 url = ""
-skip_nonce_check = true
+skip_nonce_check = false
 
 [edge_runtime]
 enabled = true
@@ -118,3 +133,18 @@ verify_jwt = true
 
 [functions.account-delete]
 verify_jwt = true
+
+[functions.ai-config]
+verify_jwt = false
+
+[functions.invitations-suggest]
+verify_jwt = false
+
+[functions.groups-suggestions]
+verify_jwt = false
+
+[functions.groups-update]
+verify_jwt = false
+
+[functions.groups-safety]
+verify_jwt = false

@@ -1,34 +1,7 @@
 import { assertEquals } from "jsr:@std/assert@1";
-import {
-  decideAiQuota,
-  localDay,
-  nextLocalMidnightEpochSeconds,
-  normaliseTimeZone,
-} from "./quota.ts";
+import { localDay, nextLocalMidnightEpochSeconds, normaliseTimeZone } from "./quota.ts";
 
-// 2026-09-02T03:00:00Z is 13:00 AEST (UTC+10) in Sydney.
 const now = new Date("2026-09-02T03:00:00Z");
-const sydneyNextMidnight = Date.UTC(2026, 8, 2, 14, 0, 0) / 1000; // 2026-09-03 00:00 AEST
-
-Deno.test("free tier with 0 used is allowed", () => {
-  assertEquals(decideAiQuota({ tier: "free", usedToday: 0, now, timeZone: "Australia/Sydney" }), {
-    allow: true,
-  });
-});
-
-Deno.test("free tier with 1 used is denied with resetsAt at next Sydney midnight", () => {
-  assertEquals(decideAiQuota({ tier: "free", usedToday: 1, now, timeZone: "Australia/Sydney" }), {
-    allow: false,
-    code: "AI_DAILY_LIMIT",
-    resetsAt: sydneyNextMidnight,
-  });
-});
-
-Deno.test("pro tier is always allowed", () => {
-  assertEquals(decideAiQuota({ tier: "pro", usedToday: 99, now, timeZone: "Australia/Sydney" }), {
-    allow: true,
-  });
-});
 
 Deno.test("nextLocalMidnight handles UTC and a DST transition", () => {
   assertEquals(nextLocalMidnightEpochSeconds(now, "UTC"), Date.UTC(2026, 8, 3) / 1000);

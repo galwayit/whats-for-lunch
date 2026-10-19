@@ -5,6 +5,7 @@
  */
 
 import { requireUser } from "../_shared/auth.ts";
+import { checkSharedText, safetyContext } from "../_shared/content-safety.ts";
 import { ApiError, ErrorCode, handle, json, readJsonObject } from "../_shared/errors.ts";
 import { groupFromRow } from "../_shared/invites.ts";
 import { notifyUsers } from "../_shared/notify.ts";
@@ -21,6 +22,8 @@ Deno.serve(handle(["POST"], async (req) => {
 
   const user = await requireUser(req);
   const client = serviceClient();
+  checkSharedText(placeName, placeAddress);
+  await safetyContext(client, groupId, user.id, null);
 
   const { data: existing, error } = await client.from("groups").select("id, host_id").eq(
     "id",

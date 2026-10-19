@@ -1,20 +1,20 @@
 /**
  * @file ai-recommend/index.ts
- * @description POST /ai-recommend: tier + daily quota, Gemini ranking of the
+ * @description POST /ai-recommend: tier + daily quota, Provider ranking of the
  *   client's candidates, usage logging.
  */
 
+import { aiDisclosure, loadAiConfig, requireConfiguredRoute } from "../_shared/ai-config.ts";
+import { routeAi, serverRouterDependencies } from "../_shared/ai-router.ts";
+import { RECOMMENDATION_SCHEMA } from "../_shared/ai-schema.ts";
+import { refundAi, requireAiConsent, reserveAi } from "../_shared/ai-access.ts";
 import { getUser, requireAppUserId } from "../_shared/auth.ts";
 import { ApiError, ErrorCode, handle, json, readJsonObject } from "../_shared/errors.ts";
-import { generateJson, modelForTier } from "../_shared/gemini.ts";
-import {
-  buildRecommendationPrompt,
-  ParseError,
-  parseRecommendationResponse,
-} from "../_shared/prompt.ts";
-import { decideAiQuota, localDay, normaliseTimeZone } from "../_shared/quota.ts";
-import { requireEnv, serviceClient } from "../_shared/supabase.ts";
+import { buildRecommendationPrompt, parseRecommendationResponse } from "../_shared/prompt.ts";
+import { serviceClient } from "../_shared/supabase.ts";
 import { tierFor } from "../_shared/tier.ts";
+import { isChainRestaurant } from "../_shared/restaurant-chains.ts";
+import { matchesDietary } from "../_shared/dietary.ts";
 import { nowEpochSeconds, type RecommendationContext, type Restaurant } from "../_shared/types.ts";
 import {
   optionalObject,
@@ -31,6 +31,7 @@ const MAX_CANDIDATES = 20;
 function parseContext(raw: Record<string, unknown>): RecommendationContext {
   return {
     mealType: requireString(raw, "mealType", 40),
+    includeChains: raw.includeChains !== false,
     budgetRange: requireString(raw, "budgetRange", 40),
     dietaryPreferences: optionalObject(raw, "dietaryPreferences"),
     recentMeals: stringArray(raw.recentMeals).slice(0, 20),
@@ -79,83 +80,46 @@ Deno.serve(handle(["POST"], async (req) => {
   const cravings = optionalString(body, "cravings", 200);
   const maxResults = requireInteger(body, "maxResults", 1, 10);
   const context = parseContext(requireObject(body, "context"));
-  const candidates = parseCandidates(requireArray(body, "candidates", MAX_CANDIDATES));
+  const candidates = parseCandidates(requireArray(body, "candidates", MAX_CANDIDATES))
+    .filter((r) => context.includeChains !== false || !isChainRestaurant(r.name))
+    .filter((r) =>
+      matchesDietary(
+        r,
+        context.dietaryPreferences.restrictions,
+        context.dietaryPreferences.allergies,
+        context.dietaryPreferences.requireVerification !== false,
+      )
+    );
   if (candidates.length === 0) throw new ApiError(ErrorCode.BAD_REQUEST, "candidates is empty");
 
   const client = serviceClient();
   const user = await getUser(req);
   const appUserId = requireAppUserId(req, user);
   const tier = await tierFor(client, appUserId);
-  const timeZone = normaliseTimeZone(req.headers.get("x-timezone"));
-  const now = new Date();
-  const day = localDay(now, timeZone);
 
-  if (tier === "free") {
-    const { data, error } = await client
-      .from("usage")
-      .select("ai_requests")
-      .eq("app_user_id", appUserId)
-      .eq("day", day)
-      .maybeSingle();
-    if (error) throw new Error(`database: ${error.message}`);
-    const decision = decideAiQuota({ tier, usedToday: data?.ai_requests ?? 0, now, timeZone });
-    if (!decision.allow) {
-      throw new ApiError(ErrorCode.AI_DAILY_LIMIT, "Daily AI limit reached", {
-        resetsAt: decision.resetsAt,
-      });
-    }
-    const { error: incError } = await client.rpc("increment_ai_usage", {
-      p_app_user_id: appUserId,
-      p_day: day,
-      p_delta: 1,
-    });
-    if (incError) throw new Error(`database: ${incError.message}`);
-  }
-
-  const model = modelForTier(tier);
+  const config = await loadAiConfig(client);
+  requireAiConsent(body, (await aiDisclosure(config)).consentVersion);
+  requireConfiguredRoute(config, (name) => Deno.env.get(name));
   const prompt = buildRecommendationPrompt({ context, cravings, maxResults, candidates });
-  let text = "";
-  let tokens = 0;
-  let latencyMs = 0;
-  let failure: string | null = null;
+  const requestId = await reserveAi(client, appUserId, tier);
   try {
-    const result = await generateJson({ apiKey: requireEnv("GEMINI_API_KEY"), model, prompt });
-    text = result.text;
-    tokens = result.tokens;
-    latencyMs = result.latencyMs;
-  } catch (err: unknown) {
-    failure = err instanceof Error ? err.message : String(err);
-  }
-
-  let recommendation = null;
-  if (failure === null) {
-    try {
-      recommendation = parseRecommendationResponse(text, candidates, {
+    const recommendation = await routeAi(config, tier, prompt, RECOMMENDATION_SCHEMA, (text) => {
+      const result = parseRecommendationResponse(text, candidates, {
         id: crypto.randomUUID(),
         userId: 0,
         generatedAtEpochSeconds: nowEpochSeconds(),
       });
-    } catch (err: unknown) {
-      failure = err instanceof ParseError ? err.message : String(err);
-    }
+      if (
+        !result.restaurants.length || !result.reasoning.trim() || result.overallConfidence < 0 ||
+        result.overallConfidence > 1
+      ) throw new Error("Invalid recommendation");
+      result.restaurants = [...new Map(result.restaurants.map((r) => [r.placeId, r])).values()]
+        .slice(0, maxResults);
+      return result;
+    }, serverRouterDependencies(client, appUserId, requestId));
+    return json({ recommendation });
+  } catch (error) {
+    await refundAi(client, appUserId, requestId);
+    throw error;
   }
-
-  await client.from("ai_requests").insert({
-    app_user_id: appUserId,
-    model,
-    tokens,
-    latency_ms: latencyMs,
-    ok: failure === null,
-    error: failure,
-  });
-
-  if (failure !== null || recommendation === null) {
-    if (tier === "free") {
-      // Give the free request back: the user got nothing for it.
-      await client.rpc("increment_ai_usage", { p_app_user_id: appUserId, p_day: day, p_delta: -1 });
-    }
-    console.error(`ai-recommend failed: ${failure}`);
-    throw new ApiError(ErrorCode.UPSTREAM_ERROR, "The recommendation service is unavailable");
-  }
-  return json({ recommendation });
 }));

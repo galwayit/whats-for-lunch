@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@1";
+import { assertEquals, assertRejects } from "jsr:@std/assert@1";
 import { ApiError, badRequest, ErrorCode, handle, readJsonObject } from "./errors.ts";
 
 Deno.test("handle answers preflight, rejects wrong methods and maps ApiError", async () => {
@@ -37,4 +37,19 @@ Deno.test("readJsonObject rejects non-objects with 400", async () => {
     assertEquals(err instanceof ApiError && err.status === 400, true);
   }
   assertEquals(badRequest("x").code, "BAD_REQUEST");
+});
+
+Deno.test("readJsonObject bounds streamed bodies without Content-Length", async () => {
+  let cancelled = false;
+  const stream = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      controller.enqueue(new Uint8Array(40 * 1024));
+    },
+    cancel() {
+      cancelled = true;
+    },
+  });
+  const request = new Request("https://x/fn", { method: "POST", body: stream });
+  await assertRejects(() => readJsonObject(request), ApiError, "too large");
+  assertEquals(cancelled, true);
 });

@@ -1,42 +1,8 @@
 /**
  * @file quota.ts
- * @description Pure free-tier quota decision for POST /ai-recommend, plus the
- *   time-zone helpers that turn the client's `x-timezone` header into the
- *   "day" bucket of the `usage` table and the `resetsAt` value of a 402.
+ * @description Time-zone helpers for usage reporting and allowance reset messages.
+ *   AI access and atomic reservations are enforced by ai-access.ts.
  */
-
-import { FreeLimits, type Tier } from "./types.ts";
-
-export type QuotaDecision =
-  | { allow: true }
-  | { allow: false; code: "AI_DAILY_LIMIT"; resetsAt: number };
-
-export interface QuotaInput {
-  tier: Tier;
-  /** `usage.ai_requests` for the caller's local day. */
-  usedToday: number;
-  /** The instant the request arrived. */
-  now: Date;
-  /** IANA zone from the `x-timezone` header, already validated. */
-  timeZone: string;
-  limit?: number;
-}
-
-/**
- * Decides whether an AI request may proceed.
- * Pro is unlimited. Free is allowed while usedToday < limit; otherwise a 402
- * payload with `resetsAt` = next local midnight in the caller's zone.
- */
-export function decideAiQuota(input: QuotaInput): QuotaDecision {
-  if (input.tier === "pro") return { allow: true };
-  const limit = input.limit ?? FreeLimits.AI_REQUESTS_PER_DAY;
-  if (input.usedToday < limit) return { allow: true };
-  return {
-    allow: false,
-    code: "AI_DAILY_LIMIT",
-    resetsAt: nextLocalMidnightEpochSeconds(input.now, input.timeZone),
-  };
-}
 
 /** Returns the zone if Intl knows it, otherwise "UTC". */
 export function normaliseTimeZone(candidate: string | null | undefined): string {
