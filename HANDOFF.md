@@ -11,17 +11,17 @@ If you change something this document describes, change this document.
 ## 1. Where the project stands
 
 The Flutter app has been rewritten as two native apps over one Kotlin Multiplatform core. Both
-apps are feature complete against the eleven screens in `design/screens.md` and run entirely on
-in-memory sample data. Nothing has been connected to a real backend yet, because no Supabase
-project exists.
+apps are feature complete against the eleven screens in `design/screens.md`. Demo builds run on
+in-memory sample data; since 2026-09-23 a plain Debug build of the iOS app runs against the live
+Supabase backend with real Google Places data (section 4a).
 
 | Area | State |
 |---|---|
 | `shared/` core | Complete. Domain rules, SQLite, backend client, purchases, auth, groups. |
 | `iosApp/` | Every screen built. Runs on device as a demo. |
 | `androidApp/` | Every screen built. Runs on an emulator. |
-| `backend/` | 13 Edge Functions and 3 migrations written and unit tested. Never deployed. |
-| Live backend | Does not exist. No Supabase project, no keys, no store products. |
+| `backend/` | 13 Edge Functions and 3 migrations, unit tested and deployed to project `lunch`. |
+| Live backend | Supabase `lunch` (ref `cswdcbmywzzisovsgwac`, Sydney, free plan). Only `GOOGLE_PLACES_API_KEY` and `INVITE_LINK_BASE` are set. No store products. |
 
 Green as of the last commit:
 
@@ -30,7 +30,7 @@ Green as of the last commit:
 | `:shared:desktopTest` | 105 |
 | `:shared:testDebugUnitTest` | 33 |
 | `:androidApp:testDebugUnitTest` | 20 |
-| iOS `xcodebuild test` | 45 |
+| iOS `xcodebuild test` | 91 |
 | `cd backend && make test` | 48 |
 
 Nothing has been pushed. The remote is **public**, so read section 6 before you push.
@@ -122,15 +122,63 @@ Launch arguments drive the rest: `-isPro`, `-signedIn`, `-offline`, `-aiUsedToda
 **Android has no equivalent of the device-location work.** Its preview core still answers with the
 Sydney anchor. Known gap, not a bug to rediscover.
 
+### 4a. Debug builds against the live backend
+
+Build Debug **without** `DEMO` and fill the git-ignored `Lunch.plist` (Supabase URL, legacy anon
+key, functions URL, RevenueCat key). The project lives in Supabase organisation "ray2ding's Org";
+the CLI must be logged in to that account (`supabase login`) to deploy. The database password is
+in `~/.config/lunch/supabase-db-password`, outside the repo.
+
+In Debug builds only, an empty RevenueCat key starts the core with purchases turned off
+(`PurchasesDisabledEntitlementRepository`): the user stays free and the backend sees a stable
+per-install `debug-<uuid>` id from user defaults. Release builds and the core both refuse to start
+without a key. The current `Lunch.plist` holds a RevenueCat **Test Store** key (`test_`), which
+simulates purchases and must never ship in a release build.
+
+Release builds cannot pick it up. The build phase "Copy runtime config"
+(`iosApp/scripts/copy_runtime_config.sh`) bundles `Config/Lunch.plist` for Debug and
+`Config/Lunch.Release.plist` for Release (both git-ignored). Archiving fails if the Release file is
+missing or its RevenueCat key is not an `appl_` key, and `LunchConfig.revenueCatKey` drops any
+`test_` key at runtime in Release as a backstop.
+
+**AI consent.** Nothing is sent to Gemini until the user agrees on the AI screen (App Review
+5.1.2(i)); the answer is stored per install under `aiDataSharingConsent`. Screenshot and Maestro
+runs pass `-aiDataSharingConsent 1` to skip the card. Android has no consent step yet.
+
+Known quality issue: with no search text, `places-nearby` asks Google for `includedTypes:
+["restaurant"]`, which also matches hotels, supermarkets and venues that merely contain one.
+
 ---
+
+## 4b. Split the bill
+
+A free calculator (`design/screens.md` §12): even split plus adjustable amounts, optional
+surcharge, share sheet summary with an optional "Pay me at" line kept on the device only. No money
+moves and nothing reaches the backend. Maths is `BillSplitEngine` (Kotlin) and
+`SwiftBillSplitEngine` (iOS), both pinned to `fixtures/bill_split_vectors.json`; change the vectors,
+not one implementation. The group entry excludes the host's own RSVP, because the core records the
+host as an accepted guest of their own group.
+
+## 4c. Inviting in person
+
+Group detail offers `Share invite` (system share sheet; on iPhones, holding the phones top to top
+AirDrops the link) and `Show QR code` (on-device QR: CoreImage on iOS, ZXing core on Android). The
+link `https://lunch.iapp.au/i/<code>` opens the app through Universal Links when installed;
+otherwise the web invite page lets the guest accept without the app, offers the stores, and shows a
+Smart App Banner whose `app-argument` hands the invite to the app after installing. The banner and
+App Store link only work once App Store 1.0 (Apple ID 6808090102) is live.
 
 ## 5. What is deliberately unfinished
 
 These are not oversights. Each needs a decision or an account that does not exist yet.
 
-- **Sign-in does not work on either platform.** Both show an unavailable message. iOS needs the
-  Google SDK linked; Android needs a choice between Credential Manager and the older Google
-  Sign-In. Sign in with Apple needs the entitlement enabled on the `au.iapp.lunch` App ID.
+- **Google is configured; device qualification and email activation remain pending.** iOS uses
+  GoogleSignIn 10.0.0; Android uses Credential Manager 1.6.0 / Google ID 1.2.1. Both use
+  nonce-verified Supabase token exchange, email verification and recovery codes. Apple remains
+  available on iOS. Google Web/iOS/Android debug OAuth clients are created and the hosted
+  Supabase Google provider is enabled with nonce checks on. Google remains in Testing.
+  See `AUTH_SETUP.md` for public client IDs, production signing, SMTP/templates and
+  qualification still required. No successful live sign-in or email delivery is implied.
 - **Group lunch reminders are device-local.** There is no core API behind them, so they do not
   sync and do not survive a reinstall.
 - **PDF export emits JSON.** The share sheet works; the format was never decided.
@@ -148,7 +196,8 @@ the only env files in git hold placeholders. Keep it that way.
 
 Runtime configuration is deliberately outside the repo:
 
-- iOS reads `iosApp/LunchApp/Config/Lunch.plist`, gitignored. `Lunch.plist.example` is the template.
+- iOS bundles `iosApp/LunchApp/Config/Lunch.plist` (Debug) or `Lunch.Release.plist` (Release), both
+  gitignored, as `Lunch.plist`. `Lunch.plist.example` is the template.
 - Android reads `BuildConfig` fields fed from `-Plunch.*` properties or environment variables,
   all defaulting to empty.
 - The backend reads `backend/supabase/.env`, gitignored.
@@ -167,8 +216,8 @@ Nobody else can close these. They block the first real build, not the demo.
    shipped as `au.iapp.guesswhat.whatWeHaveForLunch`. As it stands the App Store listing is new:
    no existing users, no reviews, no ranking. Android kept its old applicationId and *will*
    upgrade in place, so the two platforms currently disagree.
-2. **Accounts that cost money:** a Supabase project, a RevenueCat account, hosting for
-   `lunch.iapp.au`.
+2. **Accounts that cost money:** the Supabase project exists (free plan), RevenueCat exists with a
+   Test Store key, and `lunch.iapp.au` is on Cloudflare Pages (see `backend/web/README.md`).
 3. **Store products.** `lunch_pro_monthly` at A$2.99 and `lunch_pro_yearly` at A$19.99 with a
    7-day trial, mapped to the RevenueCat packages `$rc_monthly` and `$rc_annual`. Our sample data
    is inconsistent about the product id format, so the real ids need to be decided and written
@@ -200,12 +249,18 @@ re-implement a gate in a screen.
 
 - **Colours come from tokens.** `design/tokens.json` is the source; `python3 design/generate_tokens.py`
   writes both platforms. Never hand-edit the generated files. `design/check_no_literal_colours.sh`
-  fails the build if a literal colour appears outside them.
+  fails the build if a literal colour appears outside them. The palette is Paprika (warm
+  red-orange brand, saffron rating stars, berry errors); green survives only as `success`. The
+  web pages in `backend/web` copy the same values by hand, so change them together.
+- **Type is two families.** Headline roles (`display`, `title`, `heading`) use the bundled
+  Bricolage Grotesque Bold and ExtraBold; every other role uses the platform's system face. The
+  `family` field on each role in `tokens.json` decides which. Font files and their licence notes:
+  `iosApp/LunchApp/Resources/Fonts/README.md` and `androidApp/src/main/res/README.md`.
 - **Copy comes from `design/copy.md`**, mirrored into `Copy.swift` and `strings.xml`.
 - **Tests are named `should_<expected>_when_<condition>`.**
 - **Every file carries a header comment** with its purpose.
-- Screenshots live in `iosApp/screenshots/` and `androidApp/screenshots/`: 17 `screen-*` captures
-  each, 15 light and 2 dark, plus the component gallery. Regenerate them when a screen changes.
+- Screenshots live in `iosApp/screenshots/` and `androidApp/screenshots/`: 19 `screen-*` captures
+  each, 17 light and 2 dark, plus the component gallery. Regenerate them when a screen changes.
 
 ---
 

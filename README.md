@@ -8,6 +8,7 @@ The Flutter app that preceded this is kept buildable in `archive/flutter/` and t
 `archive/flutter/README.md` history and the project notes.
 
 New to the project? Read [HANDOFF.md](HANDOFF.md) after this file.
+Google sign-in and email/password setup are documented in [AUTH_SETUP.md](AUTH_SETUP.md).
 
 ## Layout
 
@@ -47,11 +48,18 @@ python3 design/generate_tokens.py                   # after editing design/token
 
 ## Configuration and secrets
 
-Apps read their configuration from generated files that are not committed:
+Service configuration stays in ignored files or build environment variables;
+public Google OAuth identifiers are shared in `config/google-oauth.json`:
 
-- `androidApp/src/main/assets/lunch.properties` and `iosApp/LunchApp/Config/Lunch.plist`
-  with `supabaseUrl`, `supabaseAnonKey`, `backendBaseUrl`, `revenueCatApiKey`, `inviteLinkBase`.
-- `androidApp/google-services.json` and `iosApp/LunchApp/GoogleService-Info.plist` for push.
+- Android uses `-Plunch.<property>` or `LUNCH_*` environment variables (see
+  `androidApp/build.gradle.kts`). iOS uses `iosApp/LunchApp/Config/Lunch.plist`
+  (Debug) / `Lunch.Release.plist` (Release; must hold the `appl_` RevenueCat key).
+  Common properties are `supabaseUrl`, `supabaseAnonKey`, `backendBaseUrl`,
+  `revenueCatApiKey`, `inviteLinkBase`, and `googleServerClientId`. iOS additionally
+  needs `googleIosClientId`; the build generates the matching Google callback scheme.
+  Both Google IDs default to the shared public JSON, with explicit build settings
+  taking precedence. Never add an OAuth client secret to an app configuration.
+- `androidApp/google-services.json` and `iosApp/LunchApp/Config/GoogleService-Info.plist` for push.
 - Backend secrets are set with `supabase secrets set` (see `backend/README.md`).
 
 Copy the `.example` files next to each of these to get started.
