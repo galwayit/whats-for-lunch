@@ -8,6 +8,7 @@
 package au.iapp.lunch.ui.features.shared
 
 import au.iapp.lunch.ui.components.dartOneDecimal
+import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -66,6 +67,9 @@ object LunchFormat {
     /** "$18.50" for meal costs; "$200" when the amount is whole. */
     fun currency(amount: Double): String =
         if (amount == Math.floor(amount)) wholeDollars.format(amount) else centsDollars.format(amount)
+
+    /** "$33.34" and "$200.00": whole cents, always two decimals, for bill splits. */
+    fun cents(amountCents: Long): String = centsDollars.format(BigDecimal.valueOf(amountCents, 2))
 
     fun localDate(epochSeconds: Long, zone: ZoneId = ZoneId.systemDefault()): LocalDate =
         Instant.ofEpochSecond(epochSeconds).atZone(zone).toLocalDate()

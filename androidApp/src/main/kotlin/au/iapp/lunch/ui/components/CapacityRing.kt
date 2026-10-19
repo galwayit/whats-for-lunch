@@ -63,7 +63,7 @@ enum class CapacityTone {
 
 /** The palette colour for a tone. */
 fun LunchColors.toneColor(tone: CapacityTone): Color = when (tone) {
-    CapacityTone.Healthy -> primary
+    CapacityTone.Healthy -> success
     CapacityTone.Caution -> warning
     CapacityTone.Over -> danger
 }

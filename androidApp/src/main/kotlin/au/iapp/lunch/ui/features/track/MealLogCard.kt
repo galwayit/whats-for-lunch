@@ -1,7 +1,8 @@
 /**
  * @file MealLogCard.kt
  * @description The quick meal log card: meal-type chips, place field with suggestions, cost
- * field with the budget impact line, date picker, notes and the log action.
+ * field with the budget impact line and the "Split bill" button, date picker, notes and the log
+ * action.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import au.iapp.lunch.R
@@ -31,10 +33,13 @@ import au.iapp.lunch.core.model.ImpactLevel
 import au.iapp.lunch.ui.components.Chip
 import au.iapp.lunch.ui.components.CurrencyField
 import au.iapp.lunch.ui.components.LunchButton
+import au.iapp.lunch.ui.components.LunchButtonStyle
 import au.iapp.lunch.ui.components.LunchCard
 import au.iapp.lunch.ui.components.LunchTextField
 import au.iapp.lunch.ui.features.shared.LunchFormat
 import au.iapp.lunch.ui.features.shared.errorToast
+import au.iapp.lunch.ui.features.split.SharedPreferencesPayIdStore
+import au.iapp.lunch.ui.features.split.SplitBillDefaults
 import au.iapp.lunch.ui.theme.LunchIcon
 import au.iapp.lunch.ui.theme.LunchText
 import au.iapp.lunch.ui.theme.LunchTextRole
@@ -56,6 +61,7 @@ fun MealLogCard(state: TrackUiState, viewModel: TrackViewModel, modifier: Modifi
     val colors = LunchTheme.colors
     val draft = state.draft
     var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LunchCard(modifier = modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(TokenSpacing.md)) {
@@ -81,15 +87,23 @@ fun MealLogCard(state: TrackUiState, viewModel: TrackViewModel, modifier: Modifi
                     suggestions.forEach { name -> Chip(text = name, selected = false, onClick = { viewModel.pickSuggestion(name) }) }
                 }
             }
-            CurrencyField(
-                value = draft.cost,
-                onValueChange = viewModel::setCost,
-                supportingText = state.impact?.message,
-                isError = state.impact?.exceedsCapacity == true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(MealLogDefaults.COST_TEST_TAG),
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(TokenSpacing.sm)) {
+                CurrencyField(
+                    value = draft.cost,
+                    onValueChange = viewModel::setCost,
+                    supportingText = state.impact?.message,
+                    isError = state.impact?.exceedsCapacity == true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(MealLogDefaults.COST_TEST_TAG),
+                )
+                LunchButton(
+                    text = stringResource(R.string.split_open),
+                    onClick = { viewModel.openSplit(SharedPreferencesPayIdStore.from(context)) },
+                    style = LunchButtonStyle.Text,
+                    modifier = Modifier.testTag(SplitBillDefaults.TRACK_BUTTON_TAG),
+                )
+            }
             state.impact?.let { impact ->
                 val tone = when (impact.impactLevel) {
                     ImpactLevel.LOW, ImpactLevel.MODERATE -> colors.success

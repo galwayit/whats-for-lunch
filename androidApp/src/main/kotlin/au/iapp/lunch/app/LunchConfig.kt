@@ -18,6 +18,7 @@ data class LunchConfig(
     val backendBaseUrl: String? = null,
     val revenueCatApiKey: String? = null,
     val inviteLinkBase: String = DEFAULT_INVITE_LINK_BASE,
+    val googleServerClientId: String? = null,
 ) {
     /** True once every value the Kotlin core needs is present. */
     val isComplete: Boolean
@@ -37,6 +38,7 @@ data class LunchConfig(
                 supabaseAnonKey = value(BuildConfig.LUNCH_SUPABASE_ANON_KEY),
                 backendBaseUrl = value(BuildConfig.LUNCH_BACKEND_BASE_URL),
                 revenueCatApiKey = value(BuildConfig.LUNCH_REVENUECAT_API_KEY),
+                googleServerClientId = value(BuildConfig.LUNCH_GOOGLE_SERVER_CLIENT_ID),
                 inviteLinkBase = value(BuildConfig.LUNCH_INVITE_LINK_BASE) ?: DEFAULT_INVITE_LINK_BASE,
             )
         }

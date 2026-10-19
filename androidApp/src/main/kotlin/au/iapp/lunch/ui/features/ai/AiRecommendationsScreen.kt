@@ -42,7 +42,7 @@ import au.iapp.lunch.ui.components.LunchCard
 import au.iapp.lunch.ui.components.LunchTextField
 import au.iapp.lunch.ui.components.RestaurantCard
 import au.iapp.lunch.ui.components.UpsellRow
-import au.iapp.lunch.ui.features.shared.ErrorStateView
+import au.iapp.lunch.ui.features.shared.AiErrorStateView
 import au.iapp.lunch.ui.features.shared.LoadState
 import au.iapp.lunch.ui.features.shared.LunchFormat
 import au.iapp.lunch.ui.features.shared.ModalScreen
@@ -66,6 +66,12 @@ fun AiRecommendationsScreen(pickPlaceId: String?, modifier: Modifier = Modifier)
     val app = LocalAppEnvironment.current
     val viewModel: AiRecommendationsViewModel = viewModel(key = "ai:$pickPlaceId") { AiRecommendationsViewModel(app, pickPlaceId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+        viewModel.refreshAccess()
+    }
+    if (state.needsConsent) {
+        au.iapp.lunch.ui.features.ai.AiConsentDialog(providers = state.aiConfiguration?.providers.orEmpty(), onAllow = viewModel::allowAiSharing, onDecline = viewModel::declineAiSharing)
+    }
     val colors = LunchTheme.colors
 
     ModalScreen(onBack = app::dismiss, modifier = modifier.imePadding()) {
@@ -96,12 +102,16 @@ fun AiRecommendationsScreen(pickPlaceId: String?, modifier: Modifier = Modifier)
             }
             if (state.isGated) {
                 item {
-                    UpsellRow(
-                        title = stringResource(R.string.gate_ai_title),
-                        body = stringResource(R.string.gate_ai_body, LunchFormat.time(state.resetEpochSeconds)),
-                        ctaLabel = stringResource(R.string.gate_ai_cta),
-                        onCta = { app.present(AppRoute.Paywall) },
-                    )
+                    if (!state.needsSubscription) {
+                        LunchText(stringResource(R.string.ai_pro_daily_limit, LunchFormat.time(state.resetEpochSeconds)), role = LunchTextRole.BodySmall)
+                    } else {
+                        UpsellRow(
+                            title = stringResource(R.string.gate_ai_title),
+                            body = stringResource(R.string.gate_ai_body, LunchFormat.time(state.resetEpochSeconds)),
+                            ctaLabel = stringResource(R.string.gate_ai_cta),
+                            onCta = { app.present(AppRoute.Paywall) },
+                        )
+                    }
                 }
             }
             when (val result = state.result) {
@@ -117,7 +127,7 @@ fun AiRecommendationsScreen(pickPlaceId: String?, modifier: Modifier = Modifier)
                 LoadState.Loading -> item {
                     AILoading(title = stringResource(R.string.ai_thinking_title), subtitle = stringResource(R.string.ai_thinking_body), modifier = Modifier.fillMaxWidth())
                 }
-                is LoadState.Failed -> item { ErrorStateView(error = result.error, onRetry = viewModel::ask) }
+                is LoadState.Failed -> item { AiErrorStateView(error = result.error, onRetry = viewModel::ask) }
                 is LoadState.Loaded -> {
                     item { ReasoningCard(result.value) }
                     itemsIndexed(result.value.restaurants, key = { _, r -> r.placeId }) { index, restaurant ->

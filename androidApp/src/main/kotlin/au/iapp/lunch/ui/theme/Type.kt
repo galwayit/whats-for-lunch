@@ -1,9 +1,9 @@
 /**
  * @file Type.kt
- * @description Typography built from TokenType: the Plus Jakarta Sans font family when its
- * resources are present under res/font (see res/README.md), otherwise the system default
- * family at the same weights; one TextStyle per role; the LunchText composable that also
- * applies the uppercase rule; and the text-scale clamp.
+ * @description Typography built from TokenType: Bricolage Grotesque (res/font, see
+ * res/README.md) for the display roles and the system default family for every other role;
+ * one TextStyle per role; the LunchText composable that also applies the uppercase rule; and
+ * the text-scale clamp.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -45,11 +45,14 @@ enum class LunchTextRole(val token: TextRole) {
     Button(TokenType.button),
 }
 
-/** One [TextStyle] per role, resolved against the active font family. */
+/**
+ * One [TextStyle] per role. Roles flagged `display` in the tokens use [displayFamily]; the rest
+ * use [FontFamily.Default] so running text keeps the platform's own face.
+ */
 @Immutable
 data class LunchTypography(
-    val fontFamily: FontFamily,
-    /** True when Plus Jakarta Sans resources were found; false means the system stand-in. */
+    val displayFamily: FontFamily,
+    /** True when the Bricolage Grotesque resources were found; false means the system stand-in. */
     val isCustomFontAvailable: Boolean,
 ) {
     val display = style(LunchTextRole.Display)
@@ -63,7 +66,7 @@ data class LunchTypography(
 
     fun style(role: LunchTextRole): TextStyle = role.token.let { token ->
         TextStyle(
-            fontFamily = fontFamily,
+            fontFamily = if (token.display) displayFamily else FontFamily.Default,
             fontWeight = FontWeight(token.weight),
             fontSize = token.size.sp,
             lineHeight = token.lineHeight.sp,
@@ -97,17 +100,14 @@ data class LunchTypography(
 val LocalLunchTypography = staticCompositionLocalOf { LunchTypography(FontFamily.Default, isCustomFontAvailable = false) }
 
 /**
- * Resource names expected under res/font, one per weight the tokens use. When every file is
- * present the family is built from them; otherwise [FontFamily.Default] carries the same
+ * Resource names expected under res/font, one per weight the display roles use. When every file
+ * is present the family is built from them; otherwise [FontFamily.Default] carries the same
  * weights so layout metrics stay comparable.
  */
 object LunchFont {
-    const val RESOURCE_PREFIX = "plus_jakarta_sans"
+    const val RESOURCE_PREFIX = "bricolage_grotesque"
 
     val weights: Map<FontWeight, String> = mapOf(
-        FontWeight.Normal to "${RESOURCE_PREFIX}_regular",
-        FontWeight.Medium to "${RESOURCE_PREFIX}_medium",
-        FontWeight.SemiBold to "${RESOURCE_PREFIX}_semibold",
         FontWeight.Bold to "${RESOURCE_PREFIX}_bold",
         FontWeight.ExtraBold to "${RESOURCE_PREFIX}_extrabold",
     )

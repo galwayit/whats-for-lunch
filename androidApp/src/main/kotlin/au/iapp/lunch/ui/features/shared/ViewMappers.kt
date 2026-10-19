@@ -60,6 +60,7 @@ fun LunchGroup.toView(): LunchGroupView = LunchGroupView(
     placeName = placeName,
     placeAddress = placeAddress,
     inviteCode = inviteCode,
+    details = au.iapp.lunch.core.model.GroupDetails(hostName, budgetPerPersonMinor, currencyCode, paymentArrangement, paymentMethod),
 )
 
 fun RsvpStatus.toView(): RsvpStatusView = when (this) {

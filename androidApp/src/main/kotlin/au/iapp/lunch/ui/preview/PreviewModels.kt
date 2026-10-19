@@ -67,6 +67,7 @@ data class LunchGroup(
     val placeName: String? = null,
     val placeAddress: String? = null,
     val inviteCode: String,
+    val details: au.iapp.lunch.core.model.GroupDetails = au.iapp.lunch.core.model.GroupDetails(),
 )
 
 enum class RsvpStatus { PENDING, ACCEPTED, DECLINED }

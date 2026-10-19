@@ -1,6 +1,7 @@
 /**
  * @file InviteShareRow.kt
- * @description The host's invite link in a raised box plus the Share invite button.
+ * @description The host's invite link in a raised box plus the Share invite button and, when
+ * the host passes `onShowQr`, the Show QR code button under it.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -33,16 +34,19 @@ import au.iapp.lunch.ui.theme.TokenSpacing
 
 object InviteShareRowDefaults {
     const val LINK_TEST_TAG = "invite_link_text"
+    const val QR_BUTTON_TEST_TAG = "invite_qr_button"
 }
 
 /**
  * @param inviteUrl The full https link; shown verbatim so it can be read back in tests.
+ * @param onShowQr Opens the QR sheet; null hides the button.
  */
 @Composable
 fun InviteShareRow(
     inviteUrl: String,
     onShare: () -> Unit,
     modifier: Modifier = Modifier,
+    onShowQr: (() -> Unit)? = null,
 ) {
     val colors = LunchTheme.colors
     val linkLabel = stringResource(R.string.a11y_invite_link)
@@ -74,6 +78,17 @@ fun InviteShareRow(
             style = LunchButtonStyle.Primary,
             icon = LunchIcon.Share,
         )
+        // Stacked, not side by side: at large text sizes two half-width labels would truncate.
+        if (onShowQr != null) {
+            LunchButton(
+                text = stringResource(R.string.group_detail_qr),
+                onClick = onShowQr,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(InviteShareRowDefaults.QR_BUTTON_TEST_TAG),
+                style = LunchButtonStyle.Secondary,
+            )
+        }
     }
 }
 

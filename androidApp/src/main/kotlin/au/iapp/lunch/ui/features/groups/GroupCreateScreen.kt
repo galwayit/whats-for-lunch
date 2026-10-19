@@ -99,6 +99,7 @@ fun GroupCreateScreen(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .testTag(GroupCreateDefaults.NAME_TEST_TAG),
             )
+            GroupDetailsFields(state.details, viewModel::setDetails)
             Column(verticalArrangement = Arrangement.spacedBy(TokenSpacing.sm)) {
                 SectionTitle(text = stringResource(R.string.group_create_when))
                 Row(horizontalArrangement = Arrangement.spacedBy(TokenSpacing.sm)) {

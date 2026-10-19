@@ -9,6 +9,7 @@ package au.iapp.lunch.ui.features.paywall
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.iapp.lunch.R
 import au.iapp.lunch.app.AppEnvironment
 import au.iapp.lunch.core.model.CoreError
 import au.iapp.lunch.core.model.ProPackage
@@ -61,26 +62,49 @@ class PaywallViewModel(private val app: AppEnvironment) : ViewModel() {
 
     fun purchase() {
         val selected = _state.value.selected ?: return
-        if (_state.value.isPurchasing) return
+        if (_state.value.isPurchasing || _state.value.isRestoring) return
         _state.update { it.copy(isPurchasing = true, purchaseError = null) }
         viewModelScope.launch {
             app.core.entitlements.purchase(selected.identifier).fold(
-                onSuccess = { status -> _state.update { it.copy(isPurchasing = false, isPro = status.isPro) } },
-                onFailure = { failure -> _state.update { it.copy(isPurchasing = false, purchaseError = failure.asCoreError()) } },
+                onSuccess = { status -> _state.update {
+                    it.copy(isPurchasing = false, isPro = status.isPro,
+                        purchaseError = if (status.isPro) null else CoreError.Service("PURCHASE_NOT_ACTIVATED", "Lunch Pro was not activated"))
+                } },
+                onFailure = { failure -> _state.update { it.copy(isPurchasing = false, purchaseError = visiblePurchaseError(failure)) } },
             )
         }
     }
 
     fun restore() {
-        if (_state.value.isRestoring) return
+        if (_state.value.isRestoring || _state.value.isPurchasing) return
         _state.update { it.copy(isRestoring = true, purchaseError = null, restoredNothing = false) }
         viewModelScope.launch {
             app.core.entitlements.restore().fold(
                 onSuccess = { status -> _state.update { it.copy(isRestoring = false, isPro = status.isPro, restoredNothing = !status.isPro) } },
-                onFailure = { failure -> _state.update { it.copy(isRestoring = false, purchaseError = failure.asCoreError()) } },
+                onFailure = { failure -> _state.update { it.copy(isRestoring = false, purchaseError = visiblePurchaseError(failure)) } },
             )
         }
     }
 
     fun consumeRestoredNothing() = _state.update { it.copy(restoredNothing = false) }
+}
+
+internal fun visiblePurchaseError(failure: Throwable): CoreError? = failure.asCoreError().let {
+    if (it is CoreError.Service && it.code == "PURCHASE_CANCELLED") null else it
+}
+
+/** Store SDK diagnostics are not user-facing copy and can include implementation details. */
+internal fun purchaseErrorMessage(error: CoreError): Int = when (error) {
+    CoreError.Offline -> R.string.paywall_error_offline
+    CoreError.NotSignedIn -> R.string.paywall_error_sign_in
+    is CoreError.Gate -> if (error.reason == au.iapp.lunch.core.model.GateReason.SIGN_IN_REQUIRED)
+        R.string.paywall_error_sign_in else R.string.paywall_error_purchase
+    is CoreError.Service -> when (error.code) {
+        "PURCHASE_NOT_ACTIVATED" -> R.string.paywall_error_activation
+        "PaymentPendingError" -> R.string.paywall_error_pending
+        "PurchaseNotAllowedError" -> R.string.paywall_error_not_allowed
+        "ProductNotAvailableForPurchaseError", "PACKAGE_NOT_FOUND" -> R.string.paywall_error_unavailable
+        else -> R.string.paywall_error_purchase
+    }
+    else -> R.string.paywall_error_purchase
 }

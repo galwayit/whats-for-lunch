@@ -5,10 +5,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-/** A quoted string literal for BuildConfig from `-Plunch.<property>` or `$env`, else "". */
-fun lunchSecret(property: String, env: String): String {
-    val value = (project.findProperty("lunch.$property") as? String)?.takeIf { it.isNotBlank() }
-        ?: System.getenv(env).orEmpty()
+// OAuth client IDs are public identifiers, shared with the iOS build. Never add a secret here.
+val googleOAuthDefaults = groovy.json.JsonSlurper()
+    .parse(rootProject.file("config/google-oauth.json")) as Map<*, *>
+
+/** A quoted BuildConfig literal; explicit properties and environment override public defaults. */
+fun lunchSecret(property: String, env: String, defaultValue: String = ""): String {
+    val value = (project.findProperty("lunch.$property") as? String)
+        ?: System.getenv(env)
+        ?: defaultValue
     return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 }
 
@@ -49,6 +54,7 @@ android {
         buildConfigField("String", "LUNCH_SUPABASE_ANON_KEY", lunchSecret("supabaseAnonKey", "LUNCH_SUPABASE_ANON_KEY"))
         buildConfigField("String", "LUNCH_BACKEND_BASE_URL", lunchSecret("backendBaseUrl", "LUNCH_BACKEND_BASE_URL"))
         buildConfigField("String", "LUNCH_REVENUECAT_API_KEY", lunchSecret("revenueCatApiKey", "LUNCH_REVENUECAT_API_KEY"))
+        buildConfigField("String", "LUNCH_GOOGLE_SERVER_CLIENT_ID", lunchSecret("googleServerClientId", "LUNCH_GOOGLE_SERVER_CLIENT_ID", googleOAuthDefaults["googleServerClientId"] as String))
         buildConfigField("String", "LUNCH_INVITE_LINK_BASE", lunchSecret("inviteLinkBase", "LUNCH_INVITE_LINK_BASE"))
     }
 
@@ -86,6 +92,11 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.play.services.location)
+    implementation("androidx.credentials:credentials:1.6.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.2.1")
+    // Encodes the group invite QR code on the device (design/screens.md section 10).
+    implementation(libs.zxing.core)
 
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)

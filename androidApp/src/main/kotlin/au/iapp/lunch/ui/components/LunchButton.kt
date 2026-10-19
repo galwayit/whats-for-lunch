@@ -1,7 +1,7 @@
 /**
  * @file LunchButton.kt
  * @description The four button styles from design/screens.md: Action (orange, the one
- * conversion button per screen), Primary (green), Secondary (soft green with outline), and Text.
+ * conversion button per screen), Primary (paprika), Secondary (soft paprika with outline), and Text.
  * @author AI Assistant
  * @date 2026-09-03
  */

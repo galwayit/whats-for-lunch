@@ -10,6 +10,7 @@ package au.iapp.lunch.ui.features.groups
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.iapp.lunch.app.AppEnvironment
+import au.iapp.lunch.core.model.AiConfiguration
 import au.iapp.lunch.core.model.CoreError
 import au.iapp.lunch.core.model.GroupProposal
 import au.iapp.lunch.core.model.Restaurant
@@ -25,6 +26,8 @@ import kotlinx.coroutines.launch
 data class GroupProposalsUiState(
     val proposals: LoadState<List<GroupProposal>> = LoadState.Idle,
     val choosingPlaceId: String? = null,
+    val needsConsent: Boolean = false,
+    val aiConfiguration: AiConfiguration? = null,
     val chooseError: CoreError? = null,
 )
 
@@ -32,16 +35,44 @@ class GroupProposalsViewModel(private val app: AppEnvironment, private val group
     private val _state = MutableStateFlow(GroupProposalsUiState())
     val state: StateFlow<GroupProposalsUiState> = _state.asStateFlow()
 
+    private var consentVersion: String? = null
+    fun allowAiSharing() {
+        consentVersion = _state.value.aiConfiguration?.consentVersion ?: return
+        _state.update { it.copy(needsConsent = false) }
+        load()
+    }
+    fun declineAiSharing() { _state.update { it.copy(needsConsent = false) }; app.dismiss() }
+
     init {
         load()
     }
 
     fun load() {
+        if (_state.value.proposals.isLoading) return
         _state.update { it.copy(proposals = LoadState.Loading) }
         viewModelScope.launch {
-            app.core.groups.propose(groupId).fold(
+            val config = app.core.ai.configuration().getOrElse {
+                _state.update { state -> state.copy(proposals = LoadState.Failed(it.asCoreError())) }
+                return@launch
+            }
+            _state.update { it.copy(aiConfiguration = config) }
+            if (consentVersion != config.consentVersion) {
+                _state.update { it.copy(needsConsent = true, proposals = LoadState.Idle) }
+                return@launch
+            }
+            _state.update { it.copy(needsConsent = false) }
+            app.core.groups.propose(groupId, consentVersion = consentVersion).fold(
                 onSuccess = { list -> _state.update { it.copy(proposals = LoadState.Loaded(list)) } },
-                onFailure = { failure -> _state.update { it.copy(proposals = LoadState.Failed(failure.asCoreError())) } },
+                onFailure = { failure ->
+                    val error = failure.asCoreError()
+                    if (error is CoreError.Service && error.code == "AI_CONSENT_REQUIRED") {
+                        consentVersion = null
+                        app.core.ai.configuration().fold(
+                            onSuccess = { config -> _state.update { it.copy(aiConfiguration = config, needsConsent = true, proposals = LoadState.Idle) } },
+                            onFailure = { cause -> _state.update { it.copy(proposals = LoadState.Failed(cause.asCoreError())) } },
+                        )
+                    } else _state.update { it.copy(proposals = LoadState.Failed(error)) }
+                },
             )
         }
     }

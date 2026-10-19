@@ -1,7 +1,7 @@
 /**
  * @file PaywallView.kt
- * @description The Lunch Pro paywall: crown header, plan cards (yearly preselected with its
- * trial line and BEST VALUE badge), six benefits, the action CTA, legal copy, and the Restore /
+ * @description The Lunch Pro paywall: crown header, store-provided plan prices and trials,
+ * supported benefits, the action CTA, legal copy, and the Restore /
  * Terms / Privacy links.
  * @author AI Assistant
  * @date 2026-09-03
@@ -60,9 +60,7 @@ object PaywallDefaults {
         R.string.paywall_benefit_1,
         R.string.paywall_benefit_2,
         R.string.paywall_benefit_3,
-        R.string.paywall_benefit_4,
         R.string.paywall_benefit_5,
-        R.string.paywall_benefit_6,
     )
 
     fun planTestTag(identifier: String) = "paywall_plan_$identifier"
@@ -148,7 +146,7 @@ fun PaywallView(
             loading = purchasing,
         )
         LunchText(
-            text = stringResource(R.string.paywall_legal, storeName),
+            text = stringResource(if (selected?.hasFreeTrial == true) R.string.paywall_legal_trial else R.string.paywall_legal, storeName),
             role = LunchTextRole.Caption,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
@@ -175,9 +173,9 @@ private fun PlanCard(pkg: ProPackage, selected: Boolean, enabled: Boolean, onCli
         label = "planBorder",
     )
     val priceLine = if (pkg.hasFreeTrial) {
-        stringResource(R.string.paywall_plan_yearly_trial, pkg.localizedPrice)
+        "${pkg.trialLabel ?: "Free trial"}, then ${pkg.localizedPrice} / ${pkg.periodLabel}"
     } else {
-        stringResource(R.string.paywall_plan_monthly_price, pkg.localizedPrice)
+        "${pkg.localizedPrice} / ${pkg.periodLabel}"
     }
     Row(
         modifier = modifier
@@ -220,16 +218,6 @@ private fun PlanCard(pkg: ProPackage, selected: Boolean, enabled: Boolean, onCli
                 role = LunchTextRole.Heading,
             )
             LunchText(text = priceLine, role = LunchTextRole.Caption, color = colors.textSecondary)
-        }
-        if (pkg.isYearly) {
-            LunchText(
-                text = stringResource(R.string.paywall_plan_yearly_badge),
-                role = LunchTextRole.Label,
-                color = colors.textOnAction,
-                modifier = Modifier
-                    .background(colors.action, LunchTheme.shapes.chip)
-                    .padding(horizontal = TokenSpacing.sm, vertical = TokenSpacing.xs),
-            )
         }
     }
 }

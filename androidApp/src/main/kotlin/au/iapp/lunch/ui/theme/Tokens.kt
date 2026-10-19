@@ -7,79 +7,83 @@ import androidx.compose.ui.unit.sp
 
 object TokenColors {
     object Light {
-        /** Screen background. One value; Discover's #FDFAF3 is retired. */
-        val ground = Color(0XFFFFF8E7)
+        /** Screen background. Warm cream; espresso in dark, never green-black. */
+        val ground = Color(0XFFFFF6EC)
         /** Cards, inputs, sheets. */
         val surface = Color(0XFFFFFFFF)
-        /** Nested cards, tab bar. */
-        val surfaceRaised = Color(0XFFFDFAF3)
+        /** Nested cards, tab bar, tags. */
+        val surfaceRaised = Color(0XFFFFF0E0)
         /** Body text. */
-        val text = Color(0XFF4A3527)
+        val text = Color(0XFF3A2218)
         /** Captions, hints, unselected tabs. */
-        val textSecondary = Color(0XFF8B6F47)
+        val textSecondary = Color(0XFF7A5A48)
         /** Text on primary fills. */
         val textOnPrimary = Color(0XFFFFFFFF)
-        /** Text on the action fill. */
+        /** Text on the action fill. Large bold labels only in light (3.7:1). */
         val textOnAction = Color(0XFFFFFFFF)
-        /** Structure, selected states, primary buttons. */
-        val primary = Color(0XFF2F7F3F)
-        /** Tinted fills (10% / 14%). */
-        val primarySoft = Color(0X1A2F7F3F)
+        /** Paprika. Structure, selected states, primary buttons. */
+        val primary = Color(0XFFC63D17)
+        /** Tinted fills (10% / 16%). */
+        val primarySoft = Color(0X1AC63D17)
         /** The Hungry button and the paywall button only. */
-        val action = Color(0XFFFF6B35)
+        val action = Color(0XFFEC4E14)
         /** Rings and glows around the action. */
-        val actionSoft = Color(0X1FFF6B35)
-        /** Positive badges. */
-        val success = Color(0XFF2E7D32)
+        val actionSoft = Color(0X1FEC4E14)
+        /** Saffron. Rating stars; decorative, always next to the rating number. */
+        val accent = Color(0XFFD98A00)
+        /** Positive badges and a healthy budget. The only green in the palette. */
+        val success = Color(0XFF2E7D4F)
         /** Caution badges. */
-        val warning = Color(0XFFB85300)
-        /** Errors, destructive actions. */
-        val danger = Color(0XFFB71C1C)
+        val warning = Color(0XFFA85A00)
+        /** Errors, destructive actions. Berry, so it never reads as the paprika brand colour. */
+        val danger = Color(0XFFA8123E)
         /** Neutral information badges. */
-        val info = Color(0XFF1B5E8A)
-        /** Card borders, dividers (14% / 10%). */
-        val hairline = Color(0X246B4E3D)
+        val info = Color(0XFF1F5F8B)
+        /** Card borders, dividers (14% / 12%). */
+        val hairline = Color(0X243A2218)
         /** Focused borders, strong dividers. */
-        val hairlineStrong = Color(0X476B4E3D)
+        val hairlineStrong = Color(0X473A2218)
         /** Behind sheets and dialogs. */
-        val scrim = Color(0X993E2B20)
+        val scrim = Color(0X992A1810)
     }
     object Dark {
-        val ground = Color(0XFF141E16)
-        val surface = Color(0XFF1A2B1E)
-        val surfaceRaised = Color(0XFF22382A)
-        val text = Color(0XFFEAE4D8)
-        val textSecondary = Color(0XFFB5A88F)
-        val textOnPrimary = Color(0XFF0E1A10)
-        val textOnAction = Color(0XFFFFFFFF)
-        val primary = Color(0XFF5FC172)
-        val primarySoft = Color(0X245FC172)
-        val action = Color(0XFFFF8A5C)
-        val actionSoft = Color(0X29FF8A5C)
-        val success = Color(0XFF6FCF80)
-        val warning = Color(0XFFFFB067)
-        val danger = Color(0XFFFF8A80)
-        val info = Color(0XFF7CC4F5)
-        val hairline = Color(0X1AFFFFFF)
-        val hairlineStrong = Color(0X38FFFFFF)
+        val ground = Color(0XFF1A1310)
+        val surface = Color(0XFF261C17)
+        val surfaceRaised = Color(0XFF33261F)
+        val text = Color(0XFFF5E9DD)
+        val textSecondary = Color(0XFFC4AE9C)
+        val textOnPrimary = Color(0XFF3A1206)
+        val textOnAction = Color(0XFF2A0E03)
+        val primary = Color(0XFFFF8A5B)
+        val primarySoft = Color(0X29FF8A5B)
+        val action = Color(0XFFFF6B35)
+        val actionSoft = Color(0X29FF6B35)
+        val accent = Color(0XFFFFC154)
+        val success = Color(0XFF7FD19B)
+        val warning = Color(0XFFFFB868)
+        val danger = Color(0XFFFF8FA8)
+        val info = Color(0XFF8CC8F2)
+        val hairline = Color(0X1FFFFFFF)
+        val hairlineStrong = Color(0X3DFFFFFF)
         val scrim = Color(0XA6000000)
     }
 }
 
-data class TextRole(val size: Int, val weight: Int, val lineHeight: Int, val tracking: Double, val uppercase: Boolean)
+/** [display] is true for roles set in the bundled display family; false for the system text face. */
+data class TextRole(val size: Int, val weight: Int, val lineHeight: Int, val tracking: Double, val uppercase: Boolean, val display: Boolean)
 
 object TokenType {
-    const val FAMILY = "Plus Jakarta Sans"
+    const val FAMILY = "Bricolage Grotesque"
     const val TEXT_SCALE_MIN = 0.8f
     const val TEXT_SCALE_MAX = 2.0f
-    val display = TextRole(32, 800, 38, -0.5, false)
-    val title = TextRole(22, 700, 28, 0.0, false)
-    val heading = TextRole(17, 700, 22, 0.0, false)
-    val body = TextRole(16, 500, 24, 0.15, false)
-    val bodySmall = TextRole(14, 400, 20, 0.25, false)
-    val caption = TextRole(13, 500, 18, 0.2, false)
-    val label = TextRole(11, 700, 16, 1.2, true)
-    val button = TextRole(16, 700, 20, 0.1, false)
+    val display = TextRole(32, 800, 38, -0.5, false, true)
+    val title = TextRole(22, 700, 28, -0.2, false, true)
+    val heading = TextRole(17, 700, 22, 0.0, false, true)
+    val body = TextRole(16, 500, 24, 0.15, false, false)
+    val bodySmall = TextRole(14, 400, 20, 0.25, false, false)
+    val caption = TextRole(13, 500, 18, 0.2, false, false)
+    val label = TextRole(11, 700, 16, 1.2, true, false)
+    val button = TextRole(16, 700, 20, 0.1, false, false)
 }
 
 object TokenSpacing {

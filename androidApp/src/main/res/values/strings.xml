@@ -91,25 +91,27 @@
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_monthly_price">%1$s a month</string>
     <string name="paywall_benefit_1">Host group lunches</string>
-    <string name="paywall_benefit_2">Unlimited AI recommendations</string>
+    <string name="paywall_benefit_2">10 AI requests each day, including group suggestions</string>
     <string name="paywall_benefit_3">Full history and insights</string>
-    <string name="paywall_benefit_4">Backup and sync</string>
+    <string name="paywall_benefit_4">Personalised cravings and preferences</string>
     <string name="paywall_benefit_5">Unlimited favourites</string>
-    <string name="paywall_benefit_6">PDF export</string>
+    <string name="paywall_benefit_6">Free JSON data export</string>
     <string name="paywall_cta_trial">Start free trial</string>
     <string name="paywall_cta_subscribe">Subscribe</string>
-    <string name="paywall_legal">Payment is charged to your %1$s account when the trial ends. The subscription renews automatically at the same price unless cancelled at least 24 hours before the end of the period. Manage or cancel any time in your %1$s subscription settings.</string>
+    <string name="paywall_legal">Payment is charged to your %1$s account at confirmation. The subscription renews automatically unless cancelled before renewal. Manage or cancel in your %1$s subscription settings.</string>
+    <string name="paywall_legal_trial">Payment is charged to your %1$s account when the eligible free trial ends. The subscription renews automatically unless cancelled before renewal. Manage or cancel in your %1$s subscription settings.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_terms">Terms of Use</string>
     <string name="paywall_privacy">Privacy Policy</string>
     <string name="paywall_pro_badge">PRO</string>
     <string name="paywall_pro_badge_a11y">Lunch Pro</string>
     <string name="gate_ai_title">You\'ve used today\'s free AI pick</string>
-    <string name="gate_ai_body">Lunch Pro makes it unlimited, with cravings and insights. Your free pick resets at %1$s.</string>
+    <string name="gate_ai_body">Subscribe to Lunch Pro for 10 AI requests a day, shared with group suggestions. Your free request resets at %1$s.</string>
+    <string name="ai_pro_daily_limit">You\'ve used your 10 Pro AI requests today, including group suggestions. Your allowance resets at %1$s.</string>
     <string name="gate_ai_cta">See Lunch Pro</string>
     <string name="gate_host_title">Hosting is a Lunch Pro feature</string>
     <string name="gate_host_body">Create the group, pick the place, and invite friends for free.</string>
-    <string name="gate_host_cta">Start free trial</string>
+    <string name="gate_host_cta">See Lunch Pro</string>
 
     <!-- Group lunch -->
     <string name="group_proposals_choose">Choose</string>
@@ -262,12 +264,12 @@
     <string name="profile_chains_on">On</string>
     <string name="profile_chains_off">Off</string>
     <string name="profile_pro_free_title">Lunch Pro</string>
-    <string name="profile_pro_free_body">Host group lunches, unlimited AI picks, full history.</string>
+    <string name="profile_pro_free_body">Host group lunches, more AI picks, full history.</string>
     <string name="profile_pro_free_cta">Try free for 7 days</string>
     <string name="profile_plan_yearly">Yearly</string>
     <string name="profile_plan_monthly">Monthly</string>
     <string name="profile_signin_title">Sign in</string>
-    <string name="profile_signin_body">Needed to host group lunches and to keep your data across devices.</string>
+    <string name="profile_signin_body">Needed for AI picks, purchases and group hosting. Your meal journal stays on this device.</string>
     <string name="profile_signin_apple">Continue with Apple</string>
     <string name="profile_signin_google">Continue with Google</string>
     <string name="profile_signout">Sign out</string>
@@ -298,7 +300,7 @@
 
     <!-- Paywall and gates -->
     <string name="paywall_success_title">You\'re on Lunch Pro</string>
-    <string name="paywall_success_body">Group lunches, unlimited AI picks and your full history are unlocked.</string>
+    <string name="paywall_success_body">Group lunches, more AI picks and your full history are unlocked.</string>
     <string name="gate_guest_offer_title">Enjoyed the lunch?</string>
     <string name="gate_guest_offer_body">Lunch Pro lets you host the next one.</string>
 
@@ -314,6 +316,9 @@
     <string name="group_create_locating">Finding your area…</string>
     <string name="group_proposals_title">Pick a place</string>
     <string name="group_detail_invite">Invite friends</string>
+    <string name="group_detail_qr">Show QR code</string>
+    <string name="group_qr_title">Scan to join</string>
+    <string name="group_qr_body">Point the other phone\'s camera at this code to open the invitation.</string>
     <string name="group_detail_guests">Guests</string>
     <string name="group_detail_reminder">Remind everyone an hour before</string>
     <string name="group_detail_cancel">Cancel lunch</string>
@@ -341,4 +346,56 @@
     <string name="budget_target_experiences">About %1$d lunches a week</string>
     <string name="track_ring_remaining_short">left this week</string>
     <string name="track_log_date_value">Date: %1$s</string>
+
+    <!-- Split the bill (design/copy.md "Split the bill") -->
+    <string name="split_title">Split the bill</string>
+    <string name="split_open">Split bill</string>
+    <string name="split_group_open">Split the bill</string>
+    <string name="split_bill_label">BILL TOTAL</string>
+    <string name="split_bill_placeholder">$0.00</string>
+    <string name="split_surcharge_label" formatted="false">SURCHARGE %</string>
+    <string name="split_surcharge_placeholder">0</string>
+    <string name="split_surcharge_help">Public holiday or card fee, if any</string>
+    <string name="split_people_label">PEOPLE</string>
+    <string name="split_person_you">You</string>
+    <string name="split_person_n">Person %1$d</string>
+    <string name="split_person_adjusted">Adjusted</string>
+    <string name="split_person_reset">Reset</string>
+    <string name="split_total">Total %1$s</string>
+    <string name="split_total_surcharge">Total %1$s incl. %2$s surcharge</string>
+    <string name="split_payid_label">PAY ME AT</string>
+    <string name="split_payid_placeholder">PayID, BSB and account, or cash</string>
+    <string name="split_payid_note">Kept on this phone only</string>
+    <string name="split_share">Share</string>
+    <string name="split_use_share">Use my share</string>
+    <string name="split_error_no_bill">Enter the bill total</string>
+    <string name="split_error_no_people">Add at least one person</string>
+    <string name="split_error_too_many">Up to 50 people</string>
+    <string name="split_error_surcharge" formatted="false">Surcharge must be 50% or less</string>
+    <string name="split_error_over">Adjusted amounts are %1$s over the bill</string>
+    <string name="split_error_under">%1$s of the bill isn\'t covered yet</string>
+    <string name="split_message_place_fallback">Lunch</string>
+    <string name="split_message_header">%1$s: bill %2$s split %3$d ways</string>
+    <string name="split_message_line">%1$s: %2$s</string>
+    <string name="split_message_pay">Pay me at: %1$s</string>
+    <string name="split_message_footer">Split with What We Have For Lunch</string>
+    <string name="split_note">Split %1$d ways, bill %2$s</string>
+    <!-- People stepper glyphs (symbols, not copy) and their spoken labels. -->
+    <string name="split_stepper_decrease" translatable="false">−</string>
+    <string name="split_stepper_increase" translatable="false">+</string>
+    <string name="a11y_split_fewer_people">One person fewer</string>
+    <string name="a11y_split_more_people">One more person</string>
+    <string name="paywall_error_purchase">The store couldn’t complete your request. Please try again. If you already completed a purchase, use Restore purchases.</string>
+    <string name="paywall_error_activation">Your purchase completed, but Lunch Pro hasn’t been activated. Try Restore purchases. If it stays locked, contact support before purchasing again.</string>
+    <string name="paywall_error_pending">Your payment is awaiting approval. Lunch Pro will unlock once the store confirms it. You don’t need to purchase again.</string>
+    <string name="paywall_error_offline">Couldn’t reach the store. Check your connection and try again.</string>
+    <string name="paywall_error_sign_in">Sign in before subscribing or restoring purchases.</string>
+    <string name="paywall_error_not_allowed">Purchases aren’t allowed on this device or account. Check your store settings.</string>
+    <string name="paywall_error_unavailable">This plan is no longer available. Close and reopen Lunch Pro to refresh the plans.</string>
+    <string name="ai_unavailable_title">AI recommendations unavailable</string>
+    <string name="ai_unavailable_body">We couldn’t generate your lunch picks. Please try again later. You can still browse nearby places.</string>
+    <string name="ai_no_matches_title">No matching places nearby</string>
+    <string name="ai_no_matches_body">Try a wider distance or adjust your food preferences, then ask again.</string>
+    <string name="ai_busy_title">AI is at capacity</string>
+    <string name="ai_busy_body">AI requests have reached the service limit for now. Please try again later.</string>
 </resources>

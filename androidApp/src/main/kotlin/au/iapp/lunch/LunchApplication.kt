@@ -9,6 +9,11 @@
 package au.iapp.lunch
 
 import android.app.Application
+import android.content.ComponentCallbacks2
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.memory.MemoryCache
+import coil3.request.CachePolicy
 import au.iapp.lunch.app.AndroidLocationProvider
 import au.iapp.lunch.app.AppEnvironment
 import au.iapp.lunch.app.LaunchArguments
@@ -18,9 +23,28 @@ import au.iapp.lunch.core.api.CoreConfig
 import au.iapp.lunch.preview.PreviewLocationProvider
 import au.iapp.lunch.preview.PreviewLunchCore
 import java.io.File
+import au.iapp.lunch.ui.features.auth.PreviewSignInTokenProvider
 
 class LunchApplication : Application() {
     private var cached: Pair<LaunchArguments, AppEnvironment>? = null
+    private var photoLoader: ImageLoader? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        SingletonImageLoader.setSafe { context ->
+            ImageLoader.Builder(context)
+                .memoryCache { MemoryCache.Builder().maxSizeBytes(32L * 1024 * 1024).build() }
+                .diskCache(null)
+                .diskCachePolicy(CachePolicy.DISABLED)
+                .build().also { photoLoader = it }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) photoLoader?.memoryCache?.clear()
+    }
 
     /** The environment for [arguments], reusing the current one when the arguments match. */
     @Synchronized
@@ -31,7 +55,7 @@ class LunchApplication : Application() {
 
     private fun makeEnvironment(arguments: LaunchArguments): AppEnvironment {
         if (arguments.usesPreviewCore || FeatureFlags.previewCoreByDefault) {
-            return AppEnvironment(core = PreviewLunchCore(arguments.previewOptions), location = PreviewLocationProvider())
+            return AppEnvironment(core = PreviewLunchCore(arguments.previewOptions), location = PreviewLocationProvider(), signInTokens = PreviewSignInTokenProvider)
         }
         val config = LunchConfig.current
         if (!config.isComplete) {

@@ -1,8 +1,7 @@
 /**
  * @file SignInTokenProvider.kt
  * @description Obtains the identity token the shared `AuthRepository` exchanges for a session.
- * The preview provider hands back a fixed token; the real provider is a product decision
- * (Credential Manager for Google, a web flow for Apple) and reports "unavailable" until then.
+ * Production Google credentials come from Credential Manager. Preview tokens stay in previews.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -15,6 +14,7 @@ enum class SignInProvider { Apple, Google }
 data class SignInToken(val idToken: String, val nonce: String = "", val fullName: String? = null)
 
 interface SignInTokenProvider {
+    val supportedProviders: List<SignInProvider> get() = listOf(SignInProvider.Google)
     suspend fun token(provider: SignInProvider): Result<SignInToken>
 }
 
@@ -25,7 +25,7 @@ object PreviewSignInTokenProvider : SignInTokenProvider {
         Result.success(SignInToken(idToken = TOKEN, nonce = "preview-nonce", fullName = "Demo User"))
 }
 
-/** Real builds until the provider decision lands; the sheet shows `signin_unavailable`. */
+/** Real builds when no credentials are configured; the sheet shows `signin_unavailable`. */
 object UnavailableSignInTokenProvider : SignInTokenProvider {
     const val CODE = "SIGN_IN_UNAVAILABLE"
     override suspend fun token(provider: SignInProvider): Result<SignInToken> =

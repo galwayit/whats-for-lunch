@@ -94,7 +94,7 @@ class AppEnvironment(
 
     /** Presents the screen a gate denial asks for; returns false for [GateReason.OK]. */
     fun present(gate: GateReason): Boolean = when (gate) {
-        GateReason.HOST_REQUIRES_PRO, GateReason.AI_DAILY_LIMIT, GateReason.FAVOURITES_LIMIT, GateReason.HISTORY_WINDOW -> {
+        GateReason.HOST_REQUIRES_PRO, GateReason.FAVOURITES_LIMIT, GateReason.HISTORY_WINDOW -> {
             present(AppRoute.Paywall)
             true
         }
@@ -102,6 +102,7 @@ class AppEnvironment(
             present(AppRoute.SignIn)
             true
         }
+        GateReason.AI_DAILY_LIMIT -> if (isPro.value) false else { present(AppRoute.Paywall); true }
         GateReason.OK -> false
     }
 

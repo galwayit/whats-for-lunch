@@ -4,26 +4,26 @@ AAPT refuses non-resource files inside `res/font` and `res/drawable`, so the not
 
 ## Fonts (res/font)
 
-The design system's type family is **Plus Jakarta Sans** (see `design/tokens.json`, `type.family`).
-Font files are not committed; download them from Google Fonts and drop them here with exactly
-these names (lower-case, underscores, `.ttf`):
+The display roles (`display`, `title`, `heading` in `design/tokens.json`) are set in **Bricolage
+Grotesque**. Every other role uses the system family (`FontFamily.Default`), so only two files
+are bundled:
 
 | File | Weight |
 | --- | --- |
-| `plus_jakarta_sans_regular.ttf` | 400 |
-| `plus_jakarta_sans_medium.ttf` | 500 |
-| `plus_jakarta_sans_semibold.ttf` | 600 |
-| `plus_jakarta_sans_bold.ttf` | 700 |
-| `plus_jakarta_sans_extrabold.ttf` | 800 |
+| `bricolage_grotesque_bold.ttf` | 700 |
+| `bricolage_grotesque_extrabold.ttf` | 800 |
+
+Both are static instances cut from the Google Fonts variable file (`ofl/bricolagegrotesque`,
+version 1.001) at width 100 and optical size 24, the same files the iOS app bundles. Licence: SIL
+Open Font License 1.1, shipped as `assets/BricolageGrotesque-OFL.txt`.
 
 ### How they are picked up
 
 `ui/theme/Type.kt` (`LunchFont.resolve`) looks each name up at runtime with
-`Resources.getIdentifier(name, "font", packageName)` and builds a `FontFamily` from the ones it
-finds. No code change is needed after adding the files: rebuild and
-`LunchTheme.typography.isCustomFontAvailable` becomes `true` (the gallery's controls card shows
-"Plus Jakarta Sans loaded from res/font"). Until then every text role falls back to
-`FontFamily.Default` (Roboto) at the same size, weight, line height and tracking.
+`Resources.getIdentifier(name, "font", packageName)` and builds the display `FontFamily`. If
+either file is missing, `LunchTheme.typography.isCustomFontAvailable` is `false`, the display
+roles fall back to `FontFamily.Default` at the same size and weight, and the gallery's controls
+card says so.
 
 Keep this directory otherwise empty; a stray file with a different name is ignored.
 

@@ -38,6 +38,7 @@ import au.iapp.lunch.ui.components.LunchButtonStyle
 import au.iapp.lunch.ui.components.LunchCard
 import au.iapp.lunch.ui.components.LunchTextField
 import au.iapp.lunch.ui.components.UpsellRow
+import au.iapp.lunch.ui.features.groups.*
 import au.iapp.lunch.ui.features.shared.ErrorStateView
 import au.iapp.lunch.ui.features.shared.HeaderDismiss
 import au.iapp.lunch.ui.features.shared.Intents
@@ -110,12 +111,25 @@ fun InvitationScreen(code: String, modifier: Modifier = Modifier) {
                             formatTime = LunchFormat::time,
                             formatDate = LunchFormat::day,
                         )
-                        state.respondError?.let { LunchText(text = errorToast(it), role = LunchTextRole.Caption, color = colors.danger) }
+                        state.respondError?.let { LunchText(text = it.planningMessage(), role = LunchTextRole.Caption, color = colors.danger) }
                     }
+                }
+            }
+            (state.invitation as? LoadState.Loaded)?.value?.let { invitation ->
+                LunchButton("Refresh invitation", viewModel::load, style = LunchButtonStyle.Secondary, enabled = !state.isResponding)
+                invitation.mySuggestion?.let { suggestion ->
+                    LunchCard {
+                        LunchText(suggestion.statusLabel(), role = LunchTextRole.Heading)
+                        SuggestionSummary(suggestion)
+                    }
+                }
+                if (invitation.mySuggestion?.status != "pending") {
+                    LunchButton("Suggest another place or time", { viewModel.showSuggestion(true) }, style = LunchButtonStyle.Secondary, enabled = !state.isResponding, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
     }
+    if (state.showSuggestion) InvitationSuggestionDialog(state, viewModel::setDisplayName, { viewModel.showSuggestion(false) }, viewModel::suggest)
 }
 
 @Composable
@@ -132,6 +146,7 @@ private fun Responded(
     LunchCard(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(TokenSpacing.sm)) {
             LunchText(text = stringResource(if (accepted) R.string.invite_accepted_title else R.string.invite_declined_title), role = LunchTextRole.Title, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            GroupPlanningSummary(group.details())
             LunchText(text = stringResource(R.string.invite_title, group.hostName), role = LunchTextRole.Body, color = colors.textSecondary)
             LunchText(text = (group.placeName ?: group.name) + "\n" + LunchFormat.dayTime(group.scheduledAtEpochSeconds), role = LunchTextRole.BodySmall)
             LunchText(text = stringResource(R.string.invite_attending, invitation.attendees.count { it.status == RsvpStatus.ACCEPTED }), role = LunchTextRole.Caption, color = colors.textSecondary)

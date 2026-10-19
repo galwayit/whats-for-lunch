@@ -1,4 +1,4 @@
-appId: au.iapp.guess_what.what_we_have_for_lunch
+appId: au.iapp.lunch
 name: ai_gate_and_paywall
 tags: [monetization]
 ---
@@ -15,14 +15,16 @@ tags: [monetization]
     id: "craving_field"
 - inputText: "something light"
 - tapOn: "Ask"
+- assertVisible:
+    id: "ai_consent_card"
+- tapOn:
+    id: "ai_consent_agree"
 - extendedWaitUntil:
     visible:
       id: "ai_result_0"
     timeout: 20000
-# Second request of the day hits the free gate
+# After the one free request, another attempt opens the subscription paywall.
 - tapOn: "Ask"
-- assertVisible: "You've used today's free AI pick"
-- tapOn: "See Lunch Pro"
 - assertVisible: "Lunch Pro"
 - assertVisible: "Host group lunches"
 - assertVisible: "Restore purchases"

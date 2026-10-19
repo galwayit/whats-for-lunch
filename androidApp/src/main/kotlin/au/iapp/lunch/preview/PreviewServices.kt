@@ -26,6 +26,9 @@ import au.iapp.lunch.core.model.GateReason
 import au.iapp.lunch.core.model.GroupProposal
 import au.iapp.lunch.core.model.Invitation
 import au.iapp.lunch.core.model.Location
+import au.iapp.lunch.core.model.GroupSuggestion
+import au.iapp.lunch.core.model.GroupSuggestionDraft
+import au.iapp.lunch.core.model.GroupDetails
 import au.iapp.lunch.core.model.LunchGroup
 import au.iapp.lunch.core.model.ProOfferings
 import au.iapp.lunch.core.model.Restaurant
@@ -43,7 +46,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
-/** Free tier: one AI pick a day, ten favourites, 30 days of history, no hosting. */
+/** One free AI request a day; Pro has ten. Hosting requires Pro. */
 class PreviewGateService(
     private val isPro: () -> Boolean,
     private val session: () -> AuthSession?,
@@ -58,8 +61,8 @@ class PreviewGateService(
     }
 
     override suspend fun canRequestAi(): GateDecision = when {
-        isPro() -> GateDecision.Allowed
-        aiRequestsToday < FreeLimits.AI_REQUESTS_PER_DAY -> GateDecision.Allowed
+        session() == null -> GateDecision.denied(GateReason.SIGN_IN_REQUIRED)
+        aiRequestsToday < (if (isPro()) 10 else FreeLimits.AI_REQUESTS_PER_DAY) -> GateDecision.Allowed
         else -> GateDecision.denied(GateReason.AI_DAILY_LIMIT)
     }
 
@@ -86,7 +89,10 @@ class PreviewAiService(
     private val history = MutableStateFlow(listOf(PreviewCoreData.aiRecommendation))
     private var nextId = 2
 
-    override suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>): Result<AiRecommendation> {
+    var aiConfiguration = au.iapp.lunch.core.model.AiConfiguration("preview-ai-v2", listOf(au.iapp.lunch.core.model.AiProviderDisclosure("Preview AI", "https://example.com/privacy")))
+    override suspend fun configuration(): Result<au.iapp.lunch.core.model.AiConfiguration> = Result.success(aiConfiguration)
+
+    override suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>, consentVersion: String?): Result<AiRecommendation> {
         val decision = gates.canRequestAi()
         if (!decision.allowed) return Result.failure(CoreError.Gate(decision.reason))
         return network.call(PreviewNetwork.AI_LATENCY_MS) {
@@ -201,19 +207,28 @@ class PreviewAuthRepository(private val network: PreviewNetwork, signedIn: Boole
     override val session: StateFlow<AuthSession?> = current.asStateFlow()
 
     override suspend fun signInWithApple(idToken: String, nonce: String, fullName: String?): Result<AuthSession> = network.call {
-        AuthSession("user_ray", "ray@privaterelay.appleid.com", fullName ?: PreviewCoreData.USER_NAME).also { current.value = it }
+        AuthSession("user_ray", "ray@privaterelay.appleid.com", fullName ?: PreviewCoreData.USER_NAME, requiresAppleReauthentication = true).also { current.value = it }
     }
 
-    override suspend fun signInWithGoogle(idToken: String): Result<AuthSession> = network.call {
+    override suspend fun signInWithGoogle(idToken: String, nonce: String, accessToken: String?): Result<AuthSession> = network.call {
         AuthSession("user_ray", "ray@gmail.com", PreviewCoreData.USER_NAME).also { current.value = it }
     }
+
+    override suspend fun signInWithEmail(email: String, password: String): Result<AuthSession> = network.call {
+        AuthSession("user_ray", email, PreviewCoreData.USER_NAME).also { current.value = it }
+    }
+    override suspend fun registerWithEmail(email: String, password: String): Result<Boolean> = network.call { false }
+    override suspend fun verifyEmail(email: String, code: String): Result<AuthSession> = signInWithEmail(email, "")
+    override suspend fun resendVerification(email: String): Result<Unit> = network.call { }
+    override suspend fun requestPasswordReset(email: String): Result<Unit> = network.call { }
+    override suspend fun resetPassword(email: String, code: String, newPassword: String): Result<AuthSession> = signInWithEmail(email, newPassword)
 
     override suspend fun signOut(): Result<Unit> {
         current.value = null
         return Result.success(Unit)
     }
 
-    override suspend fun deleteAccount(): Result<Unit> = network.call { current.value = null }
+    override suspend fun deleteAccount(appleAuthorizationCode: String?): Result<Unit> = network.call { current.value = null }
 
     companion object {
         val DEMO_SESSION = AuthSession("user_ray", "ray@example.com", "Ray")
@@ -231,17 +246,19 @@ class PreviewGroupRepository(
     seedRsvps: List<Rsvp>,
 ) : GroupRepository {
     private val groups = MutableStateFlow(listOf(seedGroup))
+    private val suggestionRows = mutableListOf<GroupSuggestion>()
     private val rsvpsByGroup = MutableStateFlow(mapOf(seedGroup.id to seedRsvps))
 
     override fun myGroups(): Flow<List<LunchGroup>> = groups
 
-    override suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double): Result<LunchGroup> = network.call {
+    override suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double, details: GroupDetails): Result<LunchGroup> = network.call {
         val host = session()
         val id = "grp_" + randomCode(6).lowercase()
         val group = LunchGroup(
             id = id,
             hostId = host?.userId ?: "user_ray",
-            hostName = host?.displayName ?: PreviewCoreData.USER_NAME,
+            hostName = details.hostName.ifBlank { host?.displayName ?: PreviewCoreData.USER_NAME },
+            budgetPerPersonMinor = details.budgetPerPersonMinor, currencyCode = details.currencyCode, paymentArrangement = details.paymentArrangement, paymentMethod = details.paymentMethod,
             name = name,
             scheduledAtEpochSeconds = scheduledAtEpochSeconds,
             areaLatitude = area.latitude,
@@ -257,7 +274,7 @@ class PreviewGroupRepository(
         group
     }
 
-    override suspend fun propose(groupId: String): Result<List<GroupProposal>> {
+    override suspend fun propose(groupId: String, consentVersion: String?): Result<List<GroupProposal>> {
         val group = groups.value.firstOrNull { it.id == groupId } ?: return Result.failure(notFound(groupId))
         return coreResult {
             val nearby = searchNearby(Location(group.areaLatitude, group.areaLongitude), group.radiusKm)
@@ -295,6 +312,31 @@ class PreviewGroupRepository(
         invitationFor(code).copy(myStatus = status)
     }
 
+    override suspend fun suggest(code: String, draft: GroupSuggestionDraft, displayName: String?): Result<Invitation> = network.call {
+        val invite = invitationFor(code)
+        val row = GroupSuggestion("suggest_" + randomCode(8), invite.group.id, displayName ?: session()?.displayName ?: "Guest", draft.placeName, draft.placeAddress, draft.scheduledAt, draft.note, "pending", clock.nowEpochSeconds())
+        suggestionRows.add(row)
+        invite.copy(mySuggestion = row)
+    }
+    override suspend fun suggestions(groupId: String): Result<List<GroupSuggestion>> = Result.success(suggestionRows.filter { it.groupId == groupId })
+    override suspend fun reviewSuggestion(groupId: String, suggestionId: String, accept: Boolean): Result<LunchGroup> = network.call {
+        val index = suggestionRows.indexOfFirst { it.id == suggestionId && it.groupId == groupId }
+        if (index < 0) throw notFound(suggestionId)
+        val row = suggestionRows[index]
+        suggestionRows[index] = row.copy(status = if (accept) "accepted" else "declined")
+        var group = groups.value.first { it.id == groupId }
+        if (accept) {
+            group = group.copy(scheduledAtEpochSeconds = row.scheduledAtEpochSeconds ?: group.scheduledAtEpochSeconds, placeName = row.placeName ?: group.placeName, placeAddress = if (row.placeName != null) row.placeAddress else group.placeAddress, placeId = if (row.placeName != null) null else group.placeId)
+            rsvpsByGroup.update { map -> map + (groupId to map[groupId].orEmpty().map { it.copy(status = RsvpStatus.PENDING) }) }
+        }
+        groups.update { rows -> rows.map { if (it.id == groupId) group else it } }
+        group
+    }
+    override suspend fun updateDetails(groupId: String, details: GroupDetails): Result<LunchGroup> = network.call {
+        val group = groups.value.first { it.id == groupId }.copy(hostName = details.hostName, budgetPerPersonMinor = details.budgetPerPersonMinor, currencyCode = details.currencyCode, paymentArrangement = details.paymentArrangement, paymentMethod = details.paymentMethod)
+        groups.update { rows -> rows.map { if (it.id == groupId) group else it } }
+        group
+    }
     override fun rsvps(groupId: String): Flow<List<Rsvp>> = rsvpsByGroup.map { it[groupId].orEmpty() }
 
     override suspend fun cancel(groupId: String): Result<Unit> = network.call {
@@ -306,7 +348,7 @@ class PreviewGroupRepository(
         val group = groups.value.firstOrNull { it.inviteCode.equals(code, ignoreCase = true) } ?: throw notFound(code)
         val attendees = rsvpsByGroup.value[group.id].orEmpty()
         val myStatus = session()?.let { me -> attendees.firstOrNull { it.guestUserId == me.userId }?.status }
-        return Invitation(group, attendees, myStatus, PreviewCoreData.INVITE_LINK_BASE + group.inviteCode)
+        return Invitation(group, attendees, myStatus, PreviewCoreData.INVITE_LINK_BASE + group.inviteCode, suggestionRows.lastOrNull { it.groupId == group.id })
     }
 
     private fun notFound(key: String) = CoreError.Service("NOT_FOUND", "No group for $key")

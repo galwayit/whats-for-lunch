@@ -1,6 +1,6 @@
 /**
  * @file RestaurantPhoto.kt
- * @description A cropped restaurant photo loaded with Coil, drawn over a `primarySoft`
+ * @description A cropped restaurant photo loaded with Coil, drawn over a `surfaceRaised`
  * placeholder with the restaurant icon so the slot never flashes empty.
  * @author AI Assistant
  * @date 2026-09-03
@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import au.iapp.lunch.ui.preview.LunchPreviewSurface
 import au.iapp.lunch.ui.preview.LunchPreviews
@@ -25,6 +27,8 @@ import au.iapp.lunch.ui.theme.LunchIconView
 import au.iapp.lunch.ui.theme.LunchTheme
 import au.iapp.lunch.ui.theme.TokenSize
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
 
 object RestaurantPhotoDefaults {
     val placeholderIconSize: Dp = TokenSize.iconDefault * 2
@@ -41,7 +45,7 @@ fun RestaurantPhoto(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.background(LunchTheme.colors.primarySoft),
+        modifier = modifier.background(LunchTheme.colors.surfaceRaised),
         contentAlignment = Alignment.Center,
     ) {
         LunchIconView(
@@ -51,8 +55,16 @@ fun RestaurantPhoto(
         )
         // Previews have no network; keep the placeholder instead of a blank image.
         if (url != null && !LocalInspectionMode.current) {
+            val context = LocalContext.current
+            val request = remember(url, context) {
+                ImageRequest.Builder(context).data(url)
+                    .memoryCacheKey(url)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.DISABLED)
+                    .build()
+            }
             AsyncImage(
-                model = url,
+                model = request,
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,

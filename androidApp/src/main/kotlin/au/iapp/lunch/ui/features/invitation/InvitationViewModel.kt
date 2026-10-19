@@ -29,6 +29,7 @@ data class InvitationUiState(
     val isResponding: Boolean = false,
     val respondError: CoreError? = null,
     val showGuestOffer: Boolean = false,
+    val showSuggestion: Boolean = false,
 ) {
     val needsName: Boolean get() = displayName.isBlank()
 }
@@ -62,6 +63,19 @@ class InvitationViewModel(
     fun accept() = respond(RsvpStatus.ACCEPTED)
     fun decline() = respond(RsvpStatus.DECLINED)
     fun dismissGuestOffer() = _state.update { it.copy(showGuestOffer = false) }
+
+    fun showSuggestion(show: Boolean) = _state.update { it.copy(showSuggestion = show, respondError = null) }
+    fun suggest(draft: au.iapp.lunch.core.model.GroupSuggestionDraft) {
+        val current = _state.value
+        if (current.isResponding || current.needsName) return
+        _state.update { it.copy(isResponding = true, respondError = null) }
+        viewModelScope.launch {
+            app.core.groups.suggest(code, draft, current.displayName.trim()).fold(
+                onSuccess = { invitation -> _state.update { it.copy(isResponding = false, showSuggestion = false, invitation = LoadState.Loaded(invitation)) } },
+                onFailure = { failure -> _state.update { it.copy(isResponding = false, respondError = failure.asCoreError()) } },
+            )
+        }
+    }
 
     private fun respond(status: RsvpStatus) {
         val current = _state.value

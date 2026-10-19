@@ -1,7 +1,7 @@
 /**
  * @file TrackScreen.kt
  * @description Screen 5 of design/screens.md: the capacity ring, the quick meal log card and
- * the recent meals list with the free-tier history gate.
+ * the recent meals list with the free-tier history gate. Hosts the "Split the bill" sheet.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -39,6 +39,7 @@ import au.iapp.lunch.ui.components.LunchCard
 import au.iapp.lunch.ui.components.UpsellRow
 import au.iapp.lunch.ui.features.shared.LunchFormat
 import au.iapp.lunch.ui.features.shared.SectionTitle
+import au.iapp.lunch.ui.features.split.SplitBillSheet
 import au.iapp.lunch.ui.navigation.AppRoute
 import au.iapp.lunch.ui.theme.LunchText
 import au.iapp.lunch.ui.theme.LunchTextRole
@@ -52,6 +53,7 @@ fun TrackScreen(modifier: Modifier = Modifier) {
     val viewModel: TrackViewModel = viewModel { TrackViewModel(app) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val events by viewModel.events.collectAsStateWithLifecycle()
+    val split by viewModel.split.collectAsStateWithLifecycle()
     val colors = LunchTheme.colors
     val loggedToast = stringResource(R.string.track_log_logged)
     val unlockedTemplate = stringResource(R.string.track_achievement_unlocked, "%s")
@@ -108,6 +110,9 @@ fun TrackScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
+    split?.let { sheet ->
+        SplitBillSheet(viewModel = sheet, onDismiss = viewModel::closeSplit, onUseShare = viewModel::useSplitShare)
     }
 }
 

@@ -8,6 +8,7 @@
 package au.iapp.lunch.ui.features.discover
 
 import androidx.lifecycle.ViewModel
+import au.iapp.lunch.core.engine.RestaurantChains
 import androidx.lifecycle.viewModelScope
 import au.iapp.lunch.app.AppEnvironment
 import au.iapp.lunch.core.model.GateReason
@@ -23,6 +24,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 enum class DiscoverSheet { Sort, Price, Distance, Rating, Dietary }
@@ -62,6 +65,11 @@ class DiscoverViewModel(private val app: AppEnvironment) : ViewModel() {
 
     init {
         observeFavourites()
+        viewModelScope.launch {
+            app.user.map { it?.preferences }.distinctUntilChanged().collect { prefs ->
+                _state.update { it.copy(visible = arrange(it.results.valueOrNull.orEmpty(), it.filters, it.sort, prefs)) }
+            }
+        }
         search()
     }
 
@@ -88,7 +96,7 @@ class DiscoverViewModel(private val app: AppEnvironment) : ViewModel() {
             core.restaurants.searchNearby(location, radius, _state.value.query.trim().ifEmpty { null }, forceRefresh = false).getOrThrow()
         }
         outcome.fold(
-            onSuccess = { list -> _state.update { it.copy(results = LoadState.Loaded(list), visible = arrange(list, it.filters, it.sort, prefs)) } },
+            onSuccess = { list -> _state.update { it.copy(results = LoadState.Loaded(list), visible = arrange(list, it.filters, it.sort, app.user.value?.preferences)) } },
             onFailure = { failure -> _state.update { it.copy(results = LoadState.Failed(failure.asCoreError()), visible = emptyList()) } },
         )
     }
@@ -108,8 +116,9 @@ class DiscoverViewModel(private val app: AppEnvironment) : ViewModel() {
     /** Filters then sorts through the recommendation engine so Discover ranks like Home. */
     private fun arrange(list: List<Restaurant>, filters: DiscoverFilters, sort: SortOption, prefs: UserPreferences?): List<Restaurant> {
         val engine = core.recommendation
-        val filtered = list.filter { r ->
-            (filters.maxPriceLevel == null || (r.priceLevel ?: 0) <= filters.maxPriceLevel) &&
+        val filtered = engine.applyPreferenceFilters(list, prefs).filter { r ->
+            (prefs?.includeChains != false || !RestaurantChains.matches(r.name)) &&
+                (filters.maxPriceLevel == null || (r.priceLevel ?: 0) <= filters.maxPriceLevel) &&
                 (filters.maxDistanceKm == null || (r.distanceFromUser ?: 0.0) <= filters.maxDistanceKm) &&
                 (filters.minRating == null || (r.rating ?: 0.0) >= filters.minRating) &&
                 (!filters.dietaryOnly || prefs == null || engine.dietaryCompatibility(r, prefs.dietaryRestrictions, prefs.allergens) >= 1.0)

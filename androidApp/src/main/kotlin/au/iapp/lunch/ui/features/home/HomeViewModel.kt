@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 sealed class HeroUiState {
@@ -49,37 +52,43 @@ class HomeViewModel(private val app: AppEnvironment) : ViewModel() {
 
     private val rejected = mutableSetOf<String>()
     private val rsvpJobs = mutableMapOf<String, Job>()
+    private var searchJob: Job? = null
+    private var searchRevision = 0
     private val core get() = app.core
 
     init {
         observeGroups()
+        viewModelScope.launch {
+            app.user.map { it?.preferences }.distinctUntilChanged().drop(1).collect { reset() }
+        }
     }
 
     fun setCraving(value: String) = _state.update { it.copy(craving = value) }
 
     fun search(prefs: UserPreferences?) {
         if (_state.value.hero == HeroUiState.Searching) return
+        val revision = ++searchRevision
         _state.update { it.copy(hero = HeroUiState.Searching) }
-        viewModelScope.launch {
-            val hero = runCatching { performSearch(prefs) }.getOrElse { HeroUiState.Failed(it.asCoreError()) }
-            _state.update { it.copy(hero = hero) }
+        searchJob = viewModelScope.launch {
+            val result = runCatching { performSearch(prefs) }
+                .getOrElse { HeroUiState.Failed(it.asCoreError()) to 0 }
+            if (revision == searchRevision) _state.update { it.copy(hero = result.first, picksCount = result.second) }
         }
     }
 
-    private suspend fun performSearch(prefs: UserPreferences?): HeroUiState {
+    private suspend fun performSearch(prefs: UserPreferences?): Pair<HeroUiState, Int> {
         val location = app.location.current().getOrThrow()
         val radius = prefs?.maxTravelDistance ?: UserPreferences().maxTravelDistance
         val nearby = core.restaurants.searchNearby(location, radius, query = null, forceRefresh = false).getOrThrow()
         val engine = core.recommendation
         val candidates = engine.applyPreferenceFilters(nearby, prefs)
         val picks = candidates.count { engine.compatibilityScore(it, prefs) > SCORE_THRESHOLD }
-        _state.update { it.copy(picksCount = picks) }
-        val best = engine.bestMatch(candidates, prefs, rejected) ?: return HeroUiState.Empty
+        val best = engine.bestMatch(candidates, prefs, rejected) ?: return HeroUiState.Empty to picks
         return HeroUiState.Result(
             restaurant = best,
             reasons = engine.reasons(best, prefs).take(REASON_COUNT),
             confidence = engine.compatibilityScore(best, prefs),
-        )
+        ) to picks
     }
 
     /** "Not this one": remember the rejection and search again. */
@@ -89,8 +98,10 @@ class HomeViewModel(private val app: AppEnvironment) : ViewModel() {
     }
 
     fun reset() {
+        searchRevision++
+        searchJob?.cancel()
         rejected.clear()
-        _state.update { it.copy(hero = HeroUiState.Idle) }
+        _state.update { it.copy(hero = HeroUiState.Idle, picksCount = 0) }
     }
 
     /** Pro users route a typed craving straight to the AI screen. */

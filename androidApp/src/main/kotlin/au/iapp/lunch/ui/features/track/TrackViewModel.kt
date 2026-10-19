@@ -1,8 +1,8 @@
 /**
  * @file TrackViewModel.kt
  * @description Weekly capacity ring, the quick meal log draft with its budget impact, and the
- * recent-meals list with the free-tier history window. Mirrors
- * iosApp/.../Track/TrackViewModel.swift.
+ * recent-meals list with the free-tier history window, plus the "Split the bill" sheet it opens.
+ * Mirrors iosApp/.../Track/TrackViewModel.swift.
  * @author AI Assistant
  * @date 2026-09-03
  */
@@ -17,6 +17,10 @@ import au.iapp.lunch.core.model.Meal
 import au.iapp.lunch.core.model.MealImpact
 import au.iapp.lunch.core.model.WeeklyBudgetState
 import au.iapp.lunch.ui.features.shared.asCoreError
+import au.iapp.lunch.ui.features.split.PayIdStore
+import au.iapp.lunch.ui.features.split.SplitBillViewModel
+import au.iapp.lunch.ui.features.split.SplitMoney
+import au.iapp.lunch.ui.features.split.SplitShare
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -69,6 +73,10 @@ class TrackViewModel(private val app: AppEnvironment) : ViewModel() {
     private val core get() = app.core
     private var recentJob: Job? = null
 
+    /** The open "Split the bill" sheet, or null. Held here so it survives rotation. */
+    private val _split = MutableStateFlow<SplitBillViewModel?>(null)
+    val split: StateFlow<SplitBillViewModel?> = _split.asStateFlow()
+
     init {
         refresh()
         observeRecent()
@@ -105,6 +113,24 @@ class TrackViewModel(private val app: AppEnvironment) : ViewModel() {
     fun setDate(epochSeconds: Long) = updateDraft { it.copy(dateEpochSeconds = epochSeconds) }
     fun setNotes(value: String) = updateDraft { it.copy(notes = value) }
     fun consumeEvent() = _events.update { it.drop(1) }
+
+    /** Opens the split sheet with the bill from the cost field (when valid) and 2 people. */
+    fun openSplit(payIds: PayIdStore) {
+        val draft = _state.value.draft
+        _split.value = SplitBillViewModel.forTrack(costText = draft.cost, placeName = draft.restaurantName, payIds = payIds)
+    }
+
+    fun closeSplit() {
+        _split.value = null
+    }
+
+    /** "Use my share": my share into the cost field, the split note only if notes are empty. */
+    fun useSplitShare(share: SplitShare) {
+        updateDraft { draft ->
+            draft.copy(cost = SplitMoney.plain(share.myShareCents), notes = draft.notes.ifBlank { share.note })
+        }
+        closeSplit()
+    }
 
     private fun updateDraft(transform: (MealDraft) -> MealDraft) {
         _state.update { it.copy(draft = transform(it.draft), logError = null) }

@@ -23,7 +23,7 @@ import au.iapp.lunch.R
 import au.iapp.lunch.app.LocalAppEnvironment
 import au.iapp.lunch.ui.components.AILoading
 import au.iapp.lunch.ui.components.ProposalCard
-import au.iapp.lunch.ui.features.shared.ErrorStateView
+import au.iapp.lunch.ui.features.shared.AiErrorStateView
 import au.iapp.lunch.ui.features.shared.LoadState
 import au.iapp.lunch.ui.features.shared.ModalScreen
 import au.iapp.lunch.ui.features.shared.ScreenHeader
@@ -39,6 +39,9 @@ fun GroupProposalsScreen(groupId: String, modifier: Modifier = Modifier) {
     val app = LocalAppEnvironment.current
     val viewModel: GroupProposalsViewModel = viewModel(key = "proposals:$groupId") { GroupProposalsViewModel(app, groupId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    if (state.needsConsent) {
+        au.iapp.lunch.ui.features.ai.AiConsentDialog(providers = state.aiConfiguration?.providers.orEmpty(), onAllow = viewModel::allowAiSharing, onDecline = viewModel::declineAiSharing)
+    }
     val colors = LunchTheme.colors
 
     ModalScreen(onBack = app::dismiss, modifier = modifier) {
@@ -51,7 +54,7 @@ fun GroupProposalsScreen(groupId: String, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .padding(TokenSpacing.page),
             )
-            is LoadState.Failed -> ErrorStateView(error = proposals.error, onRetry = viewModel::load, modifier = Modifier.fillMaxWidth())
+            is LoadState.Failed -> AiErrorStateView(error = proposals.error, onRetry = viewModel::load, modifier = Modifier.fillMaxWidth())
             is LoadState.Loaded -> LazyColumn(
                 contentPadding = PaddingValues(horizontal = TokenSpacing.page, vertical = TokenSpacing.sm),
                 verticalArrangement = Arrangement.spacedBy(TokenSpacing.md),

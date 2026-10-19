@@ -27,6 +27,7 @@ import java.time.ZoneId
 
 data class GroupCreateUiState(
     val name: String = "",
+    val details: GroupDetailsDraft = GroupDetailsDraft(),
     val scheduledAtEpochSeconds: Long = 0L,
     val area: Location? = null,
     val isLocating: Boolean = false,
@@ -36,11 +37,11 @@ data class GroupCreateUiState(
     /** True when the host gate said Pro is required; the screen shows the upsell. */
     val showHostGate: Boolean = false,
 ) {
-    val canCreate: Boolean get() = name.isNotBlank() && area != null && !isCreating && !showHostGate
+    val canCreate: Boolean get() = name.isNotBlank() && details.value() != null && area != null && !isCreating && !showHostGate
 }
 
 class GroupCreateViewModel(private val app: AppEnvironment) : ViewModel() {
-    private val _state = MutableStateFlow(GroupCreateUiState(scheduledAtEpochSeconds = defaultTime(app)))
+    private val _state = MutableStateFlow(GroupCreateUiState(scheduledAtEpochSeconds = defaultTime(app), details = GroupDetailsDraft(hostName = app.session.value?.displayName ?: app.user.value?.name.orEmpty())))
     val state: StateFlow<GroupCreateUiState> = _state.asStateFlow()
 
     init {
@@ -48,6 +49,7 @@ class GroupCreateViewModel(private val app: AppEnvironment) : ViewModel() {
         useCurrentLocation()
     }
 
+    fun setDetails(value: GroupDetailsDraft) = _state.update { it.copy(details = value) }
     fun setName(value: String) = _state.update { it.copy(name = value, error = null) }
     fun setScheduledAt(epochSeconds: Long) = _state.update { it.copy(scheduledAtEpochSeconds = epochSeconds) }
     fun setRadius(km: Double) = _state.update { it.copy(radiusKm = km) }
@@ -83,7 +85,7 @@ class GroupCreateViewModel(private val app: AppEnvironment) : ViewModel() {
                 handleGate(decision.reason)
                 return@launch
             }
-            app.core.groups.create(current.name.trim(), current.scheduledAtEpochSeconds, area, current.radiusKm).fold(
+            app.core.groups.create(current.name.trim(), current.scheduledAtEpochSeconds, area, current.radiusKm, current.details.value() ?: return@launch).fold(
                 onSuccess = { group ->
                     _state.update { it.copy(isCreating = false) }
                     app.replaceTop(AppRoute.GroupProposals(group.id))

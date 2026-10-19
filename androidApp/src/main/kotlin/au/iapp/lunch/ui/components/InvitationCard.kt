@@ -77,6 +77,7 @@ fun InvitationCard(
                     .joinToString(RestaurantCardDefaults.META_SEPARATOR),
             )
         }
+        au.iapp.lunch.ui.features.groups.GroupPlanningSummary(group.details.copy(hostName = group.hostName))
         Row(
             modifier = Modifier.padding(bottom = TokenSpacing.md),
             horizontalArrangement = Arrangement.spacedBy(TokenSpacing.sm),

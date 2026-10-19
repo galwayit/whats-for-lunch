@@ -32,3 +32,31 @@ fun ErrorStateView(error: CoreError, onRetry: () -> Unit, modifier: Modifier = M
 @Composable
 fun errorToast(error: CoreError): String =
     stringResource(if (error is CoreError.Offline) R.string.error_offline_title else R.string.error_service_title)
+
+/** Keep AI availability separate from subscription gates and raw provider diagnostics. */
+@Composable
+fun AiErrorStateView(error: CoreError, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    if (error is CoreError.Offline) {
+        ErrorStateView(error, onRetry, modifier)
+        return
+    }
+    val code = (error as? CoreError.Service)?.code
+    val title = when (code) {
+        "NO_CANDIDATES" -> R.string.ai_no_matches_title
+        "RATE_LIMITED" -> R.string.ai_busy_title
+        else -> R.string.ai_unavailable_title
+    }
+    val message = when (code) {
+        "NO_CANDIDATES" -> R.string.ai_no_matches_body
+        "RATE_LIMITED" -> R.string.ai_busy_body
+        else -> R.string.ai_unavailable_body
+    }
+    EmptyState(
+        variant = if (code == "NO_CANDIDATES") EmptyStateVariant.NothingHere else EmptyStateVariant.ServiceProblem,
+        title = stringResource(title),
+        message = stringResource(message),
+        actionLabel = stringResource(R.string.action_retry),
+        onAction = onRetry,
+        modifier = modifier,
+    )
+}

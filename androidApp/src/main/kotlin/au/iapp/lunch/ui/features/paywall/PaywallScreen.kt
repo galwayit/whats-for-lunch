@@ -34,7 +34,6 @@ import au.iapp.lunch.ui.features.shared.Intents
 import au.iapp.lunch.ui.features.shared.LoadState
 import au.iapp.lunch.ui.features.shared.ModalScreen
 import au.iapp.lunch.ui.features.shared.ScreenHeader
-import au.iapp.lunch.ui.features.shared.errorToast
 import au.iapp.lunch.ui.features.shared.toView
 import au.iapp.lunch.ui.theme.LunchText
 import au.iapp.lunch.ui.theme.LunchTextRole
@@ -97,7 +96,7 @@ fun PaywallScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.weight(1f),
                 )
                 state.purchaseError?.let {
-                    LunchText(text = errorToast(it), role = LunchTextRole.Caption, color = colors.danger, modifier = Modifier.padding(horizontal = TokenSpacing.page, vertical = TokenSpacing.sm))
+                    LunchText(text = stringResource(purchaseErrorMessage(it)), role = LunchTextRole.Caption, color = colors.danger, modifier = Modifier.padding(horizontal = TokenSpacing.page, vertical = TokenSpacing.sm))
                 }
             }
         }

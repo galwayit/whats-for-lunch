@@ -152,8 +152,8 @@ fun RatingLabel(rating: Double, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(TokenSpacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        LunchIconView(icon = LunchIcon.Star, size = RestaurantCardDefaults.ratingIconSize, filled = true, tint = colors.primary)
-        LunchText(text = formatted, role = LunchTextRole.Heading, color = colors.primary)
+        LunchIconView(icon = LunchIcon.Star, size = RestaurantCardDefaults.ratingIconSize, filled = true, tint = colors.accent)
+        LunchText(text = formatted, role = LunchTextRole.Heading, color = colors.text)
     }
 }
 
