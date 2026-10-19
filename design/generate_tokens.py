@@ -63,8 +63,9 @@ def gen_swift(t):
     lines.append(f"        public static let textScaleMax: CGFloat = {t['typography']['textScale']['max']}")
     for role, r in t["typography"]["roles"].items():
         upper = "true" if r.get("uppercase") else "false"
+        display = "true" if r.get("family") == "display" else "false"
         lines.append(
-            f"        public static let {role} = TextRole(size: {r['size']}, weight: {r['weight']}, lineHeight: {r['lineHeight']}, tracking: {r['tracking']}, uppercase: {upper})"
+            f"        public static let {role} = TextRole(size: {r['size']}, weight: {r['weight']}, lineHeight: {r['lineHeight']}, tracking: {r['tracking']}, uppercase: {upper}, display: {display})"
         )
     lines.append("    }")
     lines.append("")
@@ -88,6 +89,8 @@ def gen_swift(t):
     lines.append("")
     lines.append("public struct TextRole {")
     lines.append("    public let size: CGFloat; public let weight: Int; public let lineHeight: CGFloat; public let tracking: CGFloat; public let uppercase: Bool")
+    lines.append("    /// True for roles set in the bundled display family; false for the system text face.")
+    lines.append("    public let display: Bool")
     lines.append("    public var fontWeight: Font.Weight {")
     lines.append("        switch weight { case 800: return .heavy; case 700: return .bold; case 600: return .semibold; case 500: return .medium; default: return .regular }")
     lines.append("    }")
@@ -131,7 +134,8 @@ def gen_kotlin(t):
     lines.append("    }")
     lines.append("}")
     lines.append("")
-    lines.append("data class TextRole(val size: Int, val weight: Int, val lineHeight: Int, val tracking: Double, val uppercase: Boolean)")
+    lines.append("/** [display] is true for roles set in the bundled display family; false for the system text face. */")
+    lines.append("data class TextRole(val size: Int, val weight: Int, val lineHeight: Int, val tracking: Double, val uppercase: Boolean, val display: Boolean)")
     lines.append("")
     lines.append("object TokenType {")
     lines.append(f"    const val FAMILY = \"{t['typography']['family']['display']}\"")
@@ -140,7 +144,8 @@ def gen_kotlin(t):
     for role, r in t["typography"]["roles"].items():
         upper = "true" if r.get("uppercase") else "false"
         # tracking is a Double in the Kotlin TextRole; json integers such as 0 must not become Int literals
-        lines.append(f"    val {role} = TextRole({r['size']}, {r['weight']}, {r['lineHeight']}, {float(r['tracking'])}, {upper})")
+        display = "true" if r.get("family") == "display" else "false"
+        lines.append(f"    val {role} = TextRole({r['size']}, {r['weight']}, {r['lineHeight']}, {float(r['tracking'])}, {upper}, {display})")
     lines.append("}")
     lines.append("")
     for group in ("spacing", "radius", "size"):

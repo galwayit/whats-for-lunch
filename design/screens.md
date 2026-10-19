@@ -42,8 +42,9 @@ screen from anywhere.
 
 - Header with back. Craving field id `craving_field`, `Ask` button.
 - Results: cards id `ai_result_{i}` with confidence chip, reasoning paragraph, investment summary, actions.
-- Free gate: after the daily limit the `Ask` action shows the UpsellRow `gate.ai.*` with reset time; CTA `See Lunch Pro` opens Paywall.
+- Free AI allowance: one successful request per UTC day, after sign-in and consent. The next attempt opens Paywall; dismissing it leaves the first result and an upgrade/reset message available. Subscribers have 10 requests per UTC day, shared with group suggestions; exhaustion shows the reset time without an upgrade prompt.
 - History section (last 5) for Pro; free shows today's only.
+- Consent: until the user agrees, `Ask` (and the automatic ask from `Why this?`) shows a card with `ai.consent.*` instead of sending anything; ids `ai_consent_card`, `ai_consent_agree`, `ai_consent_decline`. Agreeing sends the held request and is remembered per install; `Not now` drops it. Launch argument `-aiDataSharingConsent 1` pre-grants it for screenshot and Maestro runs.
 
 ## 4. Discover
 
@@ -82,7 +83,8 @@ screen from anywhere.
 
 - Create: name field id `group_name_field`, date and time picker (default next weekday 12:30), area (current location, radius chips 1, 2, 5 km), CTA `Propose places` → calls `GroupRepository.create` then `propose`.
 - Proposals: three ProposalCards id `proposal_card_{i}` with `Choose` id `proposal_card_{i}_choose`.
-- Group detail: place and time, invite link text id `invite_link_text`, `Share invite` (system share sheet), guest list with RSVP status, reminder toggle, `Cancel lunch`.
+- Group detail: place and time, invite link text id `invite_link_text`, `Share invite` (system share sheet), `Show QR code` id `invite_qr_button` next to it, guest list with RSVP status, reminder toggle, `Cancel lunch`.
+- QR sheet (from `Show QR code`): title `Scan to join`, the invite URL encoded as a QR code id `invite_qr_image` (error correction M, a light quiet zone of at least 4 modules on every side, dark modules on a light background in both themes so any camera can scan it), `group.qr.body` under it, and the invite link text. Generated on the device; no network. In person on iPhones, `Share invite` plus holding the phones top to top uses AirDrop; the QR code covers Android guests and AirDrop being off.
 - Gate: a free user tapping `Plan a group lunch` sees `gate.host.*` → Paywall; a signed-out Pro user sees the sign-in sheet first.
 
 ## 11. Invitation (guest)
@@ -91,9 +93,39 @@ screen from anywhere.
 - After accepting: `You're in`, `Add to calendar`, `Directions`. After declining: `Maybe next time`.
 - Guests who have accepted two invitations see the soft `gate.guest_offer.*` card once.
 
+## 12. Split the bill (sheet)
+
+Free for everyone. A calculator only: no money moves and nothing is sent to the backend. Maths
+comes from the core's `BillSplitEngine` (Kotlin; `SwiftBillSplitEngine` on iOS), pinned to
+`shared/src/commonTest/resources/fixtures/bill_split_vectors.json`. Money is whole cents.
+
+- Entry from Track: text button `Split bill` id `split_bill_button` next to the cost field. Opens
+  the sheet with the bill prefilled from the cost field (if valid) and 2 people (`You`,
+  `Person 2`), with a stepper id `split_people_stepper` (1 to 50). `Use my share` puts my share in
+  the cost field and, if notes are empty, sets them to `split.note`; the sheet closes and the user
+  logs the meal as usual.
+- Entry from Group detail (host, once a place is confirmed): `Split the bill` id
+  `group_split_button`. People are `You` then every accepted RSVP by display name; no stepper.
+  `Use my share` logs a meal straight away (type lunch, the group's restaurant, date = the
+  scheduled time, cost = my share, notes = `split.note`) and shows the `Logged` toast.
+- Sheet: title `Split the bill`; bill field id `split_bill_field`; surcharge percent field id
+  `split_surcharge_field` with `split.surcharge.help`; one row per person with an amount field id
+  `split_person_{i}_amount` (i from 0, `You` is 0). Rows show the computed share. Typing in a row
+  adjusts it: the row shows an `Adjusted` tag and `Reset` id `split_person_{i}_reset`, and the
+  other rows rebalance live. A total line (`split.total` or `split.total.surcharge`). Engine
+  errors show inline under the rows (`split.error.*`) and disable both buttons.
+- `Pay me at` field id `split_payid_field`, optional, remembered on the device only (UserDefaults
+  / DataStore), never sent anywhere, with `split.payid.note`.
+- `Share` id `split_share_button` opens the system share sheet with plain text: `split.message.header`
+  (place name or `split.message.place_fallback`, total, people), one `split.message.line` per
+  person, `split.message.pay` when set, then `split.message.footer`. `Use my share` id
+  `split_use_share_button`.
+
 ## Test ids summary
 
 `onboarding_name_field`, `hero_hungry_button`, `recommendation_card`, `craving_field`, `ai_result_{i}`,
 `restaurant_card_{i}`, `favourite_button_{i}`, `favourite_button_{i}_selected`, `meal_place_field`,
 `meal_cost_field`, `paywall_cta`, `group_name_field`, `proposal_card_{i}`, `proposal_card_{i}_choose`,
-`invite_link_text`.
+`invite_link_text`, `split_bill_button`, `group_split_button`, `split_bill_field`, `split_surcharge_field`,
+`split_people_stepper`, `split_person_{i}_amount`, `split_person_{i}_reset`, `split_payid_field`,
+`split_share_button`, `split_use_share_button`, `invite_qr_button`, `invite_qr_image`.
