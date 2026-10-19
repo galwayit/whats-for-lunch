@@ -7,6 +7,7 @@ import au.iapp.lunch.core.api.LunchCore
 import au.iapp.lunch.core.di.coreModule
 import au.iapp.lunch.core.platform.SystemClock
 import au.iapp.lunch.core.platform.createHttpEngine
+import au.iapp.lunch.core.service.validatePurchasesConfig
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.dsl.koinApplication
 
@@ -27,6 +28,7 @@ object LunchCoreFactory {
 
     /** Test seam: the backend client uses [httpEngine] (e.g. Ktor's MockEngine). */
     internal fun start(config: CoreConfig, location: LocationProvider, clock: Clock, httpEngine: HttpClientEngine): LunchCore {
+        validatePurchasesConfig(config)
         val app = koinApplication { modules(coreModule(config, location, clock, httpEngine)) }
         return LunchCoreImpl(app.koin)
     }

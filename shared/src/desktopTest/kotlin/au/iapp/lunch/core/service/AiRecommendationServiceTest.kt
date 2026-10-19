@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -39,7 +40,7 @@ class AiRecommendationServiceTest {
     private val users = UserRepositoryImpl(db, clock, scope)
     private val meals = MealRepositoryImpl(db, clock)
     private val usage = AiUsage(db, clock)
-    private val gates = GateServiceImpl(entitlements, FakeAuthRepository(), users, usage)
+    private val gates = GateServiceImpl(entitlements, FakeAuthRepository(au.iapp.lunch.core.model.AuthSession("user-1", null, "Sam")), users, usage)
     private val service = AiRecommendationServiceImpl(
         db = db,
         backend = backend.client(),
@@ -61,11 +62,55 @@ class AiRecommendationServiceTest {
         backend.route("ai-recommend", AiRecommendResponse.serializer(), AiRecommendResponse(Samples.recommendation(restaurants = listOf(candidates[1]))))
 
     @Test
+    fun declining_consent_makes_no_provider_requests() = runTest {
+        val error = service.recommend("lunch", 3, emptyList(), consentVersion = null).exceptionOrNull()
+        assertEquals("AI_CONSENT_REQUIRED", assertIs<CoreError.Service>(error).code)
+        assertTrue(backend.requests.isEmpty())
+    }
+
+    @Test
+    fun asking_without_candidates_fetches_places_before_ai() = runTest {
+        backend.route("places-nearby", au.iapp.lunch.core.network.PlacesNearbyResponse.serializer(),
+            au.iapp.lunch.core.network.PlacesNearbyResponse(candidates))
+        serveRecommendation()
+        service.recommend("lunch", 3, emptyList(), consentVersion = "preview-ai-v2").getOrThrow()
+        assertEquals(listOf("places-nearby", "ai-recommend"), backend.requests.map { it.url.encodedPath.substringAfterLast('/') })
+        assertTrue(backend.lastBody().contains("\"aiConsentVersion\":\"preview-ai-v2\""))
+        assertTrue(backend.lastBody().contains("place-1"))
+    }
+
+    @Test
+    fun saved_chain_preference_filters_explicit_candidates_before_ai() = runTest {
+        val prefs = users.current.value!!.preferences.copy(includeChains = false)
+        users.updatePreferences(prefs).getOrThrow()
+        users.current.first { it?.preferences?.includeChains == false }
+        serveRecommendation()
+
+        service.recommend("lunch", 3, candidates + Samples.restaurant("hungry-jacks", "Hungry Jack’s"), consentVersion = "preview-ai-v2").getOrThrow()
+
+        assertFalse(backend.lastBody().contains("hungry-jacks"))
+        assertTrue(backend.lastBody().contains("place-1"))
+        assertTrue(backend.lastBody().contains("\"includeChains\":false"))
+    }
+
+    @Test
+    fun only_excluded_chains_does_not_call_ai_or_consume_allowance() = runTest {
+        users.updatePreferences(users.current.value!!.preferences.copy(includeChains = false)).getOrThrow()
+        users.current.first { it?.preferences?.includeChains == false }
+
+        val error = service.recommend(null, 3, listOf(Samples.restaurant("hungry-jacks", "Hungry Jack's Burgers")), consentVersion = "preview-ai-v2").exceptionOrNull()
+
+        assertEquals("NO_CANDIDATES", assertIs<CoreError.Service>(error).code)
+        assertTrue(backend.requests.isEmpty())
+        assertEquals(0, service.usedToday(1))
+    }
+
+    @Test
     fun recommend_persists_the_row_context_usage_and_restaurants() = runTest {
         serveRecommendation()
         meals.log(Meal(userId = 1, mealType = "lunch", cost = 18.5, dateEpochSeconds = clock.now - TestClock.DAY)).getOrThrow()
 
-        val recommendation = service.recommend("light", 3, candidates).getOrThrow()
+        val recommendation = service.recommend("light", 3, candidates, consentVersion = "preview-ai-v2").getOrThrow()
 
         assertEquals(1L, recommendation.userId, "the backend's userId 0 is replaced by the local id")
         val row = db.aiRecommendationsQueries.selectById("rec-1").executeAsOne()
@@ -89,14 +134,23 @@ class AiRecommendationServiceTest {
     }
 
     @Test
-    fun second_free_request_of_the_day_is_gated_locally_without_a_round_trip() = runTest {
+    fun second_free_request_is_gated_before_places_or_ai_requests() = runTest {
         serveRecommendation()
-        service.recommend(null, 3, candidates).getOrThrow()
-
-        val error = service.recommend(null, 3, candidates).exceptionOrNull()
-
-        assertEquals(CoreError.Gate(GateReason.AI_DAILY_LIMIT), error)
+        service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").getOrThrow()
+        for (pool in listOf(emptyList(), candidates)) {
+            val error = service.recommend(null, 3, pool, consentVersion = "preview-ai-v2").exceptionOrNull()
+            assertEquals(CoreError.Gate(GateReason.AI_DAILY_LIMIT), error)
+        }
         assertEquals(1, backend.requests.size)
+        assertEquals(1, service.usedToday(1))
+    }
+
+    @Test
+    fun server_quota_denial_is_a_gate_even_when_local_usage_is_empty() = runTest {
+        backend.fail("ai-recommend", HttpStatusCode.PaymentRequired, "AI_DAILY_LIMIT", "Quota")
+        val error = service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").exceptionOrNull()
+        assertEquals(CoreError.Gate(GateReason.AI_DAILY_LIMIT), error)
+        assertEquals(0, service.usedToday(1))
     }
 
     @Test
@@ -106,7 +160,7 @@ class AiRecommendationServiceTest {
         clock.advance(1)
         backend.fail("ai-recommend", HttpStatusCode.PaymentRequired, "AI_DAILY_LIMIT", "Quota")
 
-        val error = service.recommend(null, 3, candidates).exceptionOrNull()
+        val error = service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").exceptionOrNull()
 
         assertEquals(CoreError.Gate(GateReason.AI_DAILY_LIMIT), error)
         assertEquals(1, backend.requests.size)
@@ -116,9 +170,27 @@ class AiRecommendationServiceTest {
     }
 
     @Test
+    fun pro_provider_failure_preserves_access_and_allowance_and_allows_retry() = runTest {
+        entitlements.setPro(true)
+        backend.fail("ai-recommend", HttpStatusCode.ServiceUnavailable, "AI_UNAVAILABLE", "AI unavailable")
+
+        val error = service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").exceptionOrNull()
+
+        assertEquals("AI_UNAVAILABLE", assertIs<CoreError.Service>(error).code)
+        assertTrue(entitlements.isPro.value)
+        assertEquals(0, service.usedToday(1))
+        assertTrue(service.history(1, 10).getOrThrow().isEmpty())
+
+        serveRecommendation()
+        service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").getOrThrow()
+        assertEquals(1, service.usedToday(1))
+        assertEquals(1, service.history(1, 10).getOrThrow().size)
+    }
+
+    @Test
     fun history_and_feedback_round_trip_through_the_local_tables() = runTest {
         serveRecommendation()
-        service.recommend(null, 3, candidates).getOrThrow()
+        service.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").getOrThrow()
 
         val history = service.history(1, 10).getOrThrow()
         assertEquals("rec-1", history.single().id)
@@ -153,7 +225,7 @@ class AiRecommendationServiceTest {
             FakeLocationProvider(null), AiContextBuilder(MealDefaultsImpl(), clock), AiUsage(emptyDb, clock), clock,
         )
 
-        val error = noUser.recommend(null, 3, candidates).exceptionOrNull()
+        val error = noUser.recommend(null, 3, candidates, consentVersion = "preview-ai-v2").exceptionOrNull()
 
         assertEquals(AiRecommendationServiceImpl.NO_USER, assertIs<CoreError.Service>(error).code)
     }

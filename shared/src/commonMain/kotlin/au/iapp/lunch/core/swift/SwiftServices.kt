@@ -17,9 +17,12 @@ import au.iapp.lunch.core.api.PushRegistrar
 import au.iapp.lunch.core.model.AiRecommendation
 import au.iapp.lunch.core.model.AuthSession
 import au.iapp.lunch.core.model.CoreError
+import au.iapp.lunch.core.model.GroupSuggestion
+import au.iapp.lunch.core.model.GroupSuggestionDraft
 import au.iapp.lunch.core.model.GroupProposal
 import au.iapp.lunch.core.model.Invitation
 import au.iapp.lunch.core.model.Location
+import au.iapp.lunch.core.model.GroupDetails
 import au.iapp.lunch.core.model.LunchGroup
 import au.iapp.lunch.core.model.ProOfferings
 import au.iapp.lunch.core.model.Restaurant
@@ -32,13 +35,15 @@ import kotlinx.coroutines.flow.StateFlow
 
 /** Swift view of [AiRecommendationService]. */
 class SwiftAiRecommendationService(private val ai: AiRecommendationService) {
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun configuration(): au.iapp.lunch.core.model.AiConfiguration = unwrap { ai.configuration() }
     /**
      * Calls the backend, which enforces the daily quota and picks the model by tier.
      * The client also pre-checks GateService so the paywall shows without a round trip.
      */
     @Throws(CoreError::class, CancellationException::class)
-    suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>): AiRecommendation =
-        unwrap { ai.recommend(cravings, maxResults, candidates) }
+    suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>, consentVersion: String? = null): AiRecommendation =
+        unwrap { ai.recommend(cravings, maxResults, candidates, consentVersion) }
 
     @Throws(CoreError::class, CancellationException::class)
     suspend fun history(userId: Long, limit: Int): List<AiRecommendation> = unwrap { ai.history(userId, limit) }
@@ -90,7 +95,25 @@ class SwiftAuthRepository(private val auth: AuthRepository) {
         unwrap { auth.signInWithApple(idToken, nonce, fullName) }
 
     @Throws(CoreError::class, CancellationException::class)
-    suspend fun signInWithGoogle(idToken: String): AuthSession = unwrap { auth.signInWithGoogle(idToken) }
+    suspend fun signInWithGoogle(idToken: String, nonce: String, accessToken: String?): AuthSession = unwrap { auth.signInWithGoogle(idToken, nonce, accessToken) }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun signInWithEmail(email: String, password: String): AuthSession = unwrap { auth.signInWithEmail(email, password) }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun registerWithEmail(email: String, password: String): Boolean = unwrap { auth.registerWithEmail(email, password) }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun verifyEmail(email: String, code: String): AuthSession = unwrap { auth.verifyEmail(email, code) }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun resendVerification(email: String) { unwrap { auth.resendVerification(email) } }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun requestPasswordReset(email: String) { unwrap { auth.requestPasswordReset(email) } }
+
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun resetPassword(email: String, code: String, newPassword: String): AuthSession = unwrap { auth.resetPassword(email, code, newPassword) }
 
     @Throws(CoreError::class, CancellationException::class)
     suspend fun signOut() {
@@ -98,22 +121,26 @@ class SwiftAuthRepository(private val auth: AuthRepository) {
     }
 
     @Throws(CoreError::class, CancellationException::class)
-    suspend fun deleteAccount() {
-        unwrap { auth.deleteAccount() }
+    suspend fun deleteAccount(appleAuthorizationCode: String? = null) {
+        unwrap { auth.deleteAccount(appleAuthorizationCode) }
     }
 }
 
 /** Swift view of [GroupRepository]. */
 class SwiftGroupRepository(private val groups: GroupRepository) {
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun loadGroups(): List<LunchGroup> = unwrap { groups.loadGroups() }
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun loadRsvps(groupId: String): List<Rsvp> = unwrap { groups.loadRsvps(groupId) }
     fun myGroups(): Flow<List<LunchGroup>> = groups.myGroups()
 
     /** Host only. Backend verifies the Pro entitlement. */
     @Throws(CoreError::class, CancellationException::class)
-    suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double): LunchGroup =
-        unwrap { groups.create(name, scheduledAtEpochSeconds, area, radiusKm) }
+    suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double, details: GroupDetails): LunchGroup =
+        unwrap { groups.create(name, scheduledAtEpochSeconds, area, radiusKm, details) }
 
     @Throws(CoreError::class, CancellationException::class)
-    suspend fun propose(groupId: String): List<GroupProposal> = unwrap { groups.propose(groupId) }
+    suspend fun propose(groupId: String, consentVersion: String? = null): List<GroupProposal> = unwrap { groups.propose(groupId, consentVersion) }
 
     @Throws(CoreError::class, CancellationException::class)
     suspend fun confirmPlace(groupId: String, restaurant: Restaurant): LunchGroup =
@@ -126,6 +153,18 @@ class SwiftGroupRepository(private val groups: GroupRepository) {
     suspend fun respond(code: String, status: RsvpStatus, displayName: String?): Invitation =
         unwrap { groups.respond(code, status, displayName) }
 
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun suggest(code: String, draft: GroupSuggestionDraft, displayName: String?): Invitation = unwrap { groups.suggest(code, draft, displayName) }
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun suggestions(groupId: String): List<GroupSuggestion> = unwrap { groups.suggestions(groupId) }
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun reviewSuggestion(groupId: String, suggestionId: String, accept: Boolean): LunchGroup = unwrap { groups.reviewSuggestion(groupId, suggestionId, accept) }
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun updateDetails(groupId: String, details: GroupDetails): LunchGroup = unwrap { groups.updateDetails(groupId, details) }
+    @Throws(CoreError::class, CancellationException::class)
+    suspend fun safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String) {
+        unwrap { groups.safetyAction(code, targetKind, targetId, action, reason) }
+    }
     fun rsvps(groupId: String): Flow<List<Rsvp>> = groups.rsvps(groupId)
 
     @Throws(CoreError::class, CancellationException::class)

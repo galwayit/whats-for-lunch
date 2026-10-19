@@ -41,6 +41,15 @@ internal object DatabaseOpener {
             driver.close()
             throw CoreError.Service(DB_OPEN_FAILED, e.message ?: "Could not open the database")
         }
+        // The old app persisted full Google Places responses. Only IDs are retained now.
+        driver.execute(null, "DELETE FROM restaurant_cache", 0)
+        driver.execute(null, """UPDATE restaurants SET name='Saved place', location='', address=NULL,
+            phone_number=NULL, website=NULL, latitude=NULL, longitude=NULL, distance_from_user=NULL,
+            rating=NULL, review_count=NULL, price_level=NULL, price_ranges='[]', cuisine_type=NULL,
+            cuisine_types='[]', supported_dietary_restrictions='[]', allergen_info='[]', dietary_compatibility_scores='{}',
+            has_verified_dietary_info=0, community_verification_count=0, opening_hours='[]', is_open_now=0,
+            current_wait_time=NULL, features='[]', average_meal_cost=NULL, value_score=NULL, meal_type_average_costs='{}',
+            cached_at=0, last_verified=NULL, photo_reference=NULL, photo_references='[]'""", 0)
         return LunchDatabase(driver)
     }
 

@@ -34,11 +34,12 @@ internal class AiContextBuilder(
         return AiContext(
             mealType = mealDefaults.smartMealType(local.hour),
             budgetRange = "$".repeat(prefs.budgetLevel.coerceIn(1, 4)),
-            dietaryPreferences = DietaryContext(prefs.dietaryRestrictions, prefs.allergens),
+            dietaryPreferences = DietaryContext(prefs.dietaryRestrictions, prefs.allergens, prefs.requireDietaryVerification),
             recentMeals = recentMeals.take(MAX_RECENT_MEALS).map { summarise(it, now) },
             location = LocationContext(location != null, location?.latitude, location?.longitude),
             temporal = TemporalContext(local.hour, dayOfWeek, dayOfWeek >= 6),
             preferenceScores = preferenceScores(recentMeals),
+            includeChains = prefs.includeChains,
         )
     }
 

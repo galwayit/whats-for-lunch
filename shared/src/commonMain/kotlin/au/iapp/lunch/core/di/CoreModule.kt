@@ -32,14 +32,17 @@ import au.iapp.lunch.core.engine.RecommendationEngineImpl
 import au.iapp.lunch.core.network.BackendClient
 import au.iapp.lunch.core.network.BackendHeaders
 import au.iapp.lunch.core.network.KtorBackendClient
+import au.iapp.lunch.core.service.AccountEntitlementRepository
 import au.iapp.lunch.core.service.AiContextBuilder
 import au.iapp.lunch.core.service.AiRecommendationServiceImpl
 import au.iapp.lunch.core.service.AiUsage
 import au.iapp.lunch.core.service.AuthRepositoryImpl
 import au.iapp.lunch.core.service.GateServiceImpl
 import au.iapp.lunch.core.service.GroupRepositoryImpl
+import au.iapp.lunch.core.service.PurchasesDisabledEntitlementRepository
 import au.iapp.lunch.core.service.PushRegistrarImpl
 import au.iapp.lunch.core.service.createEntitlementRepository
+import au.iapp.lunch.core.service.purchasesDisabled
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -47,6 +50,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.HttpClientEngine
+import kotlinx.coroutines.flow.map
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -79,12 +84,25 @@ internal fun coreModule(
     single<LunchDatabase> { DatabaseFactory.open(config.databasePath) }
     single<SupabaseClient> {
         createSupabaseClient(config.supabaseUrl, config.supabaseAnonKey) {
+            // Same engine as the backend client, so tests can answer Supabase REST calls too.
+            this.httpEngine = httpEngine
             install(Auth)
             install(Postgrest)
             install(Functions)
         }
     }
-    single<EntitlementRepository> { createEntitlementRepository(config.revenueCatApiKey, get()) }
+    single<EntitlementRepository> {
+        if (config.purchasesDisabled) {
+            // validatePurchasesConfig already required isDebug and the id.
+            PurchasesDisabledEntitlementRepository(config.anonymousAppUserId!!)
+        } else {
+            val supabase = get<SupabaseClient>()
+            AccountEntitlementRepository(createEntitlementRepository(config.revenueCatApiKey, get()), get(),
+                supabase.auth.sessionStatus.map { (it as? SessionStatus.Authenticated)?.session?.user?.id }) {
+                supabase.auth.currentUserOrNull()?.id
+            }
+        }
+    }
     single {
         val supabase = get<SupabaseClient>()
         val entitlements = get<EntitlementRepository>()
@@ -95,23 +113,27 @@ internal fun coreModule(
             timeZoneId = { clock.timeZoneId() },
         )
     }
-    single<BackendClient> { KtorBackendClient(config.backendBaseUrl, get(), httpEngine) }
+    single<BackendClient> { KtorBackendClient(config.backendBaseUrl, get(), httpEngine, au.iapp.lunch.core.network.createGuestTokenStore()) }
 
     // Repositories over the local database.
     single<UserRepository> { UserRepositoryImpl(get(), get(), get()) }
     single<MealRepository> { MealRepositoryImpl(get(), get()) }
     single<RestaurantRepository> { RestaurantRepositoryImpl(get(), get(), get()) }
-    single<FavouritesRepository> { FavouritesRepositoryImpl(get(), get(), get()) }
+    single<FavouritesRepository> { FavouritesRepositoryImpl(get(), get(), get(), get()) }
     single<AchievementRepository> { AchievementRepositoryImpl(get(), get(), get()) }
 
     // Services.
     single { AiUsage(get(), get()) }
     single { AiContextBuilder(get(), get()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get()) }
     single<GateService> { GateServiceImpl(get(), get(), get(), get()) }
     single<AiRecommendationService> {
-        AiRecommendationServiceImpl(get(), get(), get(), get(), get(), get(), get(), get(), get())
+        AiRecommendationServiceImpl(get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
     single<GroupRepository> { GroupRepositoryImpl(get(), get(), get()) }
-    single<PushRegistrar> { PushRegistrarImpl(get()) }
+    single {
+        val supabase = get<SupabaseClient>()
+        PushRegistrarImpl(get(), au.iapp.lunch.core.network.createGuestTokenStore()) { supabase.auth.currentUserOrNull() != null }
+    }
+    single<PushRegistrar> { get<PushRegistrarImpl>() }
 }

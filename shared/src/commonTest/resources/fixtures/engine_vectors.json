@@ -1548,14 +1548,14 @@
     {
       "prefs": "frugal_far",
       "rejected": [],
-      "expected": "r8"
+      "expected": "r1"
     },
     {
       "prefs": "frugal_far",
       "rejected": [
         "r1"
       ],
-      "expected": "r8"
+      "expected": "r9"
     },
     {
       "prefs": "frugal_far",
@@ -1565,7 +1565,7 @@
         "r9",
         "r6"
       ],
-      "expected": "r8"
+      "expected": "r4"
     },
     {
       "prefs": "frugal_far",
@@ -1585,14 +1585,14 @@
     {
       "prefs": "veg_strict",
       "rejected": [],
-      "expected": "r6"
+      "expected": null
     },
     {
       "prefs": "veg_strict",
       "rejected": [
         "r1"
       ],
-      "expected": "r6"
+      "expected": null
     },
     {
       "prefs": "veg_strict",
@@ -1602,7 +1602,7 @@
         "r9",
         "r6"
       ],
-      "expected": "r3"
+      "expected": null
     },
     {
       "prefs": "veg_strict",
@@ -2089,9 +2089,7 @@
     },
     {
       "prefs": "veg_strict",
-      "expected": [
-        "r7"
-      ]
+      "expected": []
     },
     {
       "prefs": "unverified_ok",
@@ -2146,7 +2144,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r1",
@@ -2155,7 +2153,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r2",
@@ -2180,7 +2178,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r2",
@@ -2189,7 +2187,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r3",
@@ -2214,7 +2212,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r3",
@@ -2223,7 +2221,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r4",
@@ -2248,7 +2246,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r4",
@@ -2257,7 +2255,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r5",
@@ -2282,7 +2280,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r5",
@@ -2291,7 +2289,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r6",
@@ -2305,7 +2303,7 @@
         "vegetarian"
       ],
       "allergens": [],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r6",
@@ -2316,7 +2314,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3666666666666667
+      "expected": 0.0
     },
     {
       "placeId": "r6",
@@ -2325,7 +2323,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 0.55
+      "expected": 0.0
     },
     {
       "placeId": "r7",
@@ -2350,7 +2348,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.9666666666666667
+      "expected": 0.6333333333333333
     },
     {
       "placeId": "r7",
@@ -2359,7 +2357,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r8",
@@ -2384,7 +2382,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.3333333333333333
+      "expected": 0.0
     },
     {
       "placeId": "r8",
@@ -2393,7 +2391,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     },
     {
       "placeId": "r9",
@@ -2407,7 +2405,7 @@
         "vegetarian"
       ],
       "allergens": [],
-      "expected": 0.5
+      "expected": 0.0
     },
     {
       "placeId": "r9",
@@ -2418,7 +2416,7 @@
       "allergens": [
         "peanuts"
       ],
-      "expected": 0.5
+      "expected": 0.0
     },
     {
       "placeId": "r9",
@@ -2427,7 +2425,7 @@
         "peanuts",
         "dairy"
       ],
-      "expected": 1.0
+      "expected": 0.0
     }
   ],
   "budget": {
@@ -3121,7 +3119,7 @@
       "expected2": "1.00"
     },
     {
-      "value": 1e-7,
+      "value": 1e-07,
       "expected": "0.0",
       "expected2": "0.00"
     },

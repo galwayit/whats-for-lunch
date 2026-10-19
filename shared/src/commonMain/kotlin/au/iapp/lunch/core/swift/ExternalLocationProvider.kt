@@ -53,6 +53,7 @@ class ExternalLocationProvider(private val firstFixTimeoutMillis: Long) : Locati
 
     private val fix = MutableStateFlow<Location?>(null)
     private val permission = MutableStateFlow(false)
+    private val searchArea = MutableStateFlow<Location?>(null)
 
     /** Latest fix, null until [update] is called. Observable from Swift as well. */
     val location: StateFlow<Location?> = fix.asStateFlow()
@@ -73,6 +74,15 @@ class ExternalLocationProvider(private val firstFixTimeoutMillis: Long) : Locati
         fix.value = null
     }
 
+    /** A user-selected search centre is independent of device-location permission. */
+    fun setSearchArea(latitude: Double, longitude: Double) {
+        require(latitude.isFinite() && latitude in -90.0..90.0)
+        require(longitude.isFinite() && longitude in -180.0..180.0)
+        searchArea.value = Location(latitude, longitude)
+    }
+
+    fun clearSearchArea() { searchArea.value = null }
+
     /** Records the authorisation status. Denying also clears the last fix. */
     fun setPermission(granted: Boolean) {
         permission.value = granted
@@ -80,6 +90,7 @@ class ExternalLocationProvider(private val firstFixTimeoutMillis: Long) : Locati
     }
 
     override suspend fun current(): Result<Location> {
+        searchArea.value?.let { return Result.success(it) }
         if (!permission.value) {
             return Result.failure(CoreError.Service(LOCATION_PERMISSION_DENIED, "Location permission not granted"))
         }

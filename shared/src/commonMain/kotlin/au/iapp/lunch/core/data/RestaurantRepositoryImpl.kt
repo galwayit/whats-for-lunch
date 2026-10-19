@@ -24,6 +24,9 @@ internal class RestaurantRepositoryImpl(
     private val backend: BackendClient,
     private val clock: Clock,
 ) : RestaurantRepository {
+    // Transient display state only; Google fields never enter the on-disk cache.
+    private val visiblePlaces = mutableMapOf<String, Restaurant>()
+
 
     override suspend fun searchNearby(
         location: Location,
@@ -58,14 +61,14 @@ internal class RestaurantRepositoryImpl(
         coreResult { backend.placesDetails(placeId).reviews }
 
     override suspend fun cached(placeId: String): Restaurant? = dbRead {
-        db.restaurantsQueries.selectByPlaceId(placeId).executeAsOneOrNull()?.toRestaurant()
+        visiblePlaces[placeId] ?: db.restaurantsQueries.selectByPlaceId(placeId).executeAsOneOrNull()?.toRestaurant()?.takeIf { it.name != "Saved place" }
     }
 
     override suspend fun cacheAll(restaurants: List<Restaurant>) {
         if (restaurants.isEmpty()) return
         withContext(DbDispatcher) {
             val now = clock.nowEpochSeconds()
-            db.transaction { restaurants.forEach { db.restaurantsQueries.upsert(it, now) } }
+            db.transaction { restaurants.forEach { remember(it); db.restaurantsQueries.upsert(it, now) } }
         }
     }
 
@@ -91,7 +94,7 @@ internal class RestaurantRepositoryImpl(
         }
         if (ids.isEmpty()) return emptyList()
         val byId = db.restaurantsQueries.selectByPlaceIds(ids).executeAsList().associateBy { it.place_id }
-        return ids.mapNotNull { byId[it]?.toRestaurant() }
+        return ids.mapNotNull { byId[it]?.toRestaurant()?.takeIf { place -> place.name != "Saved place" } }
     }
 
     private fun store(key: CacheKey, restaurants: List<Restaurant>) {
@@ -99,8 +102,9 @@ internal class RestaurantRepositoryImpl(
         db.transaction {
             db.restaurantCacheQueries.deleteForKey(key.query, key.latitude, key.longitude)
             restaurants.forEach { restaurant ->
+                remember(restaurant)
                 db.restaurantsQueries.upsert(restaurant, now)
-                db.restaurantCacheQueries.upsert(
+                if (restaurant.googleMapsUri == null) db.restaurantCacheQueries.upsert(
                     place_id = restaurant.placeId,
                     search_query = key.query,
                     user_latitude = key.latitude,
@@ -110,6 +114,11 @@ internal class RestaurantRepositoryImpl(
                 )
             }
         }
+    }
+
+    private fun remember(restaurant: Restaurant) {
+        visiblePlaces[restaurant.placeId] = restaurant
+        while (visiblePlaces.size > 100) visiblePlaces.remove(visiblePlaces.keys.first())
     }
 
     /** Cached rows carry the distance from an older request point; recompute and re-apply the radius. */

@@ -4,6 +4,9 @@ import au.iapp.lunch.core.api.GroupRepository
 import au.iapp.lunch.core.api.UserRepository
 import au.iapp.lunch.core.data.coreResult
 import au.iapp.lunch.core.model.GroupProposal
+import au.iapp.lunch.core.model.GroupDetails
+import au.iapp.lunch.core.model.GroupSuggestion
+import au.iapp.lunch.core.model.GroupSuggestionDraft
 import au.iapp.lunch.core.model.Invitation
 import au.iapp.lunch.core.model.Location
 import au.iapp.lunch.core.model.LunchGroup
@@ -13,9 +16,11 @@ import au.iapp.lunch.core.model.RsvpStatus
 import au.iapp.lunch.core.network.BackendClient
 import au.iapp.lunch.core.network.GroupsConfirmRequest
 import au.iapp.lunch.core.network.GroupsCreateRequest
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -31,19 +36,31 @@ internal class GroupRepositoryImpl(
     private val users: UserRepository,
 ) : GroupRepository {
 
-    override fun myGroups(): Flow<List<LunchGroup>> = flow {
+    private val log = Logger.withTag("Groups")
+
+    // Both flows reach the server, so they can fail. A flow must never throw here: SKIE's Swift
+    // bridge and the Android collectors have no error channel, and an escaping exception
+    // terminates the app. A failed read ends the flow without emitting; the screen keeps what
+    // it had and re-collects when it reappears.
+
+    override fun myGroups(): Flow<List<LunchGroup>> = flow { emit(loadGroups().getOrThrow()) }.catch { log.w(it) { "Reading groups failed" } }
+
+    override suspend fun loadGroups(): Result<List<LunchGroup>> = coreResult {
         val rows = supabase.from("groups").select {
             filter { exact("cancelled_at", null) }
             order("scheduled_at", io.github.jan.supabase.postgrest.query.Order.ASCENDING)
         }.decodeList<GroupRow>()
-        emit(rows.map { it.toGroup() })
+        rows.map { it.toGroup() }
     }
 
-    override suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double): Result<LunchGroup> =
-        coreResult { backend.groupsCreate(GroupsCreateRequest(name, scheduledAtEpochSeconds, area.latitude, area.longitude, radiusKm)) }
+    override suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double, details: GroupDetails): Result<LunchGroup> =
+        coreResult { backend.groupsCreate(GroupsCreateRequest(name, scheduledAtEpochSeconds, area.latitude, area.longitude, radiusKm, details)) }
 
-    override suspend fun propose(groupId: String): Result<List<GroupProposal>> =
-        coreResult { backend.groupsPropose(groupId, users.current.value?.preferences) }
+    override suspend fun propose(groupId: String, consentVersion: String?): Result<List<GroupProposal>> =
+        coreResult {
+            if (consentVersion.isNullOrBlank()) throw au.iapp.lunch.core.model.CoreError.Service("AI_CONSENT_REQUIRED", "AI data sharing consent is required")
+            backend.groupsPropose(groupId, users.current.value?.preferences, consentVersion)
+        }
 
     override suspend fun confirmPlace(groupId: String, restaurant: Restaurant): Result<LunchGroup> =
         coreResult { backend.groupsConfirm(GroupsConfirmRequest(groupId, restaurant.placeId, restaurant.name, restaurant.address)) }
@@ -53,9 +70,18 @@ internal class GroupRepositoryImpl(
     override suspend fun respond(code: String, status: RsvpStatus, displayName: String?): Result<Invitation> =
         coreResult { backend.invitationsRespond(code, status, displayName) }
 
-    override fun rsvps(groupId: String): Flow<List<Rsvp>> = flow {
+    override suspend fun suggest(code: String, draft: GroupSuggestionDraft, displayName: String?): Result<Invitation> = coreResult { backend.invitationsSuggest(code, draft, displayName) }
+    override suspend fun suggestions(groupId: String): Result<List<GroupSuggestion>> = coreResult { backend.groupSuggestions(groupId) }
+    override suspend fun reviewSuggestion(groupId: String, suggestionId: String, accept: Boolean): Result<LunchGroup> = coreResult { backend.reviewSuggestion(groupId, suggestionId, accept) }
+    override suspend fun updateDetails(groupId: String, details: GroupDetails): Result<LunchGroup> = coreResult { backend.updateGroupDetails(groupId, details) }
+    override suspend fun safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String): Result<Unit> =
+        coreResult { backend.groupSafety(au.iapp.lunch.core.network.GroupSafetyRequest(code, targetKind, targetId, action, reason)) }
+
+    override fun rsvps(groupId: String): Flow<List<Rsvp>> = flow { emit(loadRsvps(groupId).getOrThrow()) }.catch { log.w(it) { "Reading RSVPs failed" } }
+
+    override suspend fun loadRsvps(groupId: String): Result<List<Rsvp>> = coreResult {
         val rows = supabase.from("rsvps").select { filter { eq("group_id", groupId) } }.decodeList<RsvpRow>()
-        emit(rows.map { it.toRsvp() })
+        rows.map { it.toRsvp() }
     }
 
     override suspend fun cancel(groupId: String): Result<Unit> =
@@ -66,6 +92,10 @@ internal class GroupRepositoryImpl(
         val id: String,
         val host_id: String,
         val host_name: String? = null,
+        val budget_per_person_minor: Long? = null,
+        val currency_code: String = "AUD",
+        val payment_arrangement: String = "undecided",
+        val payment_method: String = "undecided",
         val name: String,
         val scheduled_at: String,
         val area_lat: Double,
@@ -80,7 +110,11 @@ internal class GroupRepositoryImpl(
         fun toGroup() = LunchGroup(
             id = id,
             hostId = host_id,
-            hostName = host_name.orEmpty(),
+            hostName = host_name?.takeIf { it.isNotBlank() } ?: "Host name not provided",
+            budgetPerPersonMinor = budget_per_person_minor,
+            currencyCode = currency_code,
+            paymentArrangement = payment_arrangement,
+            paymentMethod = payment_method,
             name = name,
             scheduledAtEpochSeconds = epochSeconds(scheduled_at),
             areaLatitude = area_lat,

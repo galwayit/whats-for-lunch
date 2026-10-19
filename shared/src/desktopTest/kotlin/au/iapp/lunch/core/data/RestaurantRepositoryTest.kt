@@ -106,6 +106,24 @@ class RestaurantRepositoryTest {
     }
 
     @Test
+    fun google_content_is_displayed_with_attribution_but_only_ids_are_persisted() = runTest {
+        val google = near.copy(googleMapsUri = "https://maps.google.com/?q=fixture", photoUrl = "https://example.test/photo")
+        serveNearby(google)
+        val result = repo.searchNearby(Samples.sydney, 5.0, null, forceRefresh = false).getOrThrow().single()
+        assertEquals(google.googleMapsUri, result.googleMapsUri)
+        assertEquals("Near Sushi", repo.cached("near")?.name)
+        val stored = db.restaurantsQueries.selectByPlaceId("near").executeAsOne()
+        assertEquals("Saved place", stored.name)
+        assertEquals(null, stored.address)
+        assertEquals(null, stored.rating)
+        assertEquals(null, stored.photo_reference)
+        repo.searchNearby(Samples.sydney, 5.0, null, forceRefresh = false).getOrThrow()
+        assertEquals(2, backend.requests.size, "Google searches must fetch current provider data")
+        val restarted = RestaurantRepositoryImpl(db, backend.client(), clock)
+        assertEquals(null, restarted.cached("near"), "stale provider content must not return after restart")
+    }
+
+    @Test
     fun recordInteraction_writes_a_row_with_the_clock_time() = runTest {
         repo.recordInteraction(1, "near", "Near Sushi", "viewed", "discover")
 

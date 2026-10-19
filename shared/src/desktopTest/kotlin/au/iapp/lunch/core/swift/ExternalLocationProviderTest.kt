@@ -20,6 +20,19 @@ import kotlin.test.assertTrue
 
 class ExternalLocationProviderTest {
 
+    @Test
+    fun manual_area_works_after_permission_denial_without_claiming_device_permission() = runTest {
+        val provider = ExternalLocationProvider(firstFixTimeoutMillis = 0)
+        provider.setSearchArea(-37.81, 144.96)
+        provider.setPermission(false)
+        assertFalse(provider.hasPermission())
+        assertEquals(-37.81, provider.current().getOrThrow().latitude)
+        provider.update(0.0, 0.0)
+        assertEquals(144.96, provider.current().getOrThrow().longitude)
+        provider.clearSearchArea()
+        assertEquals(ExternalLocationProvider.LOCATION_PERMISSION_DENIED, serviceCode(provider.current()))
+    }
+
     private fun serviceCode(result: Result<*>): String = assertIs<CoreError.Service>(result.exceptionOrNull()).code
 
     @Test

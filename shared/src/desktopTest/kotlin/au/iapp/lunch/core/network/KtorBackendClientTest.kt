@@ -150,7 +150,7 @@ class KtorBackendClientTest {
         backend.route("groups-cancel", body = "")
 
         val created = client.groupsCreate(GroupsCreateRequest("Friday team lunch", 1_788_600_000, -33.87, 151.21, 2.0))
-        val proposals = client.groupsPropose("group-1", hostPreferences = null)
+        val proposals = client.groupsPropose("group-1", hostPreferences = null, consentVersion = "preview-ai-v2")
         val confirmed = client.groupsConfirm(GroupsConfirmRequest("group-1", "place-1", "Sample Sushi", "1 George St"))
         client.groupsCancel("group-1")
 
@@ -196,6 +196,61 @@ class KtorBackendClientTest {
         assertEquals(CoreError.Gate(GateReason.SIGN_IN_REQUIRED), error)
     }
 
+    @Test
+    fun guest_capability_survives_client_restart_and_is_scoped_to_invite_and_session() = runTest {
+        val tokens = MemoryGuestTokenStore()
+        val token = "a".repeat(64)
+        backend.route("invitations-respond", InvitationResponse.serializer(), InvitationResponse(Samples.invitation(RsvpStatus.ACCEPTED), guestToken = token))
+        backend.route("invitations", InvitationResponse.serializer(), InvitationResponse(Samples.invitation()))
+        val initial = KtorBackendClient(MockBackend.BASE_URL, MockBackend.anonymousHeaders(), backend.engine, tokens)
+        initial.invitationsRespond("ABCD1234", RsvpStatus.ACCEPTED, "Sam")
+        val restarted = KtorBackendClient(MockBackend.BASE_URL, MockBackend.anonymousHeaders(), backend.engine, tokens)
+        restarted.invitation("abcd1234")
+        assertEquals(token, backend.requests.last().headers["x-guest-token"])
+        restarted.invitation("EFGH5678")
+        assertEquals(null, backend.requests.last().headers["x-guest-token"])
+        val signedIn = KtorBackendClient(MockBackend.BASE_URL, MockBackend.signedInHeaders("jwt", "user-1"), backend.engine, tokens)
+        signedIn.invitation("ABCD1234")
+        assertEquals(null, backend.requests.last().headers["x-guest-token"])
+    }
+
+    @Test
+    fun suggestions_preserve_guest_capability_and_planning_fields_through_json() = runTest {
+        val tokens = MemoryGuestTokenStore()
+        val token = "c".repeat(64)
+        val group = Samples.invitation().group.copy(hostName = "Sam", budgetPerPersonMinor = 2550, paymentArrangement = "split_equally", paymentMethod = "card")
+        val suggestion = au.iapp.lunch.core.model.GroupSuggestion("suggestion", group.id, "Guest", "Cafe", "10 Test Lane", 1900000000L, "Hi", "pending", 1800000000L)
+        val invite = Samples.invitation().copy(group = group, mySuggestion = suggestion)
+        backend.route("invitations-suggest", InvitationResponse.serializer(), InvitationResponse(invite, token))
+        backend.route("invitations", InvitationResponse.serializer(), InvitationResponse(invite))
+        val guest = KtorBackendClient(MockBackend.BASE_URL, MockBackend.anonymousHeaders(), backend.engine, tokens)
+        val result = guest.invitationsSuggest("ABCD1234", au.iapp.lunch.core.model.GroupSuggestionDraft("Cafe", "10 Test Lane", 1900000000L, "Hi"), "Guest")
+        assertEquals(invite, result)
+        assertTrue(backend.lastBody().contains("\"suggestion\""))
+        guest.invitation("ABCD1234")
+        assertEquals(token, backend.requests.last().headers["x-guest-token"])
+        guest.invitation("EFGH5678")
+        assertEquals(null, backend.requests.last().headers["x-guest-token"])
+    }
+
+    @Test
+    fun safety_report_uses_only_this_invitations_capability_and_preserves_failure() = runTest {
+        val tokens = MemoryGuestTokenStore()
+        val token = "d".repeat(64)
+        backend.route("invitations", InvitationResponse.serializer(), InvitationResponse(Samples.invitation(), token))
+        backend.route("groups-safety", body = """{"recorded":true,"reportId":null}""")
+        val guest = KtorBackendClient(MockBackend.BASE_URL, MockBackend.anonymousHeaders(), backend.engine, tokens)
+        guest.invitation("ABCD1234")
+        val report = GroupSafetyRequest("ABCD1234", "group", null, "report_block", "spam")
+        guest.groupSafety(report)
+        assertEquals(token, backend.requests.last().headers["x-guest-token"])
+        assertTrue(backend.lastBody().contains("\"action\":\"report_block\""))
+        guest.groupSafety(report.copy(code = "EFGH5678"))
+        assertEquals(null, backend.requests.last().headers["x-guest-token"])
+        backend.fail("groups-safety", HttpStatusCode.ServiceUnavailable, "SERVICE_UNAVAILABLE")
+        assertTrue(runCatching { guest.groupSafety(report) }.isFailure)
+    }
+
     // ---- push and account ----
 
     @Test
@@ -217,5 +272,17 @@ class KtorBackendClientTest {
         val error = runCatching { client.accountDelete() }.exceptionOrNull()
 
         assertEquals(CoreError.Gate(GateReason.SIGN_IN_REQUIRED), error)
+    }
+
+    @Test
+    fun ai_configuration_returns_current_disclosure_and_group_request_carries_its_version() = runTest {
+        backend.route("ai-config", body = """{"consentVersion":"ai-v2-new","providers":[{"name":"Example AI","privacyUrl":"https://example.com/privacy"}]}""")
+        val config = client.aiConfiguration()
+        assertEquals(HttpMethod.Get, backend.requests.single().method)
+        assertEquals("ai-v2-new", config.consentVersion)
+        assertEquals("Example AI", config.providers.single().name)
+        backend.route("groups-propose", GroupsProposeResponse.serializer(), GroupsProposeResponse(emptyList()))
+        client.groupsPropose("group-1", null, config.consentVersion)
+        assertTrue(backend.lastBody().contains("\"aiConsentVersion\":\"ai-v2-new\""))
     }
 }

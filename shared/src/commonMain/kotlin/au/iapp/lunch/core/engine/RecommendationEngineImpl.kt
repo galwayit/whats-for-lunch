@@ -70,6 +70,8 @@ class RecommendationEngineImpl : RecommendationEngine {
         var bestScore = -1.0
         for (restaurant in candidates) {
             if (restaurant.placeId in rejected) continue
+            if (prefs?.includeChains == false && RestaurantChains.matches(restaurant.name)) continue
+            if (prefs != null && !matchesDietaryPreferences(restaurant, prefs)) continue
             val score = compatibilityScore(restaurant, prefs)
             if (score > bestScore) {
                 bestScore = score
@@ -212,14 +214,10 @@ class RecommendationEngineImpl : RecommendationEngine {
             val priceLevel = restaurant.priceLevel
             if (priceLevel != null && prefs.budgetLevel > 0 && priceLevel > prefs.budgetLevel) return@filter false
 
-            if (prefs.requireDietaryVerification && !restaurant.hasVerifiedDietaryInfo) {
-                val dietaryScore = dietaryCompatibility(restaurant, prefs.dietaryRestrictions, prefs.allergens)
-                if (dietaryScore < DIETARY_SCORE_THRESHOLD) return@filter false
-            }
+            if (!matchesDietaryPreferences(restaurant, prefs)) return@filter false
 
             if (!prefs.includeChains) {
-                val name = restaurant.name.lowercase()
-                if (CHAIN_INDICATORS.any { name.contains(it.lowercase()) }) return@filter false
+                if (RestaurantChains.matches(restaurant.name)) return@filter false
             }
             true
         }
@@ -227,6 +225,9 @@ class RecommendationEngineImpl : RecommendationEngine {
 
     override fun dietaryCompatibility(restaurant: Restaurant, dietaryRestrictions: List<String>, allergens: List<String>): Double {
         if (dietaryRestrictions.isEmpty() && allergens.isEmpty()) return 1.0
+        // An empty allergen list is missing evidence, never certified free-from data.
+        if (hasAllergenConflict(restaurant, allergens)) return 0.0
+        if (!restaurant.hasVerifiedDietaryInfo) return 0.0
         var score = 0.0
         val totalRequirements = dietaryRestrictions.size + allergens.size
         for (restriction in dietaryRestrictions) {
@@ -234,28 +235,36 @@ class RecommendationEngineImpl : RecommendationEngine {
                 score += 1.0
             } else {
                 val partial = restaurant.dietaryCompatibilityScores[restriction]
-                if (partial != null) score += partial
+                if (partial != null && partial.isFinite()) score += partial.coerceIn(0.0, 1.0)
             }
-        }
-        for (allergen in allergens) {
-            score += if (!restaurant.allergenInfo.contains(allergen)) 1.0 else 0.1
         }
         return if (totalRequirements > 0) score / totalRequirements else 1.0
     }
 
+    private fun matchesDietaryPreferences(restaurant: Restaurant, prefs: UserPreferences): Boolean {
+        if (hasAllergenConflict(restaurant, prefs.allergens)) return false
+        if (!prefs.requireDietaryVerification) return true
+        if (prefs.dietaryRestrictions.isEmpty() && prefs.allergens.isEmpty()) return true
+        return prefs.allergens.isEmpty() && restaurant.hasVerifiedDietaryInfo && prefs.dietaryRestrictions.all { it in restaurant.supportedDietaryRestrictions }
+    }
+
+    private fun hasAllergenConflict(restaurant: Restaurant, allergens: List<String>): Boolean {
+        val reported = restaurant.allergenInfo.map(::allergenFamily).toSet()
+        return allergens.any { allergenFamily(it) in reported }
+    }
+
+    private fun allergenFamily(value: String): String = when (val key = value.lowercase().replace('-', '_').replace(' ', '_')) {
+        "nut", "nuts", "nut_allergy", "peanut", "peanuts", "tree_nut", "tree_nuts" -> "nuts"
+        "shellfish", "shellfish_allergy", "crustacean", "crustaceans", "mollusc", "molluscs" -> "shellfish"
+        else -> key
+    }
+
     private fun isChainRestaurant(restaurant: Restaurant): Boolean {
-        val name = restaurant.name.lowercase()
-        return DISCOVER_CHAIN_KEYWORDS.any { name.contains(it) }
+        return RestaurantChains.matches(restaurant.name)
     }
 
     private companion object {
         const val SCORE_THRESHOLD = 0.1
-        const val DIETARY_SCORE_THRESHOLD = 0.8
 
-        /** DiscoveryNotifier's chain heuristic (matched case-insensitively). */
-        val CHAIN_INDICATORS = listOf("McDonald", "Subway", "Starbucks", "KFC", "Pizza Hut")
-
-        /** DiscoverPage._isChainRestaurant keywords (already lowercase). */
-        val DISCOVER_CHAIN_KEYWORDS = listOf("mcdonalds", "subway", "kfc", "burger king", "pizza hut", "dominos")
     }
 }

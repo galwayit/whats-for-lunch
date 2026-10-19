@@ -76,6 +76,9 @@ data class BudgetEntry(
 )
 
 @Serializable
+data class PlaceAttribution(val name: String, val uri: String? = null, val photoUri: String? = null)
+
+@Serializable
 data class RestaurantReview(
     val reviewId: String,
     val authorName: String,
@@ -84,6 +87,8 @@ data class RestaurantReview(
     val text: String? = null,
     val timeEpochSeconds: Long,
     val relativeTimeDescription: String = "",
+    val authorUri: String? = null,
+    val sourceUri: String? = null,
 )
 
 @Serializable
@@ -124,6 +129,10 @@ data class Restaurant(
     val photoReferences: List<String> = emptyList(),
     /** Absolute URL served by the backend for the first photo, when available. */
     val photoUrl: String? = null,
+    val googleMapsUri: String? = null,
+    val photoSourceUri: String? = null,
+    val photoAttributions: List<PlaceAttribution> = emptyList(),
+    val attributions: List<PlaceAttribution> = emptyList(),
 )
 
 enum class SortOption { RELEVANCE, PRICE, DISTANCE, RATING }
@@ -252,7 +261,13 @@ data class SubscriptionStatus(
 
 /* ---------- Auth and social ---------- */
 
-data class AuthSession(val userId: String, val email: String?, val displayName: String?)
+data class AuthSession(
+    val userId: String,
+    val email: String?,
+    val displayName: String?,
+    /** Any linked Apple identity needs token revocation when deleting the account. */
+    val requiresAppleReauthentication: Boolean = false,
+)
 
 /** Wire form is lowercase (`pending`, `accepted`, `declined`), matching the backend. */
 @Serializable
@@ -277,6 +292,40 @@ data class LunchGroup(
     val placeAddress: String? = null,
     val inviteCode: String,
     val createdAtEpochSeconds: Long,
+    val budgetPerPersonMinor: Long? = null,
+    val currencyCode: String = "AUD",
+    val paymentArrangement: String = "undecided",
+    val paymentMethod: String = "undecided",
+)
+
+@Serializable
+data class GroupDetails(
+    val hostName: String = "",
+    val budgetPerPersonMinor: Long? = null,
+    val currencyCode: String = "AUD",
+    val paymentArrangement: String = "undecided",
+    val paymentMethod: String = "undecided",
+)
+
+@Serializable
+data class GroupSuggestionDraft(
+    val placeName: String? = null,
+    val placeAddress: String? = null,
+    val scheduledAt: Long? = null,
+    val note: String? = null,
+)
+
+@Serializable
+data class GroupSuggestion(
+    val id: String,
+    val groupId: String,
+    val displayName: String,
+    val placeName: String? = null,
+    val placeAddress: String? = null,
+    val scheduledAtEpochSeconds: Long? = null,
+    val note: String? = null,
+    val status: String,
+    val createdAtEpochSeconds: Long,
 )
 
 @Serializable
@@ -299,6 +348,7 @@ data class Invitation(
     val attendees: List<Rsvp>,
     val myStatus: RsvpStatus? = null,
     val inviteUrl: String,
+    val mySuggestion: GroupSuggestion? = null,
 )
 
 data class Location(val latitude: Double, val longitude: Double, val accuracyMetres: Double? = null)
@@ -312,3 +362,10 @@ sealed class CoreError : Exception() {
     data object NotSignedIn : CoreError()
     data class Unknown(override val cause: Throwable?) : CoreError()
 }
+
+/** Public disclosure only. Secrets and provider routing remain on the server. */
+@Serializable
+data class AiProviderDisclosure(val name: String, val privacyUrl: String)
+
+@Serializable
+data class AiConfiguration(val consentVersion: String, val providers: List<AiProviderDisclosure>)

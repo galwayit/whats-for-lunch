@@ -65,7 +65,12 @@ internal fun Restaurants.toRestaurant(): Restaurant = Restaurant(
 )
 
 /** Writes a restaurant with INSERT OR REPLACE, like Drift's insertOrReplace. */
-internal fun RestaurantsQueries.upsert(restaurant: Restaurant, cachedAtEpochSeconds: Long) = upsert(
+internal fun RestaurantsQueries.upsert(restaurant: Restaurant, cachedAtEpochSeconds: Long) {
+    val permitted = if (restaurant.googleMapsUri != null) Restaurant(placeId = restaurant.placeId, name = "Saved place", location = "") else restaurant
+    upsertPermitted(permitted, cachedAtEpochSeconds)
+}
+
+private fun RestaurantsQueries.upsertPermitted(restaurant: Restaurant, cachedAtEpochSeconds: Long) = upsert(
     place_id = restaurant.placeId,
     name = restaurant.name,
     location = restaurant.location,

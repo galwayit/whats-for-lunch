@@ -9,9 +9,8 @@ import au.iapp.lunch.core.model.GateDecision
 import au.iapp.lunch.core.model.GateReason
 
 /**
- * Free-tier limits from [FreeLimits]; Pro (per [EntitlementRepository]) lifts
- * all of them. The AI gate counts today's successful requests locally so the
- * paywall can show before a round trip; the backend enforces the same quota.
+ * Signed-in free users get one successful AI request per UTC day. Local usage
+ * shows the upgrade prompt early; the backend verifies entitlement and quota.
  */
 internal class GateServiceImpl(
     private val entitlements: EntitlementRepository,
@@ -23,6 +22,7 @@ internal class GateServiceImpl(
     private val isPro: Boolean get() = entitlements.isPro.value
 
     override suspend fun canRequestAi(): GateDecision {
+        if (auth.session.value == null) return GateDecision.denied(GateReason.SIGN_IN_REQUIRED)
         if (isPro) return GateDecision.Allowed
         val userId = users.current.value?.id ?: return GateDecision.Allowed
         return if (usage.usedToday(userId) < FreeLimits.AI_REQUESTS_PER_DAY) GateDecision.Allowed

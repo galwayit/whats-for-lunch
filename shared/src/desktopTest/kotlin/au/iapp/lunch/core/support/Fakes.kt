@@ -15,9 +15,15 @@ class FakeAuthRepository(initial: AuthSession? = null) : AuthRepository {
     override val session: StateFlow<AuthSession?> = sessions.asStateFlow()
 
     override suspend fun signInWithApple(idToken: String, nonce: String, fullName: String?): Result<AuthSession> = signIn()
-    override suspend fun signInWithGoogle(idToken: String): Result<AuthSession> = signIn()
+    override suspend fun signInWithGoogle(idToken: String, nonce: String, accessToken: String?): Result<AuthSession> = signIn()
+    override suspend fun signInWithEmail(email: String, password: String): Result<AuthSession> = signIn()
+    override suspend fun registerWithEmail(email: String, password: String): Result<Boolean> = Result.success(false)
+    override suspend fun verifyEmail(email: String, code: String): Result<AuthSession> = signIn()
+    override suspend fun resendVerification(email: String): Result<Unit> = Result.success(Unit)
+    override suspend fun requestPasswordReset(email: String): Result<Unit> = Result.success(Unit)
+    override suspend fun resetPassword(email: String, code: String, newPassword: String): Result<AuthSession> = signIn()
     override suspend fun signOut(): Result<Unit> { sessions.value = null; return Result.success(Unit) }
-    override suspend fun deleteAccount(): Result<Unit> =
+    override suspend fun deleteAccount(appleAuthorizationCode: String?): Result<Unit> =
         if (sessions.value == null) Result.failure(CoreError.NotSignedIn) else signOut()
 
     private fun signIn(): Result<AuthSession> {

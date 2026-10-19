@@ -1,0 +1,21 @@
+{
+  "description": "Known restaurant brands and regional aliases. Match complete normalised words, never generic cuisine names. Regenerate with shared/scripts/generate_chain_catalog.py.",
+  "brands": [
+    {"name": "Burger King / Hungry Jack's", "aliases": ["burger king", "burgerking", "hungry jacks", "hungryjacks"]},
+    {"name": "McDonald's", "aliases": ["mcdonalds", "mcdonald"]},
+    {"name": "KFC", "aliases": ["kfc", "kentucky fried chicken"]},
+    {"name": "Subway", "aliases": ["subway"]},
+    {"name": "Starbucks", "aliases": ["starbucks"]},
+    {"name": "Pizza Hut", "aliases": ["pizza hut"]},
+    {"name": "Domino's", "aliases": ["dominos"]},
+    {"name": "Red Rooster", "aliases": ["red rooster"]},
+    {"name": "Oporto", "aliases": ["oporto"]},
+    {"name": "Nando's", "aliases": ["nandos"]},
+    {"name": "Grill'd", "aliases": ["grilld"]},
+    {"name": "Guzman y Gomez", "aliases": ["guzman y gomez"]},
+    {"name": "Zambrero", "aliases": ["zambrero"]},
+    {"name": "Taco Bell", "aliases": ["taco bell"]},
+    {"name": "Chicken Treat", "aliases": ["chicken treat"]},
+    {"name": "The Coffee Club", "aliases": ["the coffee club"]}
+  ]
+}

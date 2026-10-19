@@ -21,6 +21,7 @@ internal class FavouritesRepositoryImpl(
     private val db: LunchDatabase,
     private val gates: GateService,
     private val clock: Clock,
+    private val restaurants: au.iapp.lunch.core.api.RestaurantRepository? = null,
 ) : FavouritesRepository {
 
     override fun observe(userId: Long): Flow<Set<String>> =
@@ -45,14 +46,15 @@ internal class FavouritesRepositoryImpl(
     }
 
     /** Favourites in most-recent-first order; places missing from the cache keep their stored name. */
-    override suspend fun favouriteRestaurants(userId: Long): Result<List<Restaurant>> = dbResult {
-        val favourites = db.userRestaurantInteractionsQueries.selectFavourites(userId).executeAsList()
-        if (favourites.isEmpty()) return@dbResult emptyList()
-        val cached = db.restaurantsQueries.selectByPlaceIds(favourites.map { it.restaurant_place_id })
-            .executeAsList()
-            .associateBy { it.place_id }
+    override suspend fun favouriteRestaurants(userId: Long): Result<List<Restaurant>> = coreResult {
+        val favourites = dbRead { db.userRestaurantInteractionsQueries.selectFavourites(userId).executeAsList() }
+        if (favourites.isEmpty()) return@coreResult emptyList()
+        val cached = dbRead { db.restaurantsQueries.selectByPlaceIds(favourites.map { it.restaurant_place_id })
+            .executeAsList().associateBy { it.place_id } }
         favourites.map { row ->
-            cached[row.restaurant_place_id]?.toRestaurant()
+            val stored = cached[row.restaurant_place_id]?.toRestaurant()?.takeIf { it.name != "Saved place" }
+            restaurants?.cached(row.restaurant_place_id) ?: stored
+                ?: restaurants?.details(row.restaurant_place_id)?.getOrNull()
                 ?: Restaurant(placeId = row.restaurant_place_id, name = row.restaurant_name ?: row.restaurant_place_id, location = "")
         }
     }

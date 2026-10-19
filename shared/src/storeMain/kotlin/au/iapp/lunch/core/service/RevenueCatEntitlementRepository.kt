@@ -12,6 +12,8 @@ import com.revenuecat.purchases.kmp.ktx.awaitLogIn
 import com.revenuecat.purchases.kmp.ktx.awaitLogOut
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
+import com.revenuecat.purchases.kmp.ktx.awaitTrialOrIntroPriceEligibility
+import com.revenuecat.purchases.kmp.models.IntroEligibilityStatus
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
 import com.revenuecat.purchases.kmp.models.CacheFetchPolicy
 import com.revenuecat.purchases.kmp.models.CustomerInfo
@@ -56,15 +58,15 @@ internal class RevenueCatEntitlementRepository(
         purchases.delegate = object : PurchasesDelegate {
             override fun onCustomerInfoUpdated(customerInfo: CustomerInfo) = publish(customerInfo)
 
-            // Promoted App Store purchases: let the SDK complete them and the
-            // delegate above picks up the resulting customer info.
+            // Purchases are initiated from the signed-in paywall so receipts are
+            // bound to the verified account before StoreKit presents a charge.
             override fun onPurchasePromoProduct(
                 product: StoreProduct,
                 startPurchase: (
                     onError: (error: PurchasesError, userCancelled: Boolean) -> Unit,
                     onSuccess: (storeTransaction: StoreTransaction, customerInfo: CustomerInfo) -> Unit,
                 ) -> Unit,
-            ) = startPurchase({ _, _ -> }, { _, info -> publish(info) })
+            ) { /* Promoted purchases are not enabled for this release. */ }
         }
         scope.launch {
             runCatching { purchases.awaitCustomerInfo(CacheFetchPolicy.CACHED_OR_FETCHED) }
@@ -74,7 +76,13 @@ internal class RevenueCatEntitlementRepository(
 
     override suspend fun offerings(): Result<ProOfferings> = storeResult {
         val current = purchases.awaitOfferings().current
-        ProOfferings(monthly = current?.monthly?.toProPackage(), yearly = current?.annual?.toProPackage())
+        val eligibility = purchases.awaitTrialOrIntroPriceEligibility(
+            listOfNotNull(current?.monthly?.storeProduct, current?.annual?.storeProduct)
+        )
+        ProOfferings(
+            monthly = current?.monthly?.let { it.toProPackage(eligibility[it.storeProduct] == IntroEligibilityStatus.ELIGIBLE) },
+            yearly = current?.annual?.let { it.toProPackage(eligibility[it.storeProduct] == IntroEligibilityStatus.ELIGIBLE) },
+        )
     }
 
     override suspend fun purchase(packageIdentifier: String): Result<SubscriptionStatus> = storeResult {
@@ -126,12 +134,13 @@ internal class RevenueCatEntitlementRepository(
     }
 
     private fun PurchasesException.toCoreError(): CoreError = when {
-        this is PurchasesTransactionException && userCancelled -> CoreError.Service(PURCHASE_CANCELLED, message)
+        (this is PurchasesTransactionException && userCancelled) || code == PurchasesErrorCode.PurchaseCancelledError ->
+            CoreError.Service(PURCHASE_CANCELLED, message)
         code == PurchasesErrorCode.NetworkError || code == PurchasesErrorCode.OfflineConnectionError -> CoreError.Offline
         else -> CoreError.Service(code.name, underlyingErrorMessage ?: message)
     }
 
-    private fun Package.toProPackage(): ProPackage {
+    private fun Package.toProPackage(trialEligible: Boolean): ProPackage {
         val product = storeProduct
         val trial = product.subscriptionOptions?.freeTrial?.pricingPhases?.firstOrNull()?.billingPeriod
             ?: product.introductoryDiscount?.takeIf { it.price.amountMicros == 0L }?.subscriptionPeriod
@@ -140,8 +149,8 @@ internal class RevenueCatEntitlementRepository(
             productId = product.id,
             localizedPrice = product.price.formatted,
             periodLabel = product.period?.label() ?: "",
-            hasFreeTrial = trial != null,
-            trialLabel = trial?.let { "${it.label(plural = true)} free trial" },
+            hasFreeTrial = trial != null && trialEligible,
+            trialLabel = trial?.takeIf { trialEligible }?.let { "${it.label(plural = true)} free trial" },
         )
     }
 

@@ -17,6 +17,20 @@ class RecommendationEngineTest {
     private val vectors = EngineVectors.load()
     private val engine = RecommendationEngineImpl()
 
+    @Test
+    fun absent_allergen_data_is_unknown_and_conflicts_are_never_eligible() {
+        val unknown = Restaurant(placeId = "x", name = "Cafe", location = "", hasVerifiedDietaryInfo = true)
+        val strict = UserPreferences(allergens = listOf("nut_allergy"))
+        assertEquals(0.0, engine.dietaryCompatibility(unknown, emptyList(), strict.allergens))
+        assertTrue(engine.applyPreferenceFilters(listOf(unknown), strict).isEmpty())
+        assertNull(engine.bestMatch(listOf(unknown), strict, emptySet()))
+        val exploring = strict.copy(requireDietaryVerification = false)
+        assertEquals(listOf(unknown), engine.applyPreferenceFilters(listOf(unknown), exploring))
+        for (allergen in listOf("Peanuts", "tree-nuts", "nut_allergy")) {
+            assertTrue(engine.applyPreferenceFilters(listOf(unknown.copy(allergenInfo = listOf(allergen))), exploring).isEmpty())
+        }
+    }
+
     private fun restaurant(id: String): Restaurant = vectors.restaurants.getValue(id)
     private fun prefs(key: String): UserPreferences? = vectors.prefs.getValue(key)
 
@@ -47,7 +61,9 @@ class RecommendationEngineTest {
     }
 
     @Test
-    fun bestMatch_matchesDart() {
+    fun bestMatch_matchesFixture() {
+        // The legacy Dart vectors allowed chains in bestMatch. The no-chain cases now
+        // select the highest remaining score after excluding r2 (Burger King) and r8 (McDonald's).
         val candidates = vectors.restaurantOrder.map(::restaurant)
         for (case in vectors.cases("bestMatch")) {
             val rejected = case.strings("rejected").toSet()

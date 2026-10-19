@@ -54,10 +54,10 @@ class LunchCoreFactoryTest {
     fun desktop_core_wires_the_fake_entitlements_and_free_gates() = runTest {
         val core = LunchCoreFactory.start(config, FakeLocationProvider(null), clock, MockBackend().engine)
 
-        assertIs<FakeEntitlementRepository>(core.entitlements)
+        assertIs<au.iapp.lunch.core.service.AccountEntitlementRepository>(core.entitlements)
         assertFalse(core.entitlements.isPro.value)
         assertEquals(FreeLimits.HISTORY_DAYS, core.gates.historyWindowDays())
-        assertTrue(core.gates.canRequestAi().allowed)
+        assertEquals(au.iapp.lunch.core.model.GateReason.SIGN_IN_REQUIRED, core.gates.canRequestAi().reason)
         assertEquals(clock, core.clock)
     }
 }

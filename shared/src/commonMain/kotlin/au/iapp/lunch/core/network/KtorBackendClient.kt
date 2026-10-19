@@ -1,9 +1,14 @@
 package au.iapp.lunch.core.network
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import au.iapp.lunch.core.model.AiRecommendation
 import au.iapp.lunch.core.model.CoreError
 import au.iapp.lunch.core.model.GateReason
 import au.iapp.lunch.core.model.GroupProposal
+import au.iapp.lunch.core.model.GroupDetails
+import au.iapp.lunch.core.model.GroupSuggestion
+import au.iapp.lunch.core.model.GroupSuggestionDraft
 import au.iapp.lunch.core.model.Invitation
 import au.iapp.lunch.core.model.LunchGroup
 import au.iapp.lunch.core.model.RsvpStatus
@@ -12,6 +17,7 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -53,6 +59,7 @@ internal class KtorBackendClient(
     baseUrl: String,
     private val backendHeaders: BackendHeaders,
     engine: HttpClientEngine,
+    private val guestTokens: GuestTokenStore = MemoryGuestTokenStore(),
 ) : BackendClient {
 
     private val log = Logger.withTag("Backend")
@@ -73,14 +80,17 @@ internal class KtorBackendClient(
     override suspend fun placesDetails(placeId: String): PlacesDetailsResponse =
         post("places-details", PlacesDetailsRequest(placeId))
 
+    override suspend fun aiConfiguration(): au.iapp.lunch.core.model.AiConfiguration =
+        execute { http.get("ai-config") { commonHeaders() } }
+
     override suspend fun aiRecommend(request: AiRecommendRequest): AiRecommendation =
         post<AiRecommendRequest, AiRecommendResponse>("ai-recommend", request).recommendation
 
     override suspend fun groupsCreate(request: GroupsCreateRequest): LunchGroup =
         post<GroupsCreateRequest, GroupResponse>("groups-create", request).group
 
-    override suspend fun groupsPropose(groupId: String, hostPreferences: UserPreferences?): List<GroupProposal> =
-        post<GroupsProposeRequest, GroupsProposeResponse>("groups-propose", GroupsProposeRequest(groupId, hostPreferences)).proposals
+    override suspend fun groupsPropose(groupId: String, hostPreferences: UserPreferences?, consentVersion: String?): List<GroupProposal> =
+        post<GroupsProposeRequest, GroupsProposeResponse>("groups-propose", GroupsProposeRequest(groupId, hostPreferences, aiConsentVersion = consentVersion)).proposals
 
     override suspend fun groupsConfirm(request: GroupsConfirmRequest): LunchGroup =
         post<GroupsConfirmRequest, GroupResponse>("groups-confirm", request).group
@@ -89,22 +99,75 @@ internal class KtorBackendClient(
         post<GroupsCancelRequest, Unit>("groups-cancel", GroupsCancelRequest(groupId))
     }
 
-    override suspend fun invitation(code: String): Invitation =
-        execute<InvitationResponse> { http.get("invitations") { commonHeaders(); parameter("code", code) } }.invitation
+    override suspend fun invitation(code: String): Invitation = guestRequest(code) {
+        execute<InvitationResponse> {
+            http.get("invitations") { commonHeaders(); parameter("code", code); guestHeaders(code) }
+        }
+    }
 
-    override suspend fun invitationsRespond(code: String, status: RsvpStatus, displayName: String?): Invitation =
-        post<InvitationsRespondRequest, InvitationResponse>("invitations-respond", InvitationsRespondRequest(code, status, displayName)).invitation
+    override suspend fun invitationsRespond(code: String, status: RsvpStatus, displayName: String?): Invitation = guestRequest(code) {
+        execute<InvitationResponse> {
+            http.post("invitations-respond") {
+                commonHeaders(); guestHeaders(code); contentType(ContentType.Application.Json)
+                setBody(InvitationsRespondRequest(code, status, displayName))
+            }
+        }
+    }
+
+    override suspend fun invitationsSuggest(code: String, draft: GroupSuggestionDraft, displayName: String?): Invitation = guestRequest(code) {
+        execute<InvitationResponse> {
+            http.post("invitations-suggest") {
+                commonHeaders(); guestHeaders(code); contentType(ContentType.Application.Json)
+                setBody(InvitationSuggestRequest(code, draft, displayName))
+            }
+        }
+    }
+    override suspend fun groupSuggestions(groupId: String): List<GroupSuggestion> = execute<GroupSuggestionsResponse> {
+        http.get("groups-suggestions") { commonHeaders(); parameter("groupId", groupId) }
+    }.suggestions
+    override suspend fun reviewSuggestion(groupId: String, suggestionId: String, accept: Boolean): LunchGroup =
+        post<ReviewSuggestionRequest, GroupResponse>("groups-suggestions", ReviewSuggestionRequest(groupId, suggestionId, accept)).group
+    override suspend fun updateGroupDetails(groupId: String, details: GroupDetails): LunchGroup =
+        post<GroupUpdateRequest, GroupResponse>("groups-update", GroupUpdateRequest(groupId, details)).group
+
+    private suspend fun HttpRequestBuilder.guestHeaders(code: String) {
+        if (backendHeaders.accessToken() == null) guestTokens.get(code.uppercase())?.let { header("x-guest-token", it) }
+    }
+
+    override suspend fun groupSafety(request: GroupSafetyRequest) {
+        execute<Unit> {
+            http.post("groups-safety") {
+                commonHeaders(); guestHeaders(request.code); contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+    private val guestLock = Mutex()
+
+    private suspend fun guestRequest(code: String, action: suspend () -> InvitationResponse): Invitation = guestLock.withLock {
+        val response = action()
+        response.guestToken?.takeIf { Regex("^[a-f0-9]{64}$").matches(it) }?.let {
+            guestTokens.put(code.uppercase(), it)
+        }
+        response.invitation
+    }
 
     override suspend fun pushRegister(token: String, platform: String) {
         post<PushRegisterRequest, Unit>("push-register", PushRegisterRequest(token, platform))
     }
 
-    override suspend fun accountDelete() {
-        execute<Unit> { http.post("account-delete") { commonHeaders() } }
+    override suspend fun pushUnregister(token: String, platform: String) {
+        post<PushRegisterRequest, Unit>("push-register", PushRegisterRequest(token, platform, "unregister"))
+    }
+
+    override suspend fun accountDelete(appleAuthorizationCode: String?) {
+        post<AccountDeleteRequest, Unit>("account-delete", AccountDeleteRequest(appleAuthorizationCode))
     }
 
     private suspend inline fun <reified B, reified T> post(path: String, body: B): T = execute {
         http.post(path) {
+            // Billing (10s), group Places (12s), and two bounded AI attempts (20s).
+            if (path == "ai-recommend" || path == "groups-propose") timeout { requestTimeoutMillis = 60_000L }
             commonHeaders()
             contentType(ContentType.Application.Json)
             setBody(body)

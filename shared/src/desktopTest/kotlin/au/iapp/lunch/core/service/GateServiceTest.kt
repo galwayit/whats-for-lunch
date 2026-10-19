@@ -31,31 +31,41 @@ class GateServiceTest {
     fun tearDown() = scope.cancel()
 
     @Test
-    fun ai_gate_allows_one_successful_request_per_local_day() = runTest {
+    fun ai_allows_one_successful_free_request_per_utc_day() = runTest {
+        auth.sessions.value = AuthSession("user-1", null, "Sam")
         assertEquals(GateDecision.Allowed, gates.canRequestAi())
-
-        usage.record(1, AiUsage.RECOMMENDATION, 10, successful = false, errorMessage = "boom")
-        assertEquals(GateDecision.Allowed, gates.canRequestAi(), "failed requests do not count")
-
+        usage.record(1, AiUsage.RECOMMENDATION, 10, successful = false, errorMessage = "offline")
+        assertEquals(GateDecision.Allowed, gates.canRequestAi(), "failed requests do not spend the free request")
         usage.record(1, AiUsage.RECOMMENDATION, 10, successful = true, errorMessage = null)
         assertEquals(GateDecision.denied(GateReason.AI_DAILY_LIMIT), gates.canRequestAi())
-        assertEquals(FreeLimits.AI_REQUESTS_PER_DAY, usage.usedToday(1))
-
         clock.advance(TestClock.DAY)
-        assertEquals(GateDecision.Allowed, gates.canRequestAi(), "a new local day resets the quota")
+        assertEquals(GateDecision.Allowed, gates.canRequestAi(), "the free request renews at UTC midnight")
     }
 
     @Test
-    fun local_day_bounds_follow_the_clock_time_zone() {
-        // 1_788_400_000 is 2026-09-03 11:46:40 AEST; that Sydney day starts at 2026-09-02 14:00:00 UTC.
+    fun signed_out_requires_login_and_expired_subscriptions_return_to_free_allowance() = runTest {
+        entitlements.setPro(true)
+        assertEquals(GateDecision.denied(GateReason.SIGN_IN_REQUIRED), gates.canRequestAi())
+        auth.sessions.value = AuthSession("user-1", null, "Sam")
+        assertEquals(GateDecision.Allowed, gates.canRequestAi())
+        entitlements.setPro(false)
+        assertEquals(GateDecision.Allowed, gates.canRequestAi())
+        usage.record(1, AiUsage.RECOMMENDATION, 10, successful = true, errorMessage = null)
+        assertEquals(GateDecision.denied(GateReason.AI_DAILY_LIMIT), gates.canRequestAi())
+    }
+
+    @Test
+    fun quota_day_uses_utc_regardless_of_device_time_zone() {
+        // Daily quota is fixed to UTC so a device timezone change cannot reset usage.
         val (start, end) = usage.localDayBounds()
 
-        assertEquals(1_788_357_600L, start)
+        assertEquals(1_788_393_600L, start)
         assertEquals(start + TestClock.DAY, end)
     }
 
     @Test
-    fun pro_lifts_every_limit() = runTest {
+    fun pro_lifts_local_limits_after_sign_in() = runTest {
+        auth.sessions.value = AuthSession("user-1", null, "Sam")
         usage.record(1, AiUsage.RECOMMENDATION, 10, successful = true, errorMessage = null)
         entitlements.setPro(true)
 

@@ -9,6 +9,7 @@ import au.iapp.lunch.core.api.UserRepository
 import au.iapp.lunch.core.data.DbDispatcher
 import au.iapp.lunch.core.data.coreResult
 import au.iapp.lunch.core.data.dbResult
+import au.iapp.lunch.core.data.dbRead
 import au.iapp.lunch.core.db.DbJson
 import au.iapp.lunch.core.db.LunchDatabase
 import au.iapp.lunch.core.db.toRecommendation
@@ -40,19 +41,38 @@ internal class AiRecommendationServiceImpl(
     private val contextBuilder: AiContextBuilder,
     private val usage: AiUsage,
     private val clock: Clock,
+    private val restaurants: au.iapp.lunch.core.api.RestaurantRepository? = null,
 ) : AiRecommendationService {
 
-    override suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>): Result<AiRecommendation> {
+    override suspend fun configuration(): Result<au.iapp.lunch.core.model.AiConfiguration> = coreResult { backend.aiConfiguration() }
+
+    override suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>, consentVersion: String?): Result<AiRecommendation> {
+        if (consentVersion.isNullOrBlank()) return Result.failure(CoreError.Service("AI_CONSENT_REQUIRED", "AI data sharing consent is required"))
         val user = users.current.value ?: return Result.failure(CoreError.Service(NO_USER, "No local user exists yet"))
         val gate = gates.canRequestAi()
         if (!gate.allowed) return Result.failure(CoreError.Gate(gate.reason))
 
+        val pool = coreResult {
+            if (candidates.isNotEmpty()) candidates else {
+                val here = location.current().getOrThrow()
+                val nearby = backend.placesNearby(au.iapp.lunch.core.network.PlacesNearbyRequest(
+                    lat = here.latitude, lng = here.longitude, radiusKm = user.preferences.maxTravelDistance,
+                )).restaurants
+                au.iapp.lunch.core.engine.RecommendationEngineImpl().applyPreferenceFilters(nearby, user.preferences)
+            }
+        }.getOrElse { return Result.failure(it) }.let {
+            // Explicit candidates (including an existing Home pick) must obey the
+            // same current preferences as candidates fetched for this request.
+            au.iapp.lunch.core.engine.RecommendationEngineImpl().applyPreferenceFilters(it, user.preferences)
+        }
+        if (pool.isEmpty()) return Result.failure(CoreError.Service("NO_CANDIDATES", "No nearby places match your preferences"))
         val context = buildContext(user)
         val request = AiRecommendRequest(
             cravings = cravings?.trim()?.ifEmpty { null },
             maxResults = maxResults,
             context = context,
-            candidates = candidates.take(MAX_CANDIDATES),
+            candidates = pool.take(MAX_CANDIDATES),
+            aiConsentVersion = consentVersion,
         )
         val started = TimeSource.Monotonic.markNow()
         val result = coreResult { backend.aiRecommend(request) }
@@ -61,6 +81,7 @@ internal class AiRecommendationServiceImpl(
         return result.fold(
             onSuccess = { recommendation ->
                 val local = recommendation.copy(userId = user.id)
+                restaurants?.cacheAll(request.candidates + local.restaurants)
                 persist(local, request.candidates, context)
                 usage.record(user.id, AiUsage.RECOMMENDATION, elapsedMs, successful = true, errorMessage = null)
                 Result.success(local)
@@ -72,11 +93,17 @@ internal class AiRecommendationServiceImpl(
         )
     }
 
-    override suspend fun history(userId: Long, limit: Int): Result<List<AiRecommendation>> = dbResult {
-        val rows = db.aiRecommendationsQueries.selectRecentByUser(userId, limit.toLong()).executeAsList()
+    override suspend fun history(userId: Long, limit: Int): Result<List<AiRecommendation>> = coreResult {
+        val rows = dbRead { db.aiRecommendationsQueries.selectRecentByUser(userId, limit.toLong()).executeAsList() }
         val ids = rows.flatMap { DbJson.stringList(it.recommended_restaurant_ids) }.distinct()
-        val restaurants = if (ids.isEmpty()) emptyMap() else
-            db.restaurantsQueries.selectByPlaceIds(ids).executeAsList().associate { it.place_id to it.toRestaurant() }
+        val stored = if (ids.isEmpty()) emptyMap() else
+            dbRead { db.restaurantsQueries.selectByPlaceIds(ids).executeAsList().associate { it.place_id to it.toRestaurant() } }
+        val restaurants = ids.mapNotNull { id ->
+            val place = this@AiRecommendationServiceImpl.restaurants?.cached(id)
+                ?: stored[id]?.takeIf { it.name != "Saved place" }
+                ?: this@AiRecommendationServiceImpl.restaurants?.details(id)?.getOrNull()
+            place?.let { id to it }
+        }.toMap()
         rows.map { it.toRecommendation(restaurants) }
     }
 
@@ -116,7 +143,7 @@ internal class AiRecommendationServiceImpl(
     private suspend fun buildContext(user: UserProfile): AiContext {
         val now = clock.nowEpochSeconds()
         val recent = meals.inRange(user.id, now - RECENT_MEALS_WINDOW_SECONDS, now + 1).getOrDefault(emptyList())
-        val here = if (location.hasPermission()) location.current().getOrNull() else null
+        val here = location.current().getOrNull()
         return contextBuilder.build(user.preferences, recent, here)
     }
 

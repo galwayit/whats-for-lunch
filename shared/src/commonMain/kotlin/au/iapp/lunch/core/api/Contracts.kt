@@ -1,6 +1,7 @@
 package au.iapp.lunch.core.api
 
 import au.iapp.lunch.core.model.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -101,11 +102,12 @@ interface AchievementRepository {
 /* ---------- Services (backend, purchases, auth, social) ---------- */
 
 interface AiRecommendationService {
+    suspend fun configuration(): Result<AiConfiguration>
     /**
      * Calls the backend, which enforces the daily quota and picks the model by tier.
      * The client also pre-checks GateService so the paywall shows without a round trip.
      */
-    suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>): Result<AiRecommendation>
+    suspend fun recommend(cravings: String?, maxResults: Int, candidates: List<Restaurant>, consentVersion: String? = null): Result<AiRecommendation>
     suspend fun history(userId: Long, limit: Int): Result<List<AiRecommendation>>
     suspend fun submitFeedback(recommendationId: String, placeId: String?, rating: Int, feedback: String?, wasSelected: Boolean): Result<Unit>
     /** Requests made today by this user, for the gate row copy. */
@@ -136,19 +138,34 @@ interface GateService {
 interface AuthRepository {
     val session: StateFlow<AuthSession?>
     suspend fun signInWithApple(idToken: String, nonce: String, fullName: String?): Result<AuthSession>
-    suspend fun signInWithGoogle(idToken: String): Result<AuthSession>
+    suspend fun signInWithGoogle(idToken: String, nonce: String, accessToken: String?): Result<AuthSession>
+    suspend fun signInWithEmail(email: String, password: String): Result<AuthSession>
+    /** True only when signup immediately creates a session; otherwise verify the email code. */
+    suspend fun registerWithEmail(email: String, password: String): Result<Boolean>
+    suspend fun verifyEmail(email: String, code: String): Result<AuthSession>
+    suspend fun resendVerification(email: String): Result<Unit>
+    suspend fun requestPasswordReset(email: String): Result<Unit>
+    suspend fun resetPassword(email: String, code: String, newPassword: String): Result<AuthSession>
     suspend fun signOut(): Result<Unit>
-    suspend fun deleteAccount(): Result<Unit>
+    suspend fun deleteAccount(appleAuthorizationCode: String? = null): Result<Unit>
 }
 
 interface GroupRepository {
+    suspend fun loadGroups(): Result<List<LunchGroup>> = au.iapp.lunch.core.data.coreResult { myGroups().first() }
+    suspend fun loadRsvps(groupId: String): Result<List<Rsvp>> = au.iapp.lunch.core.data.coreResult { rsvps(groupId).first() }
     fun myGroups(): Flow<List<LunchGroup>>
     /** Host only. Backend verifies the Pro entitlement. */
-    suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double): Result<LunchGroup>
-    suspend fun propose(groupId: String): Result<List<GroupProposal>>
+    suspend fun create(name: String, scheduledAtEpochSeconds: Long, area: Location, radiusKm: Double, details: GroupDetails = GroupDetails()): Result<LunchGroup>
+    suspend fun propose(groupId: String, consentVersion: String? = null): Result<List<GroupProposal>>
     suspend fun confirmPlace(groupId: String, restaurant: Restaurant): Result<LunchGroup>
     suspend fun invitation(code: String): Result<Invitation>
     suspend fun respond(code: String, status: RsvpStatus, displayName: String?): Result<Invitation>
+    suspend fun suggest(code: String, draft: GroupSuggestionDraft, displayName: String?): Result<Invitation>
+    suspend fun suggestions(groupId: String): Result<List<GroupSuggestion>>
+    suspend fun reviewSuggestion(groupId: String, suggestionId: String, accept: Boolean): Result<LunchGroup>
+    suspend fun updateDetails(groupId: String, details: GroupDetails): Result<LunchGroup>
+    suspend fun safetyAction(code: String, targetKind: String, targetId: String?, action: String, reason: String): Result<Unit> =
+        Result.failure(CoreError.Service("NOT_CONFIGURED", "Content safety is unavailable"))
     fun rsvps(groupId: String): Flow<List<Rsvp>>
     suspend fun cancel(groupId: String): Result<Unit>
 }
@@ -180,6 +197,11 @@ data class CoreConfig(
     val databasePath: String,
     val inviteLinkBase: String = "https://lunch.iapp.au/i/",
     val isDebug: Boolean = false,
+    /**
+     * Debug builds only: with an empty [revenueCatApiKey] purchases are turned off and this
+     * host-persisted id is sent to the backend as x-app-user-id instead of RevenueCat's.
+     */
+    val anonymousAppUserId: String? = null,
 )
 
 /**

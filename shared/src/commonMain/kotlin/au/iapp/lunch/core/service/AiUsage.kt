@@ -17,7 +17,7 @@ import kotlinx.datetime.toLocalDateTime
  */
 internal class AiUsage(private val db: LunchDatabase, private val clock: Clock) {
 
-    /** Successful recommendation requests inside today's local calendar day. */
+    /** Successful recommendation requests inside today's UTC calendar day. */
     suspend fun usedToday(userId: Long): Int = withContext(DbDispatcher) {
         val (start, end) = localDayBounds()
         db.aiUsageMetricsQueries.countSuccessfulInRange(userId, RECOMMENDATION, start, end).executeAsOne().toInt()
@@ -38,9 +38,9 @@ internal class AiUsage(private val db: LunchDatabase, private val clock: Clock) 
         }
     }
 
-    /** [start, end) epoch seconds of the current day in the device time zone. */
+    /** [start, end) epoch seconds of the current UTC day, independent of the device time zone. */
     fun localDayBounds(): Pair<Long, Long> {
-        val zone = TimeZone.of(clock.timeZoneId())
+        val zone = TimeZone.UTC
         val today = Instant.fromEpochSeconds(clock.nowEpochSeconds()).toLocalDateTime(zone).date
         val start = today.atStartOfDayIn(zone).epochSeconds
         val end = today.plus(1, DateTimeUnit.DAY).atStartOfDayIn(zone).epochSeconds
