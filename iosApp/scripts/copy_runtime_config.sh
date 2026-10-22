@@ -37,11 +37,7 @@ if [ ! -f "$src" ]; then
 fi
 
 if [ "$CONFIGURATION" = "Release" ]; then
-  if [ "${ACTION:-build}" = "install" ]; then
-    python3 "$SRCROOT/scripts/validate_release_config.py" --config "$src" --firebase "$config_dir/GoogleService-Info.plist"
-  else
-    python3 "$SRCROOT/scripts/validate_release_config.py" --config "$src"
-  fi
+  python3 "$SRCROOT/scripts/validate_release_config.py" --config "$src"
   key=$(/usr/libexec/PlistBuddy -c "Print :revenueCatApiKey" "$src" 2>/dev/null || true)
   case "$key" in
     appl_*) ;;

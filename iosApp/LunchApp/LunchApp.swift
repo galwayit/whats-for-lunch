@@ -25,7 +25,6 @@ struct LunchApp: App {
                     if !GIDSignIn.sharedInstance.handle(url) { app.open(url: url) }
                 }
                 .task {
-                    appDelegate.pushRegistrar = app.core.push
                     app.start()
                     if let code = LaunchArguments.current.inviteCode { app.openInvitation(code: code) }
                     if let route = LaunchArguments.current.openRoute { app.present(route) }

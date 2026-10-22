@@ -63,6 +63,7 @@ final class GroupDetailViewModel {
             guard !Task.isCancelled else { return }
             group = groups.first { $0.id == groupId }
             error = group == nil ? .service(code: "NOT_FOUND", message: "This lunch was cancelled or is no longer available.") : nil
+            if group != nil { reminderEnabled = await GroupReminder.isScheduled(groupId: groupId) }
         } catch is CancellationError { return }
         catch { self.error = CoreError.from(error) }
     }

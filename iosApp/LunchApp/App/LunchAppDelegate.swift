@@ -2,72 +2,27 @@
 //  LunchAppDelegate.swift
 //  LunchApp
 //
-//  Owns APNs/FCM registration and forwards FCM registration tokens to the shared core.
+//  Owns the notification centre delegate for the device-local group lunch reminders.
+//  Remote push (APNs/FCM) is out of 1.0; when it returns, this is where registration goes.
 //
 
-import FirebaseCore
-import FirebaseMessaging
 import UIKit
 import UserNotifications
 
 @MainActor
-final class LunchAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
-    var pushRegistrar: PushRegistrar? {
-        didSet { submitPendingToken() }
-    }
-
-    private var isFirebaseConfigured = false
-    private var pendingFCMToken: String?
-
+final class LunchAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
-        if
-            let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
-            let options = FirebaseOptions(contentsOfFile: path)
-        {
-            FirebaseApp.configure(options: options)
-            Messaging.messaging().delegate = self
-            isFirebaseConfigured = true
-        }
         return true
     }
 
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        guard isFirebaseConfigured else { return }
-        // FCM maps this APNs token to its own registration token. The backend sends
-        // through FCM HTTP v1, so sending the raw APNs token would never work.
-        Messaging.messaging().apnsToken = deviceToken
-    }
-
-    /// Firebase does not promise the main thread for this callback, and the target defaults every
-    /// member to the main actor, so an off-main call would trap. Hop to the main actor instead.
-    nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        guard let fcmToken, !fcmToken.isEmpty else { return }
-        Task { @MainActor in
-            self.pendingFCMToken = fcmToken
-            self.submitPendingToken()
-        }
-    }
-
-    private func submitPendingToken() {
-        guard let token = pendingFCMToken, let pushRegistrar else { return }
-        Task {
-            do {
-                try await pushRegistrar.register(token: token, platform: "ios")
-                pendingFCMToken = nil
-            } catch {
-                // Keep the token so a later core assignment or refresh can retry.
-            }
-        }
-    }
-
+    /// Asks for alert and sound permission for local lunch reminders only. No badge, no remote registration.
     static func requestNotificationPermission() async {
         do {
-            let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
-            if granted { UIApplication.shared.registerForRemoteNotifications() }
+            _ = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
         } catch {
             // The system owns permission UI; users can retry from Profile or iOS Settings.
         }

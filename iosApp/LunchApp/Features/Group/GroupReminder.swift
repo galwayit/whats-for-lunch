@@ -34,6 +34,12 @@ enum GroupReminder {
         try await centre.add(request)
     }
 
+    /// True when a reminder for this group is still pending on this device.
+    static func isScheduled(groupId: String) async -> Bool {
+        let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
+        return pending.contains { $0.identifier == identifier(groupId) }
+    }
+
     static func cancel(groupId: String) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier(groupId)])
     }

@@ -59,7 +59,7 @@ public Google OAuth identifiers are shared in `config/google-oauth.json`:
   needs `googleIosClientId`; the build generates the matching Google callback scheme.
   Both Google IDs default to the shared public JSON, with explicit build settings
   taking precedence. Never add an OAuth client secret to an app configuration.
-- `androidApp/google-services.json` and `iosApp/LunchApp/Config/GoogleService-Info.plist` for push.
+- Push notifications are out of 1.0; group reminders are local notifications on the phone.
 - Backend secrets are set with `supabase secrets set` (see `backend/README.md`).
 
 Copy the `.example` files next to each of these to get started.

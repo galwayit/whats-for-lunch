@@ -201,7 +201,7 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | profile.signin.google | Continue with Google |
 | profile.signout | Sign out |
 | profile.settings.edit | Edit preferences |
-| profile.settings.notifications | Notifications |
+| profile.settings.notifications | Lunch reminders |
 | profile.settings.privacy | Privacy |
 | profile.settings.help | Help & support |
 | profile.export | Export my data |
@@ -269,7 +269,7 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | group.detail.accepted | Accepted |
 | group.detail.declined | Declined |
 | group.detail.pending | Pending |
-| group.detail.reminder | Remind everyone an hour before |
+| group.detail.reminder | Remind me an hour before |
 | group.detail.cancel | Cancel lunch |
 | invite.title | %s invited you to lunch |
 | invite.attending | %d going |

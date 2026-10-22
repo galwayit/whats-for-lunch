@@ -250,7 +250,7 @@ nonisolated enum Copy {
         static let signOut = "Sign out"
         static func signedInAs(_ name: String) -> String { "Signed in as \(name)" }
         static let settingsEdit = "Edit preferences"
-        static let settingsNotifications = "Notifications"
+        static let settingsNotifications = "Lunch reminders"
         static let settingsPrivacy = "Privacy"
         static let settingsHelp = "Help & support"
         static let exportData = "Export my data"
@@ -356,7 +356,7 @@ nonisolated enum Copy {
         static let qrTitle = "Scan to join" // group.qr.title
         static let qrBody = "Point the other phone's camera at this code to open the invitation." // group.qr.body
         static let detailGuests = "Guests"
-        static let detailReminder = "Remind everyone an hour before"
+        static let detailReminder = "Remind me an hour before"
         static let detailCancel = "Cancel lunch"
         static let detailAccepted = "Accepted"
         static let detailDeclined = "Declined"
