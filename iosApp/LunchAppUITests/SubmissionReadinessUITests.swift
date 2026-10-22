@@ -22,6 +22,24 @@ final class SubmissionReadinessUITests: XCTestCase {
         add(shot)
     }
 
+    /// A guest who installs from the invite link has never onboarded; the invitation must be the
+    /// first screen, not buried behind five onboarding steps.
+    @MainActor
+    func testInvitationShowsBeforeOnboardingOnFreshInstall() {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-previewCore", "-onboarded", "0", "-signedIn", "0", "-openInvite", "K7P2QX"]
+        app.launch()
+        let invitation = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'invited you to lunch'")).firstMatch
+        XCTAssertTrue(invitation.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Accept"].exists)
+        XCTAssertFalse(app.staticTexts["STEP 1 OF 5"].isHittable)
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "Invitation shown before onboarding"
+        shot.lifetime = .keepAlways
+        add(shot)
+    }
+
     @MainActor
     func testGuestCanReachReportingAndBlockingFromInvitation() {
         continueAfterFailure = false

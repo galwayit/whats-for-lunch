@@ -2,7 +2,7 @@
 //  RootTabView.swift
 //  LunchApp
 //
-//  Four tabs behind the custom tab bar, plus the modal route stack and the toast host.
+//  Four tabs behind the custom tab bar. The route stack and toast host live in ContentView.
 //
 
 import SwiftUI
@@ -25,8 +25,6 @@ struct RootTabView: View {
             LunchTabBar(selection: $app.selectedTab)
         }
         .background(Tokens.Palette.ground.ignoresSafeArea())
-        .toastHost()
-        .routePresenter(level: 0)
     }
 }
 
