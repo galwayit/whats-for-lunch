@@ -121,7 +121,9 @@ enum AppDiagnostics {
         let file = String(describing: component).split(separator: "/").last.map(String.init) ?? "LunchApp"
         let function = String(describing: operation)
         let key = "\(code):\(file):\(function)"
-        guard limiter.admit(key: key, now: ProcessInfo.processInfo.systemUptime) else { return }
+        // Wall-clock time, not systemUptime: the latter is a required-reason API (system boot time)
+        // and the limiter only needs coarse windows.
+        guard limiter.admit(key: key, now: Date().timeIntervalSinceReferenceDate) else { return }
         SentrySDK.capture(event: makeEvent(code: code, component: file, operation: function))
     }
 
