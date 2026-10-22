@@ -36,10 +36,10 @@ class PaywallViewModelTest {
         advanceUntilIdle()
         val packages = (viewModel.state.value.packages as LoadState.Loaded).value
         assertEquals(listOf("year", "month"), packages.map { it.periodLabel })
-        assertTrue(packages.first().hasFreeTrial)
+        assertFalse(packages.first().hasFreeTrial)
         assertFalse(packages.last().hasFreeTrial)
-        assertEquals("A\$19.99", packages.first().localizedPrice)
-        assertEquals("A\$2.99", packages.last().localizedPrice)
+        assertEquals("A\$29.99", packages.first().localizedPrice)
+        assertEquals("A\$4.99", packages.last().localizedPrice)
         assertEquals(packages.first().identifier, viewModel.state.value.selectedIdentifier)
     }
 

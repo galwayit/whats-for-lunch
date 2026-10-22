@@ -1,12 +1,12 @@
 appId: au.iapp.guess_what.what_we_have_for_lunch
-name: start_trial_sandbox
+name: subscribe_sandbox
 tags: [monetization, sandbox]
 # Requires a sandbox tester signed in on the device (iOS) or a licence tester (Android).
 ---
 - launchApp
 - tapOn: "Profile"
 - tapOn: "Lunch Pro"
-- assertVisible: "7-day free trial"
+- assertVisible: "per year"
 - tapOn:
     id: "paywall_cta"
 - extendedWaitUntil:

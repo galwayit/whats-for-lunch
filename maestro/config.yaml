@@ -10,6 +10,6 @@ executionOrder:
     - discover_filter_and_detail
     - log_meal
     - ai_gate_and_paywall
-    - start_trial_sandbox
+    - subscribe_sandbox
     - create_group_and_share
     - accept_invitation_from_link

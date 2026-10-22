@@ -165,8 +165,9 @@ enum PreviewData {
 
     // MARK: - Monetisation
 
-    static let yearlyPackage = ProPackage(identifier: "$rc_annual", productId: "au.iapp.lunch.pro.yearly", localizedPrice: "A$19.99", periodLabel: "year", hasFreeTrial: true, trialLabel: "7 days")
-    static let monthlyPackage = ProPackage(identifier: "$rc_monthly", productId: "au.iapp.lunch.pro.monthly", localizedPrice: "A$2.99", periodLabel: "month", hasFreeTrial: false)
+    // Decided 2026-10-19: A$4.99 a month, A$29.99 a year, no introductory offer.
+    static let yearlyPackage = ProPackage(identifier: "$rc_annual", productId: "au.iapp.lunch.pro.yearly", localizedPrice: "A$29.99", periodLabel: "year", hasFreeTrial: false)
+    static let monthlyPackage = ProPackage(identifier: "$rc_monthly", productId: "au.iapp.lunch.pro.monthly", localizedPrice: "A$4.99", periodLabel: "month", hasFreeTrial: false)
     static let offerings = ProOfferings(monthly: monthlyPackage, yearly: yearlyPackage)
 
     // MARK: - Formatting

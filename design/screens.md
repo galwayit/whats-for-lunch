@@ -69,7 +69,7 @@ screen from anywhere.
 ## 7. Profile
 
 - Header card: initial disc, name, `FOOD EXPLORER` badge.
-- Sections: preferences tiles (budget, distance, chains → Preferences), Lunch Pro card (free: title, body, CTA `Try free for 7 days` → Paywall; active: plan and renewal, `Manage subscription`, `Restore purchases`), sign-in row (Apple, Google) when signed out, settings list (Edit preferences, Notifications, Privacy, Help & support), `Export my data`, `Delete account` (confirm dialog, calls `AuthRepository.deleteAccount`).
+- Sections: preferences tiles (budget, distance, chains → Preferences), Lunch Pro card (free: title, body, CTA `See Lunch Pro` → Paywall; active: plan and renewal, `Manage subscription`, `Restore purchases`), sign-in row (Apple, Google) when signed out, settings list (Edit preferences, Notifications, Privacy, Help & support), `Export my data`, `Delete account` (confirm dialog, calls `AuthRepository.deleteAccount`).
 
 ## 8. Preferences
 
@@ -77,7 +77,7 @@ screen from anywhere.
 
 ## 9. Paywall
 
-- Two plan cards (yearly preselected with trial line and `BEST VALUE`; monthly), six benefit rows, CTA id `paywall_cta` (`Start free trial` when trial available else `Subscribe`), legal sentence with the store name substituted, `Restore purchases`, `Terms of Use`, `Privacy Policy`. Success state `You're on Lunch Pro` with `Done`.
+- Two plan cards (yearly preselected with `BEST VALUE`, trial line only when the store reports an eligible introductory offer; monthly), six benefit rows, CTA id `paywall_cta` (`Start free trial` when trial available else `Subscribe`), legal sentence with the store name substituted, `Restore purchases`, `Terms of Use`, `Privacy Policy`. Success state `You're on Lunch Pro` with `Done`.
 
 ## 10. Group lunch, host
 

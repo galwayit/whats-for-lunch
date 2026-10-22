@@ -96,7 +96,7 @@ the AI until the user agrees; the answer is remembered per install.
 | Key | Text |
 |---|---|
 | ai.consent.title | Before we ask the AI |
-| ai.consent.body | To pick places for you, we send your craving, budget, dietary preferences, recent meals, location and the nearby places we found to Google Gemini, an AI service run by Google. Nothing is sent until you agree. |
+| ai.consent.body | To pick places for you, we send your craving, budget, dietary preferences, recent meals, location and the nearby places we found to the AI providers listed below. Nothing is sent until you agree. (The provider list comes from the backend `ai-config` and changes the consent version.) |
 | ai.consent.agree | Agree and continue |
 | ai.consent.decline | Not now |
 | ai.consent.privacy | How we handle your data |
@@ -189,14 +189,14 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | profile.pref.chains | Include chains |
 | profile.pro.free.title | Lunch Pro |
 | profile.pro.free.body | Host group lunches, 10 AI requests a day, full history. |
-| profile.pro.free.cta | Try free for 7 days |
+| profile.pro.free.cta | See Lunch Pro |
 | profile.pro.active.title | Lunch Pro · %s |
 | profile.pro.active.renews | Renews %s |
 | profile.pro.active.expires | Ends %s |
 | profile.pro.manage | Manage subscription |
 | profile.pro.restore | Restore purchases |
 | profile.signin.title | Sign in |
-| profile.signin.body | Needed to host group lunches and to keep your data across devices. |
+| profile.signin.body | Needed for AI picks, purchases and group lunches. Your meal journal stays on this device. |
 | profile.signin.apple | Continue with Apple |
 | profile.signin.google | Continue with Google |
 | profile.signout | Sign out |
@@ -221,21 +221,21 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | Key | Text |
 |---|---|
 | paywall.title | Lunch Pro |
-| paywall.subtitle | Everything the free tier does, without the limits. |
+| paywall.subtitle | Make lunch plans together and get more from your meal journal. |
 | paywall.plan.yearly | Yearly |
-| paywall.plan.yearly.trial | 7-day free trial, then %s a year |
+| paywall.plan.yearly.trial | %s, then %s a year (only when the store reports an eligible introductory offer; none is configured for 1.0) |
 | paywall.plan.yearly.badge | BEST VALUE |
 | paywall.plan.monthly | Monthly |
 | paywall.plan.monthly.price | %s a month |
 | paywall.benefit.1 | Host group lunches |
 | paywall.benefit.2 | 10 AI requests a day |
 | paywall.benefit.3 | Full history and insights |
-| paywall.benefit.4 | Backup and sync |
+| paywall.benefit.4 | Personalised cravings and preferences |
 | paywall.benefit.5 | Unlimited favourites |
 | paywall.benefit.6 | PDF export |
-| paywall.cta.trial | Start free trial |
+| paywall.cta.trial | Start free trial (only when the store reports an eligible introductory offer) |
 | paywall.cta.subscribe | Subscribe |
-| paywall.legal | Payment is charged to your %s account when the trial ends. The subscription renews automatically at the same price unless cancelled at least 24 hours before the end of the period. Manage or cancel any time in your %s subscription settings. |
+| paywall.legal | Payment is charged when you confirm the purchase. Your subscription renews automatically at the displayed price and duration unless cancelled at least 24 hours before the end of the current period. Manage or cancel in your %s subscription settings. AI allowances reset at 00:00 UTC. |
 | paywall.restore | Restore purchases |
 | paywall.terms | Terms of Use |
 | paywall.privacy | Privacy Policy |
@@ -245,7 +245,7 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | gate.ai.cta | See Lunch Pro |
 | gate.host.title | Hosting is a Lunch Pro feature |
 | gate.host.body | Create the group, pick the place, and invite friends for free. |
-| gate.host.cta | Start free trial |
+| gate.host.cta | See Lunch Pro |
 | gate.guest_offer.title | Enjoyed the lunch? |
 | gate.guest_offer.body | Lunch Pro lets you host the next one. |
 

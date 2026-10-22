@@ -254,11 +254,11 @@ struct PaywallViewModelTests {
         await model.load()
 
         #expect(model.yearly?.productId == "au.iapp.lunch.pro.yearly")
-        #expect(model.yearly?.hasFreeTrial == true)
-        #expect(model.yearly?.localizedPrice == "A$19.99")
+        #expect(model.yearly?.hasFreeTrial == false)
+        #expect(model.yearly?.localizedPrice == "A$29.99")
         #expect(model.monthly?.productId == "au.iapp.lunch.pro.monthly")
         #expect(model.monthly?.hasFreeTrial == false)
-        #expect(model.monthly?.localizedPrice == "A$2.99")
+        #expect(model.monthly?.localizedPrice == "A$4.99")
     }
 
     @Test func should_report_subscribed_when_purchase_succeeds() async {

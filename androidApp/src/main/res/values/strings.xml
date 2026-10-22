@@ -84,9 +84,8 @@
     <!-- Paywall -->
     <string name="paywall_store_name">Google Play</string>
     <string name="paywall_title">Lunch Pro</string>
-    <string name="paywall_subtitle">Everything the free tier does, without the limits.</string>
+    <string name="paywall_subtitle">Make lunch plans together and get more from your meal journal.</string>
     <string name="paywall_plan_yearly">Yearly</string>
-    <string name="paywall_plan_yearly_trial">7-day free trial, then %1$s a year</string>
     <string name="paywall_plan_yearly_badge">BEST VALUE</string>
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_monthly_price">%1$s a month</string>
@@ -265,7 +264,7 @@
     <string name="profile_chains_off">Off</string>
     <string name="profile_pro_free_title">Lunch Pro</string>
     <string name="profile_pro_free_body">Host group lunches, more AI picks, full history.</string>
-    <string name="profile_pro_free_cta">Try free for 7 days</string>
+    <string name="profile_pro_free_cta">See Lunch Pro</string>
     <string name="profile_plan_yearly">Yearly</string>
     <string name="profile_plan_monthly">Monthly</string>
     <string name="profile_signin_title">Sign in</string>

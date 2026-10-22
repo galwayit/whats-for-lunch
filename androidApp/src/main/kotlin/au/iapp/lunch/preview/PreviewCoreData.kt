@@ -205,14 +205,14 @@ object PreviewCoreData {
         Rsvp("rsvp_4", GROUP_ID, "user_aisha", "Aisha", RsvpStatus.DECLINED, 1_756_720_000),
     )
 
-    // Monetisation (fixed product rule: A$2.99 monthly, A$19.99 yearly with a 7-day trial)
+    // Monetisation (decided 2026-10-19: A$4.99 monthly, A$29.99 yearly, no introductory offer)
 
     val yearlyPackage = ProPackage(
-        identifier = "\$rc_annual", productId = "au.iapp.lunch.pro.yearly", localizedPrice = "A\$19.99",
-        periodLabel = "year", hasFreeTrial = true, trialLabel = "7 days",
+        identifier = "\$rc_annual", productId = "au.iapp.lunch.pro.yearly", localizedPrice = "A\$29.99",
+        periodLabel = "year", hasFreeTrial = false, trialLabel = null,
     )
     val monthlyPackage = ProPackage(
-        identifier = "\$rc_monthly", productId = "au.iapp.lunch.pro.monthly", localizedPrice = "A\$2.99",
+        identifier = "\$rc_monthly", productId = "au.iapp.lunch.pro.monthly", localizedPrice = "A\$4.99",
         periodLabel = "month", hasFreeTrial = false, trialLabel = null,
     )
     val offerings = ProOfferings(monthly = monthlyPackage, yearly = yearlyPackage)
