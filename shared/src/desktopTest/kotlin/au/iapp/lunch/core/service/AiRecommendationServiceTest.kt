@@ -80,6 +80,34 @@ class AiRecommendationServiceTest {
     }
 
     @Test
+    fun ai_request_sends_only_prompt_fields_and_rehydrates_the_answer() = runTest {
+        val heavy = Samples.restaurant("place-heavy", "Heavy Diner").copy(
+            recentReviews = listOf(Samples.review().copy(text = "UNIQUE_REVIEW_TEXT")),
+            openingHours = listOf("Mon 11:00-15:00"),
+            photoReferences = listOf("UNIQUE_PHOTO_REFERENCE"),
+            photoUrl = "https://example.test/photo.jpg",
+            mealTypeAverageCosts = mapOf("lunch" to 18.0),
+            supportedDietaryRestrictions = listOf("vegan"),
+            features = listOf("outdoor"),
+        )
+        // The backend answers with the slim copy it was given, as the real function does.
+        backend.route("ai-recommend", AiRecommendResponse.serializer(),
+            AiRecommendResponse(Samples.recommendation(restaurants = listOf(Samples.restaurant("place-heavy", "Heavy Diner")))))
+
+        val result = service.recommend("lunch", 3, listOf(heavy), consentVersion = "preview-ai-v2").getOrThrow()
+
+        val body = backend.lastBody()
+        assertFalse(body.contains("UNIQUE_REVIEW_TEXT"))
+        assertFalse(body.contains("UNIQUE_PHOTO_REFERENCE"))
+        assertFalse(body.contains("Mon 11:00-15:00"))
+        assertFalse(body.contains("\"lunch\":18.0"))
+        assertTrue(body.contains("\"supportedDietaryRestrictions\":[\"vegan\"]"))
+        assertTrue(body.contains("\"features\":[\"outdoor\"]"))
+        assertEquals("https://example.test/photo.jpg", result.restaurants.single().photoUrl)
+        assertEquals("UNIQUE_REVIEW_TEXT", result.restaurants.single().recentReviews.single().text)
+    }
+
+    @Test
     fun saved_chain_preference_filters_explicit_candidates_before_ai() = runTest {
         val prefs = users.current.value!!.preferences.copy(includeChains = false)
         users.updatePreferences(prefs).getOrThrow()

@@ -1,5 +1,13 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { ApiError, badRequest, ErrorCode, handle, readJsonObject } from "./errors.ts";
+import {
+  AI_BODY_LIMIT,
+  ApiError,
+  badRequest,
+  DEFAULT_BODY_LIMIT,
+  ErrorCode,
+  handle,
+  readJsonObject,
+} from "./errors.ts";
 
 Deno.test("handle answers preflight, rejects wrong methods and maps ApiError", async () => {
   const fn = handle(["POST"], (_req) => {
@@ -37,6 +45,33 @@ Deno.test("readJsonObject rejects non-objects with 400", async () => {
     assertEquals(err instanceof ApiError && err.status === 400, true);
   }
   assertEquals(badRequest("x").code, "BAD_REQUEST");
+});
+
+Deno.test("readJsonObject accepts an AI candidate body over the default limit only with the AI limit", async () => {
+  // 20 full candidates from the app measured about 105 KB on 23 October 2026.
+  const body = JSON.stringify({ candidates: "x".repeat(100 * 1024) });
+  const make = () =>
+    new Request("https://x/fn", {
+      method: "POST",
+      body,
+      headers: { "content-type": "application/json" },
+    });
+  assertEquals(body.length > DEFAULT_BODY_LIMIT && body.length < AI_BODY_LIMIT, true);
+  await assertRejects(() => readJsonObject(make()), ApiError, "too large");
+  const parsed = await readJsonObject(make(), AI_BODY_LIMIT);
+  assertEquals(typeof parsed.candidates, "string");
+  await assertRejects(
+    () =>
+      readJsonObject(
+        new Request("https://x/fn", {
+          method: "POST",
+          body: JSON.stringify({ c: "x".repeat(AI_BODY_LIMIT) }),
+        }),
+        AI_BODY_LIMIT,
+      ),
+    ApiError,
+    "too large",
+  );
 });
 
 Deno.test("readJsonObject bounds streamed bodies without Content-Length", async () => {

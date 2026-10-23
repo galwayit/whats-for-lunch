@@ -9,7 +9,14 @@ import { routeAi, serverRouterDependencies } from "../_shared/ai-router.ts";
 import { RECOMMENDATION_SCHEMA } from "../_shared/ai-schema.ts";
 import { refundAi, requireAiConsent, reserveAi } from "../_shared/ai-access.ts";
 import { getUser, requireAppUserId } from "../_shared/auth.ts";
-import { ApiError, ErrorCode, handle, json, readJsonObject } from "../_shared/errors.ts";
+import {
+  AI_BODY_LIMIT,
+  ApiError,
+  ErrorCode,
+  handle,
+  json,
+  readJsonObject,
+} from "../_shared/errors.ts";
 import { buildRecommendationPrompt, parseRecommendationResponse } from "../_shared/prompt.ts";
 import { serviceClient } from "../_shared/supabase.ts";
 import { tierFor } from "../_shared/tier.ts";
@@ -76,7 +83,7 @@ function parseCandidates(raw: unknown[]): Restaurant[] {
 }
 
 Deno.serve(handle(["POST"], async (req) => {
-  const body = await readJsonObject(req);
+  const body = await readJsonObject(req, AI_BODY_LIMIT);
   const cravings = optionalString(body, "cravings", 200);
   const maxResults = requireInteger(body, "maxResults", 1, 10);
   const context = parseContext(requireObject(body, "context"));

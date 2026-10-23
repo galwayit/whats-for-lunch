@@ -11,7 +11,14 @@ import { refundAi, requireAiConsent, reserveAi } from "../_shared/ai-access.ts";
 import { requireAppUserId, requireUser } from "../_shared/auth.ts";
 import { safetyContext } from "../_shared/content-safety.ts";
 import { matchesDietary } from "../_shared/dietary.ts";
-import { ApiError, ErrorCode, handle, json, readJsonObject } from "../_shared/errors.ts";
+import {
+  AI_BODY_LIMIT,
+  ApiError,
+  ErrorCode,
+  handle,
+  json,
+  readJsonObject,
+} from "../_shared/errors.ts";
 import { nearbyRestaurants } from "../_shared/nearby.ts";
 import { buildGroupProposalPrompt, parseGroupProposalResponse } from "../_shared/prompt.ts";
 import { functionsBaseUrl, requireEnv, serviceClient, unwrap } from "../_shared/supabase.ts";
@@ -23,7 +30,7 @@ import { optionalObject, requireUuid } from "../_shared/validate.ts";
 const PROPOSAL_COUNT = 3;
 
 Deno.serve(handle(["POST"], async (req) => {
-  const body = await readJsonObject(req);
+  const body = await readJsonObject(req, AI_BODY_LIMIT);
   const groupId = requireUuid(body, "groupId");
   const hostPreferences = optionalObject(body, "hostPreferences");
 

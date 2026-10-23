@@ -67,11 +67,14 @@ internal class AiRecommendationServiceImpl(
         }
         if (pool.isEmpty()) return Result.failure(CoreError.Service("NO_CANDIDATES", "No nearby places match your preferences"))
         val context = buildContext(user)
+        // Full objects stay here; the backend only needs the fields its prompt and dietary
+        // filter read, and 20 full candidates (reviews, hours, photos) exceed its body limit.
+        val chosen = pool.take(MAX_CANDIDATES)
         val request = AiRecommendRequest(
             cravings = cravings?.trim()?.ifEmpty { null },
             maxResults = maxResults,
             context = context,
-            candidates = pool.take(MAX_CANDIDATES),
+            candidates = chosen.map { it.forAiRequest() },
             aiConsentVersion = consentVersion,
         )
         val started = TimeSource.Monotonic.markNow()
@@ -80,9 +83,14 @@ internal class AiRecommendationServiceImpl(
 
         return result.fold(
             onSuccess = { recommendation ->
-                val local = recommendation.copy(userId = user.id)
-                restaurants?.cacheAll(request.candidates + local.restaurants)
-                persist(local, request.candidates, context)
+                // The backend echoes the slim candidates it was given; put the full objects back.
+                val byId = chosen.associateBy { it.placeId }
+                val local = recommendation.copy(
+                    userId = user.id,
+                    restaurants = recommendation.restaurants.map { byId[it.placeId] ?: it },
+                )
+                restaurants?.cacheAll(chosen + local.restaurants)
+                persist(local, chosen, context)
                 usage.record(user.id, AiUsage.RECOMMENDATION, elapsedMs, successful = true, errorMessage = null)
                 Result.success(local)
             },
@@ -170,6 +178,30 @@ internal class AiRecommendationServiceImpl(
             }
         }
     }
+
+    /**
+     * The subset of a restaurant the backend prompt (`prompt.ts`) and dietary filter (`dietary.ts`)
+     * read. Reviews, opening hours, photo references and score maps are dropped: they are never
+     * sent to an AI provider and twenty full candidates exceeded the backend's request body limit.
+     */
+    private fun Restaurant.forAiRequest(): Restaurant = Restaurant(
+        placeId = placeId,
+        name = name,
+        location = location,
+        address = address,
+        distanceFromUser = distanceFromUser,
+        rating = rating,
+        reviewCount = reviewCount,
+        priceLevel = priceLevel,
+        cuisineType = cuisineType,
+        cuisineTypes = cuisineTypes,
+        supportedDietaryRestrictions = supportedDietaryRestrictions,
+        allergenInfo = allergenInfo,
+        hasVerifiedDietaryInfo = hasVerifiedDietaryInfo,
+        features = features,
+        averageMealCost = averageMealCost,
+        valueScore = valueScore,
+    )
 
     /** Short diagnostic stored in `a_i_usage_metrics.error_message`; gates have no message, only a reason. */
     private fun Throwable.metricLabel(): String = when (this) {

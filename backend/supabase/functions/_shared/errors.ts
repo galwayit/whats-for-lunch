@@ -115,9 +115,16 @@ export function handle(allowedMethods: string[], fn: Handler): Handler {
   };
 }
 
-/** Reads and parses a JSON body, returning 400 on syntax errors or non-objects. */
-export async function readJsonObject(req: Request): Promise<Record<string, unknown>> {
-  const maxBytes = 64 * 1024;
+/** Default request body ceiling; large enough for every call except AI candidate lists. */
+export const DEFAULT_BODY_LIMIT = 64 * 1024;
+/** Ceiling for ai-recommend and groups-propose, whose bodies carry up to 20 restaurant candidates. */
+export const AI_BODY_LIMIT = 256 * 1024;
+
+/** Reads and parses a JSON body, returning 400 on syntax errors, non-objects or bodies over `maxBytes`. */
+export async function readJsonObject(
+  req: Request,
+  maxBytes: number = DEFAULT_BODY_LIMIT,
+): Promise<Record<string, unknown>> {
   if (Number(req.headers.get("content-length")) > maxBytes) {
     throw badRequest("Request body is too large");
   }
