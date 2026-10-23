@@ -42,7 +42,7 @@ the existing consent version because the companies receiving data are unchanged.
 | `providers[].id` | Stable lowercase profile ID; letters, digits, `_` and `-`, max 32 characters. |
 | `providers[].kind` | `google`, `openai`, `anthropic`, or `openai-compatible`. |
 | `providers[].models.free/pro` | Model IDs for each tier. Verify access and quality in your paid project. |
-| `providers[].timeoutMs` | 1,000–10,000 milliseconds per attempt; initial value 10,000. |
+| `providers[].timeoutMs` | 1,000–30,000 milliseconds per attempt; seed value 10,000. The apps allow 60 s for an AI call, so primary plus backup must stay under that. Live values since 24 October 2026: OpenAI 25,000 (GPT-6 Luna exceeded 10 s on a 20-candidate prompt), Google 10,000. |
 | `providers[].maxOutputTokens` | 256–4,096; includes provider-specific output/reasoning limits. |
 | `providers[].dailyRequestLimit` | 1–10,000 attempts per profile, UTC day. Failed paid attempts still count. |
 | `consentRevision` | Change when the data-sharing policy changes; always requires fresh permission. |

@@ -1,6 +1,6 @@
-import { assertEquals } from "jsr:@std/assert@1";
+import { assertEquals, assertRejects } from "jsr:@std/assert@1";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { aiDisclosure, loadAiConfig } from "./ai-config.ts";
+import { aiDisclosure, loadAiConfig, MAX_PROVIDER_TIMEOUT_MS } from "./ai-config.ts";
 import { routeAi } from "./ai-router.ts";
 
 Deno.test("runtime model edits apply on the next request and preserve the in-flight snapshot", async () => {
@@ -58,4 +58,31 @@ Deno.test("runtime model edits apply on the next request and preserve the in-fli
   await routeAi(nextRequest, "free", "fixture", {}, JSON.parse, deps);
   await routeAi(nextRequest, "pro", "fixture", {}, JSON.parse, deps);
   assertEquals(models, ["gpt-6-luna", "future-free-model", "future-pro-model"]);
+});
+
+Deno.test("provider timeout accepts up to 30 s per attempt and rejects more", async () => {
+  const withTimeout = (timeoutMs: number) => ({
+    enabled: true,
+    primary: "openai",
+    backup: null,
+    consentRevision: "1",
+    providers: [{
+      id: "openai",
+      kind: "openai",
+      models: { free: "gpt-6-luna", pro: "gpt-6-luna" },
+      timeoutMs,
+      maxOutputTokens: 1024,
+      dailyRequestLimit: 10,
+    }],
+  });
+  const clientFor = (value: unknown) =>
+    createClient("https://fixture.supabase.co", "fixture-key", {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      global: { fetch: () => Promise.resolve(Response.json([{ value }])) },
+    });
+  assertEquals(MAX_PROVIDER_TIMEOUT_MS, 30_000);
+  assertEquals((await loadAiConfig(clientFor(withTimeout(25_000)))).providers[0].timeoutMs, 25_000);
+  assertEquals((await loadAiConfig(clientFor(withTimeout(30_000)))).providers[0].timeoutMs, 30_000);
+  await assertRejects(() => loadAiConfig(clientFor(withTimeout(30_001))));
+  await assertRejects(() => loadAiConfig(clientFor(withTimeout(999))));
 });

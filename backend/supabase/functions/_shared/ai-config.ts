@@ -5,6 +5,8 @@ import type { Tier } from "./types.ts";
 
 export type AiProviderKind = "google" | "openai" | "anthropic" | "openai-compatible";
 export type ReadEnv = (name: string) => string | undefined;
+export const MAX_PROVIDER_TIMEOUT_MS = 30_000;
+
 export interface AiProvider {
   id: string;
   kind: AiProviderKind;
@@ -112,7 +114,9 @@ export function parseAiConfig(raw: unknown): AiConfig {
         free: text(models.free, /^[a-zA-Z0-9][a-zA-Z0-9._:/-]*$/),
         pro: text(models.pro, /^[a-zA-Z0-9][a-zA-Z0-9._:/-]*$/),
       },
-      timeoutMs: integer(p.timeoutMs, 1000, 10000),
+      // Per-attempt ceiling. The apps allow 60 s for an AI call, so primary plus backup must
+      // stay under that; 25 s + 10 s is the live arrangement (AI_PROVIDERS.md).
+      timeoutMs: integer(p.timeoutMs, 1000, MAX_PROVIDER_TIMEOUT_MS),
       maxOutputTokens: integer(p.maxOutputTokens, 256, 4096),
       dailyRequestLimit: integer(p.dailyRequestLimit, 1, 10000),
     };
