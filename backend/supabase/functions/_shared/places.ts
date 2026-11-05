@@ -304,10 +304,19 @@ async function placesPost(
   return await response.json();
 }
 
+/** Upstream requests one `searchNearbyRaw` call makes; charge the budget this many times. */
+export const NEARBY_UPSTREAM_REQUESTS = 2;
+
 /**
  * Raw Place resources near a point. Without a query this is `searchNearby`
  * restricted to restaurants; with a query it is `searchText` biased to the
  * same circle, because searchNearby has no text filter.
+ *
+ * Both endpoints cap a response at 20 places with no paging, and their default
+ * ranking (popularity / relevance) fills those 20 with the well-known places
+ * kilometres away, so the shops next to the user never appear. Each search is
+ * therefore made twice, ranked by DISTANCE and by the default, and merged with
+ * the nearest places first.
  */
 export async function searchNearbyRaw(
   params: NearbyParams,
@@ -319,22 +328,43 @@ export async function searchNearbyRaw(
     center: { latitude: params.lat, longitude: params.lng },
     radius: radiusMetres,
   };
-  const body = params.query.length > 0
-    ? {
-      textQuery: params.query,
-      includedType: "restaurant",
-      maxResultCount: 20,
-      locationBias: { circle },
-    }
-    : {
-      includedTypes: ["restaurant"],
-      maxResultCount: 20,
-      locationRestriction: { circle },
-    };
-  const path = params.query.length > 0 ? "places:searchText" : "places:searchNearby";
-  const payload = await placesPost(path, body, NEARBY_FIELD_MASK, apiKey, fetchImpl);
-  const places = (payload as { places?: unknown }).places;
-  return Array.isArray(places) ? places : [];
+  const textSearch = params.query.length > 0;
+  const path = textSearch ? "places:searchText" : "places:searchNearby";
+  const bodyFor = (rankPreference: string) =>
+    textSearch
+      ? {
+        textQuery: params.query,
+        includedType: "restaurant",
+        maxResultCount: 20,
+        rankPreference,
+        locationBias: { circle },
+      }
+      : {
+        includedTypes: ["restaurant"],
+        maxResultCount: 20,
+        rankPreference,
+        locationRestriction: { circle },
+      };
+  const rankings = ["DISTANCE", textSearch ? "RELEVANCE" : "POPULARITY"];
+  const pages = await Promise.all(
+    rankings.map((rank) => placesPost(path, bodyFor(rank), NEARBY_FIELD_MASK, apiKey, fetchImpl)),
+  );
+  return dedupePlaces(pages.flatMap((payload) => {
+    const places = (payload as { places?: unknown }).places;
+    return Array.isArray(places) ? places : [];
+  }));
+}
+
+/** Keeps the first occurrence of each place id; entries without an id are kept as-is. */
+function dedupePlaces(places: unknown[]): unknown[] {
+  const seen = new Set<string>();
+  return places.filter((place) => {
+    const id = (place as { id?: unknown } | null)?.id;
+    if (typeof id !== "string") return true;
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
 
 /** Raw Place details resource. Throws PlacesError(404) when unknown. */

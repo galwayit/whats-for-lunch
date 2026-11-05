@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@1";
+import { assertEquals, assertRejects } from "jsr:@std/assert@1";
 import details from "./__fixtures__/places_details_response.json" with { type: "json" };
 import nearby from "./__fixtures__/places_nearby_response.json" with { type: "json" };
 import {
@@ -7,8 +7,11 @@ import {
   extractFeatures,
   mapPlace,
   mapReviews,
+  NEARBY_UPSTREAM_REQUESTS,
   normaliseQuery,
   photoProxyUrl,
+  PlacesError,
+  searchNearbyRaw,
 } from "./places.ts";
 import type { Restaurant } from "./types.ts";
 
@@ -193,4 +196,90 @@ Deno.test("photo, provider and review source attributions survive mapping", () =
   }]);
   assertEquals(reviews[0].sourceUri, "https://maps.google.com/review");
   assertEquals(reviews[0].authorUri, "https://maps.google.com/author");
+});
+
+/* ---------- searchNearbyRaw ---------- */
+
+interface RecordedRequest {
+  path: string;
+  body: Record<string, unknown>;
+}
+
+/** Fake fetch that records every Places request and answers from `pages` in order. */
+function fakePlacesFetch(pages: unknown[], requests: RecordedRequest[]): typeof fetch {
+  return ((input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    requests.push({
+      path: url.replace("https://places.googleapis.com/v1/", ""),
+      body: JSON.parse(String(init?.body)),
+    });
+    const page = pages[requests.length - 1];
+    return Promise.resolve(
+      page instanceof Response ? page : new Response(JSON.stringify(page), { status: 200 }),
+    );
+  }) as typeof fetch;
+}
+
+const point = { lat: -33.7969, lng: 151.1728, radiusKm: 5 };
+const place = (id: string) => ({ id, displayName: { text: id } });
+
+Deno.test("searchNearbyRaw asks for the nearest and the most popular places and merges them", async () => {
+  const requests: RecordedRequest[] = [];
+  const fetchImpl = fakePlacesFetch(
+    [
+      { places: [place("near-1"), place("near-2"), place("shared")] },
+      { places: [place("shared"), place("popular-1")] },
+    ],
+    requests,
+  );
+
+  const merged = await searchNearbyRaw({ ...point, query: "" }, "key", fetchImpl);
+
+  assertEquals(requests.length, NEARBY_UPSTREAM_REQUESTS);
+  assertEquals(requests.map((r) => r.path), ["places:searchNearby", "places:searchNearby"]);
+  assertEquals(requests.map((r) => r.body.rankPreference), ["DISTANCE", "POPULARITY"]);
+  for (const { body } of requests) {
+    assertEquals(body.includedTypes, ["restaurant"]);
+    assertEquals(body.maxResultCount, 20);
+    assertEquals(body.locationRestriction, {
+      circle: { center: { latitude: point.lat, longitude: point.lng }, radius: 5000 },
+    });
+  }
+  // Nearest first, duplicates dropped, popular extras appended.
+  assertEquals(
+    merged.map((p) => (p as { id: string }).id),
+    ["near-1", "near-2", "shared", "popular-1"],
+  );
+});
+
+Deno.test("searchNearbyRaw with a query uses text search ranked by distance and relevance", async () => {
+  const requests: RecordedRequest[] = [];
+  const fetchImpl = fakePlacesFetch([{ places: [place("a")] }, { places: [] }], requests);
+
+  const merged = await searchNearbyRaw({ ...point, query: "sushi" }, "key", fetchImpl);
+
+  assertEquals(requests.map((r) => r.path), ["places:searchText", "places:searchText"]);
+  assertEquals(requests.map((r) => r.body.rankPreference), ["DISTANCE", "RELEVANCE"]);
+  for (const { body } of requests) {
+    assertEquals(body.textQuery, "sushi");
+    assertEquals(body.includedType, "restaurant");
+    assertEquals(body.locationBias, {
+      circle: { center: { latitude: point.lat, longitude: point.lng }, radius: 5000 },
+    });
+  }
+  assertEquals(merged.length, 1);
+});
+
+Deno.test("searchNearbyRaw surfaces an upstream failure as PlacesError", async () => {
+  const requests: RecordedRequest[] = [];
+  const fetchImpl = fakePlacesFetch(
+    [{ places: [place("a")] }, new Response("quota", { status: 429 })],
+    requests,
+  );
+
+  await assertRejects(
+    () => searchNearbyRaw({ ...point, query: "" }, "key", fetchImpl),
+    PlacesError,
+    "429",
+  );
 });

@@ -7,7 +7,7 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { reserveUpstream } from "./budget.ts";
 import { haversineKm, roundKm } from "./haversine.ts";
-import { mapPlace, searchNearbyRaw } from "./places.ts";
+import { mapPlace, NEARBY_UPSTREAM_REQUESTS, searchNearbyRaw } from "./places.ts";
 import { nowEpochSeconds, type Restaurant } from "./types.ts";
 
 export const PLACES_CACHE_TTL_SECONDS = 24 * 60 * 60;
@@ -45,7 +45,7 @@ export async function nearbyRestaurants(
   deps: NearbyDeps,
 ): Promise<NearbyResult> {
   const fetchedAt = nowEpochSeconds();
-  await reserveUpstream(deps.client, "places");
+  for (let i = 0; i < NEARBY_UPSTREAM_REQUESTS; i++) await reserveUpstream(deps.client, "places");
   const places = await searchNearbyRaw(req, deps.apiKey, deps.fetchImpl ?? fetch);
   const cached = false;
 

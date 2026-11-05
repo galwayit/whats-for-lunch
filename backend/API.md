@@ -33,7 +33,9 @@ clears those rebuildable caches. Native clients retain place IDs in the database
 and current responses in bounded process memory. Author credits and source links
 travel with Google photos/reviews; content lacking required credits is hidden on iOS.
 Global UTC daily request ceilings protect Places, photos, and all AI providers. These are
-request limits, not a substitute for provider billing controls.
+request limits, not a substitute for provider billing controls. One nearby search costs two
+Places requests: a distance-ranked and a popularity-ranked call, merged so the closest places
+are never crowded out by the well-known ones.
 
 ## AI
 
