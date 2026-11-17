@@ -35,7 +35,7 @@ This comprehensive security audit identifies **CRITICAL** vulnerabilities and se
 ```xml
 <!-- CRITICAL SECURITY ISSUE -->
 <meta-data android:name="com.google.android.geo.API_KEY"
-    android:value="AIzaSyA47-rYYHqDghRMva05HKKvNrt_yIuWCUY"/>
+    android:value="[REDACTED-GOOGLE-MAPS-KEY]"/>
 ```
 
 **Risk Level:** CRITICAL  
@@ -59,7 +59,7 @@ This comprehensive security audit identifies **CRITICAL** vulnerabilities and se
 #### Recommendations
 
 1. **Immediate Action Required:**
-   - Revoke exposed Google Maps API key `AIzaSyA47-rYYHqDghRMva05HKKvNrt_yIuWCUY`
+   - Revoke exposed Google Maps API key `[REDACTED-GOOGLE-MAPS-KEY]`
    - Generate new API keys with proper restrictions
    - Remove hardcoded keys from manifest files
 

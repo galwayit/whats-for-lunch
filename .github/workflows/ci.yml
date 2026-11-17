@@ -49,9 +49,10 @@ jobs:
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
       - name: Select Xcode
-        # Use the newest Xcode on the image. RevenueCat's purchases-ios must match the
-        # Swift version: 5.67.1 and earlier do not compile under Swift 6.4 (Xcode 27).
-        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+        # Pinned so an image update cannot change the compiler under a release branch. The
+        # macos-26 image has no Xcode 27 yet; App Store archives are built locally with 27.x,
+        # so move this pin when the image gains the same major version.
+        run: sudo xcode-select -s /Applications/Xcode_26.6.app
       - name: Build LunchCore framework for the simulator
         run: ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --no-daemon
       - name: Release configuration security checks
@@ -66,6 +67,14 @@ jobs:
           xcodebuild -project iosApp/LunchApp.xcodeproj -scheme LunchApp \
             -destination "platform=iOS Simulator,id=$UDID" \
             -configuration Debug test CODE_SIGNING_ALLOWED=NO | xcpretty
+      - name: Release configuration builds
+        # The archive uses Release: the Release-only Swift paths, the Kotlin/Native release link
+        # and the runtime-config build phase are otherwise first exercised on archive day.
+        run: |
+          set -o pipefail
+          xcodebuild -project iosApp/LunchApp.xcodeproj -scheme LunchApp \
+            -destination "generic/platform=iOS Simulator" \
+            -configuration Release build CODE_SIGNING_ALLOWED=NO | xcpretty
 
   backend:
     name: Backend checks and tests
@@ -75,6 +84,14 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      - name: No credential patterns in tracked files
+        # The repository is public. A PEM header that ends its line is a real key file; the test
+        # fixtures keep their generated PEM text on one line and do not match.
+        run: |
+          if git grep -nIE 'AIza[0-9A-Za-z_-]{35}|sk_[A-Za-z0-9]{24,}|sb_secret_[A-Za-z0-9_-]{10,}|sntrys_[A-Za-z0-9_-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----$' -- . ':!.github/workflows/ci.yml'; then
+            echo "error: a credential pattern is committed; revoke it and remove it." >&2
+            exit 1
+          fi
       - name: Type check, format, test
         working-directory: backend
         run: make check && make test
