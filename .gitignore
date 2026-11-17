@@ -46,7 +46,6 @@ shared/src/iosMain/**/*.framework/
 
 # --- Node / Deno ---
 node_modules/
-backend/**/deno.lock
 
 # --- Flutter archive (kept buildable, artefacts ignored) ---
 archive/flutter/.dart_tool/

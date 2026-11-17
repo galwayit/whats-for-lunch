@@ -15,15 +15,17 @@ help:
 	@echo "make deploy           db push + deploy every function (needs a linked project)"
 	@echo "make secrets          push secrets from supabase/.env (never committed)"
 
+# --frozen: fail when a dependency differs from supabase/functions/deno.lock instead of
+# resolving it again. After a deliberate dependency change, run `deno check` once without it.
 check:
 	cd $(FUNCTIONS_DIR) && $(DENO) fmt --check
-	cd $(FUNCTIONS_DIR) && $(DENO) check $$(find . -name '*.ts' | sort)
+	cd $(FUNCTIONS_DIR) && $(DENO) check --frozen $$(find . -name '*.ts' | sort)
 
 fmt:
 	cd $(FUNCTIONS_DIR) && $(DENO) fmt
 
 test:
-	cd $(FUNCTIONS_DIR) && $(DENO) test .
+	cd $(FUNCTIONS_DIR) && $(DENO) test --frozen .
 
 # --- deployment (documented in README.md; not run by CI) ---
 deploy: deploy-db deploy-functions
