@@ -25,6 +25,14 @@ import { optionalString, requireEnum } from "../_shared/validate.ts";
 
 const STATUSES = ["accepted", "declined"] as const;
 
+/** The database caps guests per lunch (22023). Tell the guest instead of returning a generic 500. */
+function savedRsvp<T>(
+  result: { data: T | null; error: { code?: string; message: string } | null },
+): T {
+  if (result.error?.code === "22023") throw badRequest(result.error.message);
+  return unwrap(result);
+}
+
 function newGuestToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
@@ -56,7 +64,7 @@ Deno.serve(handle(["POST"], async (req) => {
 
   if (user) {
     const displayName = displayNameInput ?? user.displayName;
-    unwrap(
+    savedRsvp(
       await client
         .from("rsvps")
         .upsert(
@@ -86,7 +94,7 @@ Deno.serve(handle(["POST"], async (req) => {
     } else {
       if (!displayNameInput) throw badRequest("displayName is required when not signed in");
       issuedToken = existingToken ?? newGuestToken();
-      unwrap(
+      savedRsvp(
         await client
           .from("rsvps")
           .insert({

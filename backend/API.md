@@ -18,6 +18,10 @@ Errors are `{ "error": { "code": "...", "message": "..." } }`. Key codes:
 JSON bodies are capped at 64 KiB, including streams without Content-Length.
 API model timestamps are epoch seconds.
 
+CORS allows one browser origin, `https://lunch.iapp.au` (the invitation page). Native apps
+send no `Origin` header and are not affected. A page on any other origin, including a local
+or preview copy of the invitation page, cannot read responses from these functions.
+
 ## Places
 
 - `POST /places-nearby`: `{lat, lng, radiusKm, query?, maxPrice?, minRating?}`.
@@ -36,6 +40,18 @@ Global UTC daily request ceilings protect Places, photos, and all AI providers. 
 request limits, not a substitute for provider billing controls. One nearby search costs two
 Places requests: a distance-ranked and a popularity-ranked call, merged so the closest places
 are never crowded out by the well-known ones.
+
+Each caller also has a UTC daily ceiling on these three functions, so one caller cannot spend
+the global budget for everyone: 200 Places requests (a nearby search counts as two, details as
+one) and 1000 photos by default (`PLACES_CALLER_DAILY_REQUEST_LIMIT`,
+`PHOTOS_CALLER_DAILY_REQUEST_LIMIT`). It is checked before the global ceiling, so a refused
+caller spends no global budget. The caller is the verified account when the request carries a
+valid user JWT; otherwise it is the network address (`cf-connecting-ip`, else the first
+`x-forwarded-for` hop; an IPv6 address counts as its /64). Photo requests from the apps carry no
+JWT, so they are counted by network address, and people behind one shared address share a ceiling. Only a SHA-256 of the caller, salted with the
+service role key, is stored (`caller_usage`). Both ceilings return `RATE_LIMITED` (429).
+`groups-propose` also searches Places but has no per-caller ceiling: it requires a verified Pro
+host and first spends one of that account's 10 daily AI requests.
 
 ## AI
 
@@ -73,8 +89,16 @@ The example leaves candidates empty to show the shape; actual requests require
 It obtains consent before building/sending personal AI context. The consent field
 records the client contract; it is not an authentication credential.
 
-The backend reconciles the account's current RevenueCat subscriber state, then
-atomically reserves a UTC daily allowance: **free 1; Pro 10**, with personal and
+Tier checks (AI and group hosting) trust a stored Pro entitlement that RevenueCat verified
+in the last 5 minutes; the webhook rewrites that row on refund or expiry. An older Pro row,
+and every free, absent or expired row, is reconciled with RevenueCat first, so a new purchase
+counts on the next request without waiting for the webhook. If RevenueCat is unavailable, an
+account without a stored Pro row is served as free (after the 10-second verification timeout)
+and an older Pro row returns the retryable `UPSTREAM_ERROR`. An outage never grants or
+extends Pro. A subscriber whose purchase or renewal has not yet reached the stored row is
+therefore treated as free until RevenueCat answers again.
+
+The backend then atomically reserves a UTC daily allowance: **free 1; Pro 10**, with personal and
 group suggestions sharing the Pro allowance. After the free request is used,
 the next attempt opens the subscription paywall. A new UTC day restores the
 free allowance. `AI_DAILY_LIMIT` includes `resetsAt`
@@ -113,7 +137,9 @@ local journal user ID by the client.
   Signed-in responses belong to the verified account. Anonymous responses return a
   64-character hex `guestToken` for subsequent requests. Native clients persist it in
   Keychain/Keystore storage per invitation; the web page uses localStorage. Never log
-  it or attach it to an unrelated invitation.
+  it or attach it to an unrelated invitation. A lunch holds at most 200 guests, counting
+  guests who only sent a suggestion. A new guest beyond that receives `BAD_REQUEST`
+  ("Guest limit reached for this lunch"); existing guests can still change their reply.
 
 Hosts and their signed-in guests read relevant groups/RSVPs through RLS. The iOS
 app refreshes visible groups periodically and surfaces errors explicitly.
@@ -149,8 +175,18 @@ access; that is not proof a real purchase works.
 
 Migrations define `entitlements`, `usage`, `ai_requests`, `groups`, `rsvps`,
 `device_tokens`, legacy caches, plus `revenuecat_events`, `ai_reservations`,
-`account_deletions`, `upstream_usage`, `system_parameters` and `system_parameter_history`. Billing/quota/deletion tables and RPCs
+`account_deletions`, `upstream_usage`, `caller_usage`, `system_parameters` and `system_parameter_history`. Billing/quota/deletion tables and RPCs
 are service-role-only with explicit grants. See migrations for columns and policies.
+
+`run_daily_maintenance()` (service-role only) is scheduled by pg_cron as job
+`lunch-daily-maintenance` at 17:17 UTC. It removes expired legacy cache rows and `usage` rows
+older than 60 days (the existing `cleanup_places_cache`); rows older than 90 days from
+`ai_requests`, `ai_reservations`, `upstream_usage`, `caller_usage` and `revenuecat_events`;
+and content reports closed more than 90 days ago (open reports are kept). For a lunch
+scheduled more than 30 days ago it clears the venue name and address on the group and its
+suggestions and keeps the place ID, because Google allows other Places content to be stored
+for 30 days only. A suggestion that only named a place is deleted, because a suggestion row
+must keep a place or a time. The evidence snapshot inside a content report is not changed. See [README.md](README.md) for how to check that the job ran.
 
 `production.env.example` lists required server secrets and optional limits. No
 secret API key, Apple private key, or Firebase service account belongs in an app

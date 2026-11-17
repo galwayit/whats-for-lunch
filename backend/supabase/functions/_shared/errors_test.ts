@@ -15,13 +15,16 @@ Deno.test("handle answers preflight, rejects wrong methods and maps ApiError", a
   });
   const preflight = await fn(new Request("https://x/fn", { method: "OPTIONS" }));
   assertEquals(preflight.status, 204);
-  assertEquals(preflight.headers.get("Access-Control-Allow-Origin"), "*");
+  assertEquals(preflight.headers.get("Access-Control-Allow-Origin"), "https://lunch.iapp.au");
 
   const wrong = await fn(new Request("https://x/fn", { method: "GET" }));
   assertEquals(wrong.status, 405);
 
-  const denied = await fn(new Request("https://x/fn", { method: "POST" }));
+  const denied = await fn(
+    new Request("https://x/fn", { method: "POST", headers: { Origin: "https://attacker.test" } }),
+  );
   assertEquals(denied.status, 402);
+  assertEquals(denied.headers.get("Access-Control-Allow-Origin"), "https://lunch.iapp.au");
   assertEquals(await denied.json(), {
     error: { code: "AI_DAILY_LIMIT", message: "Daily AI limit reached", resetsAt: 1 },
   });

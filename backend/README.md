@@ -32,6 +32,8 @@ docker run --detach --name lunch-review-postgres-local --env POSTGRES_PASSWORD=l
 docker exec lunch-review-postgres-local pg_isready -U postgres
 python3 tests/postgres_regression.py lunch-review-postgres-local
 python3 tests/postgres_regression.py lunch-review-postgres-local --bootstrap-settings-first
+# Also runs the checks above, then invitations, the guest ceiling and scheduled maintenance (as CI does).
+python3 tests/invitation_regression.py lunch-review-postgres-local
 docker rm --force lunch-review-postgres-local
 ```
 
@@ -47,7 +49,8 @@ preserves operator model choices and audit history when all migrations later run
 git-ignored environment file. The current `.env` is incomplete; deploying blank
 values does not configure working providers.
 
-- Google Places: restricted server Places key and provider API quotas.
+- Google Places: restricted server Places key and provider API quotas. The global and
+  per-caller daily ceilings are optional settings in `production.env.example`.
 - AI: configure primary and backup provider keys in Supabase Secrets and runtime
   parameters using [AI_PROVIDERS.md](AI_PROVIDERS.md). The migration seeds a disabled
   Google/OpenAI route and a selectable Claude profile. Qualify actual model access,
@@ -100,6 +103,38 @@ quota contention, Apple account deletion, and push delivery. Inspect function lo
 without recording secrets or prompts. Local tests and TEST webhooks are not proof
 that real purchases work.
 
+## Scheduled maintenance and per-caller limits
+
+As of 18 November 2026, migrations `20261118000001` to `20261118000003` are not deployed. Apply them before
+deploying the functions: `places-nearby`, `places-details` and `places-photo` call
+`reserve_caller_request` and return an error until `20261118000001` exists.
+
+`20261118000003` enables pg_cron and schedules `select public.run_daily_maintenance()` daily
+at 17:17 UTC as job `lunch-daily-maintenance` (see [API.md](API.md) for what it removes).
+Rerunning the migration replaces the job. After the first scheduled run, check it in the SQL
+editor:
+
+```sql
+select jobid, schedule, active from cron.job where jobname = 'lunch-daily-maintenance';
+select status, return_message, start_time, end_time from cron.job_run_details
+where jobid = (select jobid from cron.job where jobname = 'lunch-daily-maintenance')
+order by start_time desc limit 5;
+-- To run it once by hand:
+select public.run_daily_maintenance();
+```
+
+pg_cron does not clean `cron.job_run_details`; one row a day needs no action for years.
+
+After deploying the functions, confirm that callers are told apart. Search from two networks
+without signing in, then run
+`select provider, count(*) as callers, max(requests) from caller_usage where day = (now() at time zone 'utc')::date group by provider;`.
+Two networks must give two `places` rows. One row means the gateway reports the same address
+for every caller, and no row means it reports none; correct `clientNetwork` in
+`_shared/budget.ts` before relying on the limit. Also send one request with a made-up
+`X-Forwarded-For` header: if that creates a new row, the gateway does not set
+`cf-connecting-ip`, a caller can evade the per-caller limit, and only the global ceiling
+protects Places.
+
 ## Static site and operations
 
 Deploy `web/` through the existing hosting path after reviewing the updated privacy
@@ -107,6 +142,6 @@ and terms text. See [web/README.md](web/README.md) for routes and association ch
 Source changes do not prove the public policy or AASA file is live.
 
 Before charging users, establish uptime/error alerts, provider cost alerts,
-database backup/restore evidence, retention/cleanup for usage and event ledgers,
-support ownership, and a provider outage response. The verified Supabase account
+database backup/restore evidence, support ownership, and a provider outage response.
+Retention and cleanup for usage and event ledgers is the scheduled job above; confirm it runs. The verified Supabase account
 is on the Free plan; production capacity and backup capabilities remain unqualified.

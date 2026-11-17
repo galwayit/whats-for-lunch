@@ -189,6 +189,7 @@ export interface EntitlementRow {
   product_id: string | null;
   expires_at: string | null;
   source: string;
+  reconciled_at: string | null;
 }
 
 export interface DeviceTokenRow {

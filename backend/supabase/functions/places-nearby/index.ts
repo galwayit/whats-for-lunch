@@ -3,9 +3,10 @@
  * @description POST /places-nearby: cached restaurant search around a point.
  */
 
+import { reserveCaller } from "../_shared/budget.ts";
 import { handle, json, readJsonObject } from "../_shared/errors.ts";
 import { nearbyRestaurants } from "../_shared/nearby.ts";
-import { applyFilters, normaliseQuery } from "../_shared/places.ts";
+import { applyFilters, NEARBY_UPSTREAM_REQUESTS, normaliseQuery } from "../_shared/places.ts";
 import { functionsBaseUrl, requireEnv, serviceClient } from "../_shared/supabase.ts";
 import { optionalNumber, requireNumber } from "../_shared/validate.ts";
 
@@ -18,8 +19,10 @@ Deno.serve(handle(["POST"], async (req) => {
   const minRating = optionalNumber(body, "minRating", 0, 5);
   const query = normaliseQuery(body.query);
 
+  const client = serviceClient();
+  await reserveCaller(client, req, "places", NEARBY_UPSTREAM_REQUESTS);
   const result = await nearbyRestaurants({ lat, lng, radiusKm, query }, {
-    client: serviceClient(),
+    client,
     apiKey: requireEnv("GOOGLE_PLACES_API_KEY"),
     functionsBase: functionsBaseUrl(),
   });

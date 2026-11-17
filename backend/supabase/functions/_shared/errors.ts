@@ -7,7 +7,8 @@
  */
 
 export const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
+  // The invitation page is the only browser caller; native apps send no Origin.
+  "Access-Control-Allow-Origin": "https://lunch.iapp.au",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, apikey, content-type, x-app-user-id, x-timezone, x-guest-token, x-client-info",

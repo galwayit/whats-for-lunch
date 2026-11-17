@@ -82,4 +82,11 @@ elements['safety-block'].listeners.click();await settle();
 assert.equal(requests.at(-1).body.action,'report_block');
 assert.equal(elements.invite.classList.contains('hidden'),true);
 assert.match(elements['not-found-detail'].textContent,/Host blocked/);
+// A browser delivers these responses only if the functions' CORS policy admits this page and every header it sent.
+const cors = readFileSync(new URL('../supabase/functions/_shared/errors.ts', import.meta.url), 'utf8');
+assert.match(cors, /"Access-Control-Allow-Origin": "https:\/\/lunch\.iapp\.au"/);
+const allowedHeaders = cors.match(/"Access-Control-Allow-Headers":\s*"([^"]+)"/)[1].split(/,\s*/);
+const sentHeaders = new Set(requests.flatMap(r => Object.keys(r.options.headers ?? {}).map(h => h.toLowerCase())));
+assert.ok(sentHeaders.has('x-guest-token') && sentHeaders.has('authorization'));
+for (const header of sentHeaders) assert.ok(allowedHeaders.includes(header), header + ' is allowed by CORS');
 console.log('PASS: web invitation details, first-RSVP validation despite a GET token, safe rendering, retry, RSVP, plan refresh, report and block (fictional data).');

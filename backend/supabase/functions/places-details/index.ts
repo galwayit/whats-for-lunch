@@ -3,7 +3,7 @@
  * @description POST /places-details: fresh place details and attributed reviews; no persistent cache.
  */
 
-import { reserveUpstream } from "../_shared/budget.ts";
+import { reserveCaller, reserveUpstream } from "../_shared/budget.ts";
 import { ApiError, ErrorCode, handle, json, readJsonObject } from "../_shared/errors.ts";
 import { mapPlace, mapReviews, placeDetailsRaw, PlacesError } from "../_shared/places.ts";
 import { functionsBaseUrl, requireEnv, serviceClient } from "../_shared/supabase.ts";
@@ -19,6 +19,7 @@ Deno.serve(handle(["POST"], async (req) => {
   const fetchedAt = now;
   let payload: unknown;
   try {
+    await reserveCaller(client, req, "places");
     await reserveUpstream(client, "places");
     payload = await placeDetailsRaw(placeId, requireEnv("GOOGLE_PLACES_API_KEY"));
   } catch (err: unknown) {

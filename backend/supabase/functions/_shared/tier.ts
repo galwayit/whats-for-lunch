@@ -2,6 +2,7 @@
  * @file tier.ts
  * @description Entitlement lookup: `pro` when the row says is_pro and has not
  *   expired, otherwise `free`. Mirrors the SQL `current_tier()` function.
+ *   RevenueCat is asked only when the stored row cannot be trusted as it is.
  */
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
@@ -21,17 +22,44 @@ export function tierFromRow(
   return "pro";
 }
 
-export async function tierFor(client: SupabaseClient, appUserId: string): Promise<Tier> {
-  // Verification on protected requests also closes the purchase-to-webhook delay.
-  // A provider outage returns a retryable error, never a fabricated entitlement.
-  await reconcileBilling(client, [appUserId]);
-  // Read the accepted snapshot: a concurrent newer webhook may have superseded ours.
-  const { data, error } = await client.from("entitlements").select("is_pro, expires_at").eq(
-    "app_user_id",
-    appUserId,
-  ).maybeSingle();
+/** How long a verified Pro row is trusted before RevenueCat is asked again. */
+export const ENTITLEMENT_FRESH_MS = 5 * 60 * 1000;
+
+async function storedEntitlement(
+  client: SupabaseClient,
+  appUserId: string,
+): Promise<Pick<EntitlementRow, "is_pro" | "expires_at" | "reconciled_at"> | null> {
+  const { data, error } = await client.from("entitlements")
+    .select("is_pro, expires_at, reconciled_at").eq("app_user_id", appUserId).maybeSingle();
   if (error) throw new Error("Unable to read verified entitlement");
-  return tierFromRow(data, Date.now());
+  return data;
+}
+
+export async function tierFor(
+  client: SupabaseClient,
+  appUserId: string,
+  reconcile: typeof reconcileBilling = reconcileBilling,
+): Promise<Tier> {
+  const stored = await storedEntitlement(client, appUserId);
+  const storedPro = tierFromRow(stored, Date.now()) === "pro";
+  // The webhook rewrites this row on refund or expiry, so a recent Pro row needs no provider call.
+  if (storedPro && Date.now() - Date.parse(stored?.reconciled_at ?? "") < ENTITLEMENT_FRESH_MS) {
+    return "pro";
+  }
+  // A row that is not Pro is always verified: this closes the purchase-to-webhook delay.
+  try {
+    await reconcile(client, [appUserId]);
+  } catch (error) {
+    // A provider outage never fabricates or extends Pro. A stale Pro row gets a retryable
+    // error; any other account is served as free, which can only under-grant.
+    // Configuration and database faults are not outages and stay visible.
+    const outage = error instanceof ApiError && error.code === ErrorCode.UPSTREAM_ERROR;
+    if (storedPro || !outage) throw error;
+    console.error("RevenueCat unavailable; serving the unverified account as free");
+    return "free";
+  }
+  // Read the accepted snapshot: a concurrent newer webhook may have superseded ours.
+  return tierFromRow(await storedEntitlement(client, appUserId), Date.now());
 }
 
 /** 403 HOST_REQUIRES_PRO unless the id is Pro. */

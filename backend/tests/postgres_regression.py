@@ -99,10 +99,31 @@ check(sql("SELECT count(*) FROM revenuecat_events WHERE event_id='refund';") == 
 with ThreadPoolExecutor(max_workers=12) as executor:
     budgets = list(executor.map(lambda _: sql("SET ROLE service_role; SELECT reserve_upstream_request('places', 10);"), range(30)))
 check(budgets.count("t") == 10, "upstream capacity cap holds under simultaneous calls")
+# Per-caller ceilings: a nearby search reserves its two upstream requests together.
+caller, neighbour = "a" * 64, "b" * 64
+with ThreadPoolExecutor(max_workers=12) as executor:
+    caller_budgets = list(executor.map(lambda _: sql(f"SET ROLE service_role; SELECT reserve_caller_request('places', '{caller}', 10, 2);"), range(30)))
+check(caller_budgets.count("t") == 5, "per-caller cap holds under simultaneous calls")
+check(sql(f"SELECT requests FROM caller_usage WHERE caller_hash='{caller}';") == "10", "refused caller requests are not recorded")
+check(sql(f"SET ROLE service_role; SELECT reserve_caller_request('places', '{caller}', 10);") == "f", "an exhausted caller stays refused")
+check(sql(f"SET ROLE service_role; SELECT reserve_caller_request('places', '{neighbour}', 10);") == "t", "one caller's exhaustion does not affect another caller")
+check(sql(f"SET ROLE service_role; SELECT reserve_caller_request('photos', '{caller}', 10);") == "t", "search and photo ceilings are separate")
+check(sql("SELECT requests FROM upstream_usage WHERE provider='places';") == "10", "per-caller reservations never spend the global budget")
+for call, label in [("reserve_caller_request('places', '203.0.113.9', 10)", "a raw network address cannot be stored as a caller"),
+                    (f"reserve_caller_request('places', '{caller}', null)", "a null limit cannot bypass the per-caller cap")]:
+    try:
+        sql(f"SET ROLE service_role; SELECT {call};")
+    except subprocess.CalledProcessError:
+        check(True, label)
+    else:
+        raise AssertionError(label)
 for role in ["anon", "authenticated"]:
     for function in ["reserve_ai_request(uuid,uuid,integer)", "refund_ai_request(uuid,uuid)",
-                     "apply_revenuecat_snapshot(jsonb,timestamptz,text)", "reserve_upstream_request(text,integer)"]:
+                     "apply_revenuecat_snapshot(jsonb,timestamptz,text)", "reserve_upstream_request(text,integer)",
+                     "reserve_caller_request(text,text,integer,integer)"]:
         check(sql(f"SELECT has_function_privilege('{role}', '{function}', 'EXECUTE');") == "f", f"{role} cannot execute {function}")
+    for privilege in ["SELECT", "INSERT", "UPDATE", "DELETE"]:
+        check(sql(f"SELECT has_table_privilege('{role}', 'caller_usage', '{privilege}');") == "f", f"{role} cannot {privilege} caller_usage")
 
 sql(f"""INSERT INTO groups(id,host_id,name,scheduled_at,area_lat,area_lng,radius_km,invite_code)
 VALUES ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','{alice}','Fictional test lunch',now(),-33,151,2,'ABCD1234');""")
