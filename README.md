@@ -8,6 +8,8 @@ The Flutter app that preceded this is kept buildable in `archive/flutter/` and t
 `archive/flutter/README.md` history and the project notes.
 
 New to the project? Read [HANDOFF.md](HANDOFF.md) after this file.
+Releasing? The open work is in [RELEASE_GAP_PLAN_2026-11-18.md](RELEASE_GAP_PLAN_2026-11-18.md) and the
+release-day commands are in [RUNBOOK.md](RUNBOOK.md).
 Google sign-in and email/password setup are documented in [AUTH_SETUP.md](AUTH_SETUP.md).
 
 ## Layout

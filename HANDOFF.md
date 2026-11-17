@@ -10,30 +10,39 @@ If you change something this document describes, change this document.
 
 ## 1. Where the project stands
 
-The Flutter app has been rewritten as two native apps over one Kotlin Multiplatform core. Both
-apps are feature complete against the eleven screens in `design/screens.md`. Demo builds run on
-in-memory sample data; since 2026-09-23 a plain Debug build of the iOS app runs against the live
-Supabase backend with real Google Places data (section 4a).
+Last updated 2026-11-18. The Flutter app has been rewritten as two native apps over one Kotlin
+Multiplatform core. Both apps are feature complete against the screens in `design/screens.md`.
+Demo builds run on in-memory sample data; a plain Debug build of the iOS app runs against the
+live Supabase backend with real Google Places data (section 4a).
+
+The iOS app is being prepared for its first App Store submission. What is left, who does it and
+in which order is in `RELEASE_GAP_PLAN_2026-11-18.md`; the release-day commands are in
+`RUNBOOK.md`; the listing text and screenshots are in `design/store-listing.md`. Android is a
+second release.
 
 | Area | State |
 |---|---|
 | `shared/` core | Complete. Domain rules, SQLite, backend client, purchases, auth, groups. |
-| `iosApp/` | Every screen built. Runs on device as a demo. |
-| `androidApp/` | Every screen built. Runs on an emulator. |
-| `backend/` | 13 Edge Functions and 3 migrations, unit tested and deployed to project `lunch`. |
-| Live backend | Supabase `lunch` (ref `cswdcbmywzzisovsgwac`, Sydney, free plan). Only `GOOGLE_PLACES_API_KEY` and `INVITE_LINK_BASE` are set. No store products. |
+| `iosApp/` | Every screen built. Version 1.0.0, build 10. No signed archive has been made yet. |
+| `androidApp/` | Every screen built. Runs on an emulator. Not ready for Play (target API 35, no release signing). |
+| `backend/` | 18 Edge Functions and 11 migrations, unit and database tested. |
+| Live backend | Supabase `lunch` (ref `cswdcbmywzzisovsgwac`, Sydney, **Free plan, hibernates when idle**). 8 migrations applied; `20261118000001` to `20261118000003` are not applied yet and must go in before the next function deploy. Section 6 lists the secrets. No store products exist yet. |
+| Website | `lunch.iapp.au` on Cloudflare Pages. The live privacy page is older than `backend/web/privacy/`; deploy it together with the backend. |
 
-Green as of the last commit:
+Green on 2026-11-18:
 
 | Suite | Count |
 |---|---|
-| `:shared:desktopTest` | 105 |
-| `:shared:testDebugUnitTest` | 33 |
-| `:androidApp:testDebugUnitTest` | 20 |
-| iOS `xcodebuild test` | 91 |
-| `cd backend && make test` | 48 |
+| `:shared:desktopTest` | 158 |
+| `:shared:testDebugUnitTest` | 41 |
+| `:androidApp:testDebugUnitTest` | 66 |
+| iOS `xcodebuild test` (unit and UI, from the `.xcresult`) | 163 |
+| `cd backend && make test` | 129 |
+| `backend/tests/invitation_regression.py` (PostgreSQL 17 in Docker) | 119 assertions |
 
-Nothing has been pushed. The remote is **public**, so read section 6 before you push.
+`origin/native-migration` holds the branch up to commit 4fe09d7; newer commits are local until
+they are pushed. `main` still shows the Flutter tree. The remote is **public**, so read
+section 6 before you push.
 
 ---
 
@@ -141,9 +150,12 @@ Release builds cannot pick it up. The build phase "Copy runtime config"
 missing or its RevenueCat key is not an `appl_` key, and `LunchConfig.revenueCatKey` drops any
 `test_` key at runtime in Release as a backstop.
 
-**AI consent.** Nothing is sent to Gemini until the user agrees on the AI screen (App Review
-5.1.2(i)); the answer is stored per install under `aiDataSharingConsent`. Screenshot and Maestro
-runs pass `-aiDataSharingConsent 1` to skip the card. Android has no consent step yet.
+**AI consent.** Nothing is sent to an AI provider until the user agrees on the AI screen (App
+Review 5.1.2(i)). The card names the providers that the backend's `ai-config` function returns,
+and the answer is stored per install as the agreed consent version (`aiDataSharingConsentVersion`),
+so a provider change asks again. Both platforms have the consent step. The iOS code no longer
+reads the old `-aiDataSharingConsent 1` launch argument; preview runs keep their answer in a
+separate preview store.
 
 Known quality issue: with no search text, `places-nearby` asks Google for `includedTypes:
 ["restaurant"]`, which also matches hotels, supermarkets and venues that merely contain one.
@@ -170,61 +182,69 @@ App Store link only work once App Store 1.0 (Apple ID 6808090102) is live.
 
 ## 5. What is deliberately unfinished
 
-These are not oversights. Each needs a decision or an account that does not exist yet.
+These are not oversights. Each needs a decision or an account step that is not done yet.
 
-- **Google is configured; device qualification and email activation remain pending.** iOS uses
-  GoogleSignIn 10.0.0; Android uses Credential Manager 1.6.0 / Google ID 1.2.1. Both use
-  nonce-verified Supabase token exchange, email verification and recovery codes. Apple remains
-  available on iOS. Google Web/iOS/Android debug OAuth clients are created and the hosted
-  Supabase Google provider is enabled with nonce checks on. Google remains in Testing.
-  See `AUTH_SETUP.md` for public client IDs, production signing, SMTP/templates and
-  qualification still required. No successful live sign-in or email delivery is implied.
-- **Group lunch reminders are device-local.** There is no core API behind them, so they do not
-  sync and do not survive a reinstall.
-- **PDF export emits JSON.** The share sheet works; the format was never decided.
+- **Push notifications are out of 1.0.** The iOS app has no Firebase, no remote registration and
+  no `aps-environment` entitlement. The shared core and the backend keep the `push-register`
+  path, but nothing calls it. Group lunch reminders are local notifications: they do not sync
+  and do not survive a reinstall.
+- **Google sign-in is configured but not qualified.** iOS uses GoogleSignIn 10.0.0; Android uses
+  Credential Manager 1.6.0 / Google ID 1.2.1. Both use nonce-verified Supabase token exchange.
+  The last recorded state of the Google consent screen is Testing, which limits sign-in to
+  listed test users. See `AUTH_SETUP.md` for the client ids, SMTP, templates and the
+  qualification still required. No successful production sign-in or email delivery is implied.
 - **Maestro is not installed**, so the eight flows in `maestro/flows/` have never run. The test
   ids they need exist and were verified on-device.
 - **The Android app-link file carries a placeholder fingerprint.** It needs the Play upload key
-  SHA-256 before deep links will verify.
+  SHA-256 before deep links will verify. Android is a second release; its open items are in
+  `PUBLISH_REVIEW_2026-10-23.md` (N24 to N34).
 
 ---
 
 ## 6. Secrets and the public remote
 
-`github.com/galwayit/whats-for-lunch` is **public**. Nothing secret has ever been committed, and
-the only env files in git hold placeholders. Keep it that way.
+`github.com/galwayit/whats-for-lunch` is **public**. The only env files in git hold
+placeholders. One real credential did reach the public history: a Google Maps key quoted in the
+archived Flutter audit report. The text is redacted on this branch, but the key stays in history
+and on `main`, so it must be revoked in Google Cloud. CI now fails when a provider key or a key
+file is committed.
 
 Runtime configuration is deliberately outside the repo:
 
 - iOS bundles `iosApp/LunchApp/Config/Lunch.plist` (Debug) or `Lunch.Release.plist` (Release), both
-  gitignored, as `Lunch.plist`. `Lunch.plist.example` is the template.
+  gitignored, as `Lunch.plist`. `Lunch.plist.example` is the template. The Release file does not
+  exist yet; it needs the production RevenueCat key (`appl_...`).
 - Android reads `BuildConfig` fields fed from `-Plunch.*` properties or environment variables,
   all defaulting to empty.
-- The backend reads `backend/supabase/.env`, gitignored.
+- The backend reads its secrets from Supabase. Set on the live project: `GOOGLE_PLACES_API_KEY`,
+  `GEMINI_API_KEY`, `OPENAI_API_KEY`, `REVENUECAT_SECRET_API_KEY`, `REVENUECAT_PROJECT_ID`,
+  `REVENUECAT_WEBHOOK_SECRET` and `INVITE_LINK_BASE`. **Not set yet** (checked 2026-11-18):
+  `REVENUECAT_PRO_PRODUCT_IDS`, `REVENUECAT_ALLOW_APPLE_SANDBOX`, `APPLE_CLIENT_ID`,
+  `APPLE_TEAM_ID`, `APPLE_KEY_ID` and `APPLE_SIGN_IN_PRIVATE_KEY`. Without them a purchase does
+  not unlock Lunch Pro and an Apple user cannot delete their account. The template with the
+  right commands is the git-ignored `backend/supabase/.env.phase1`. Do not use `make secrets`:
+  it pushes a different file. The `SUPABASE_*` values are injected by the platform.
 
-The backend needs five secrets set before anything works: `GOOGLE_PLACES_API_KEY`,
-`GEMINI_API_KEY`, `REVENUECAT_WEBHOOK_SECRET`, `INVITE_LINK_BASE` and `FCM_SERVICE_ACCOUNT_JSON`.
-The three `SUPABASE_*` values are injected by the platform. `backend/README.md` has the commands.
+The signing and config material (Apple `.p8` keys, the Release config, the Sentry token in
+`.sentryclirc`) exists only on Ray's Mac until it is stored in a password manager.
 
 ---
 
-## 7. Open decisions, all Ray's
+## 7. Decisions
 
-Nobody else can close these. They block the first real build, not the demo.
+Decided by Ray on 2026-10-19 (`RELEASE_PLAN_2026-10-19.md`, Phase 0):
 
-1. **The iOS bundle id breaks upgrade continuity.** iOS is now `au.iapp.lunch`; the Flutter app
-   shipped as `au.iapp.guesswhat.whatWeHaveForLunch`. As it stands the App Store listing is new:
-   no existing users, no reviews, no ranking. Android kept its old applicationId and *will*
-   upgrade in place, so the two platforms currently disagree.
-2. **Accounts that cost money:** the Supabase project exists (free plan), RevenueCat exists with a
-   Test Store key, and `lunch.iapp.au` is on Cloudflare Pages (see `backend/web/README.md`).
-3. **Store products.** `lunch_pro_monthly` at A$2.99 and `lunch_pro_yearly` at A$19.99 with a
-   7-day trial, mapped to the RevenueCat packages `$rc_monthly` and `$rc_annual`. Our sample data
-   is inconsistent about the product id format, so the real ids need to be decided and written
-   down when they are created.
-4. **Sign-in approach**, per section 5. It changes the Android dependency set.
-5. **The Apple Program License Agreement** is unaccepted. Ordinary builds work; anything that
-   talks to the provisioning portal fails until it is accepted.
+1. The iOS bundle id stays `au.iapp.lunch`. The App Store listing is new; the Flutter app's id
+   `au.iapp.guesswhat.whatWeHaveForLunch` is not reused. Android keeps its old applicationId.
+2. Lunch Pro costs A$4.99 a month and A$29.99 a year, with no trial. The product ids are
+   `au.iapp.lunch.pro.monthly` and `au.iapp.lunch.pro.yearly`, mapped to the RevenueCat packages
+   `$rc_monthly` and `$rc_annual` in offering `default`, entitlement `pro`.
+3. No push notifications in 1.0.
+4. iAPP trades as a sole trader on the existing ABN. Australia only at launch.
+5. iOS ships first; Android is a second release.
+
+Still open, all Ray's: the account steps and the six decisions in
+`RELEASE_GAP_PLAN_2026-11-18.md` (Track A and section 7). They block the first signed build.
 
 ---
 
@@ -234,7 +254,7 @@ The free tier is limited rather than ad-supported. That was a deliberate decisio
 
 | Limit | Free | Lunch Pro |
 |---|---|---|
-| AI requests | 1 a day | Unlimited |
+| AI requests | 1 a day | 10 a day, shared between personal and group suggestions |
 | Favourites | 10 | Unlimited |
 | History | 30 days | Full |
 | Group lunches | Accept invitations only | Create and host |
