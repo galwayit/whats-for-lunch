@@ -14,7 +14,6 @@ import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 /**
  * Supabase Auth via native ID tokens (Sign in with Apple, Google Sign-In).
@@ -38,8 +38,8 @@ internal class AuthRepositoryImpl(
 
     private val log = Logger.withTag("Auth")
 
-    override val session: StateFlow<AuthSession?> = supabase.auth.sessionStatus
-        .map { status -> (status as? SessionStatus.Authenticated)?.session?.toAuthSession() }
+    override val session: StateFlow<AuthSession?> = supabase.auth.retainedSessions()
+        .map { it?.toAuthSession() }
         .stateIn(scope, SharingStarted.Eagerly, supabase.auth.currentSessionOrNull()?.toAuthSession())
 
     override suspend fun signInWithApple(idToken: String, nonce: String, fullName: String?): Result<AuthSession> =
@@ -49,7 +49,18 @@ internal class AuthRepositoryImpl(
                 this.provider = Apple
                 this.nonce = nonce
             }
-        }.map { session -> if (session.displayName == null && !fullName.isNullOrBlank()) session.copy(displayName = fullName) else session }
+        }.map { session ->
+            if (session.displayName != null || fullName.isNullOrBlank()) return@map session
+            // Apple sends the name only with the first authorisation and never in the id token,
+            // so it is lost for good unless it is saved to the account now.
+            try {
+                supabase.auth.updateUser { data { put("full_name", fullName) } }
+            } catch (failure: Exception) {
+                if (failure is kotlinx.coroutines.CancellationException) throw failure
+                log.w { "Apple name was not saved to the account" }
+            }
+            session.copy(displayName = fullName)
+        }
 
     override suspend fun signInWithGoogle(idToken: String, nonce: String, accessToken: String?): Result<AuthSession> = signIn {
         supabase.auth.signInWith(IDToken) {
@@ -110,7 +121,9 @@ internal class AuthRepositoryImpl(
 
     /** Calls the account-delete function with the user's JWT, then clears the local session. */
     override suspend fun deleteAccount(appleAuthorizationCode: String?): Result<Unit> {
-        if (supabase.auth.currentSessionOrNull() == null) return Result.failure(CoreError.NotSignedIn)
+        // Also accept `session`: while a token refresh is failing the SDK has no current session,
+        // but the user is still signed in and the request below reports the real problem.
+        if (supabase.auth.currentSessionOrNull() == null && session.value == null) return Result.failure(CoreError.NotSignedIn)
         return SupabaseErrors.result {
             backend.accountDelete(appleAuthorizationCode)
             supabase.auth.signOut(SignOutScope.LOCAL)

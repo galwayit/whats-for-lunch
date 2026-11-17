@@ -6,11 +6,24 @@ import au.iapp.lunch.core.support.MockBackend
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.createSupabaseClient
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.json.Json
 import kotlin.test.*
+import kotlin.time.Duration.Companion.seconds
 
 /** Exercises the actual pinned Supabase SDK over HTTP fixtures, never a live account. */
 class AuthRepositoryTest {
@@ -113,6 +126,66 @@ class AuthRepositoryTest {
         f.client.close()
     }
 
+    @Test fun apple_name_from_the_first_authorisation_is_saved_to_the_account() = runTest {
+        val f = fixture("apple")
+        f.backend.route("token", body = f.session).route("user", body = f.user)
+        val session = f.auth.signInWithApple("fictional", "nonce", "Sam Example").getOrThrow()
+        assertEquals("Sam Example", session.displayName)
+        val update = f.backend.requests.single { it.url.encodedPath.endsWith("/user") }
+        assertEquals(HttpMethod.Put, update.method)
+        assertTrue((update.body as io.ktor.http.content.TextContent).text.contains("\"full_name\":\"Sam Example\""))
+        f.client.close()
+    }
+
+    @Test fun apple_sign_in_without_a_new_name_does_not_touch_the_account() = runTest {
+        val f = fixture("apple")
+        f.backend.route("token", body = f.session)
+        assertNull(f.auth.signInWithApple("fictional", "nonce", null).getOrThrow().displayName)
+        assertTrue(f.backend.requests.none { it.url.encodedPath.endsWith("/user") })
+        f.client.close()
+    }
+
+    @Test fun apple_sign_in_succeeds_when_saving_the_name_fails() = runTest {
+        val f = fixture("apple")
+        f.backend.route("token", body = f.session).route("user", HttpStatusCode.InternalServerError, """{"error_code":"unexpected_failure","msg":"Try later"}""")
+        val session = f.auth.signInWithApple("fictional", "nonce", "Sam Example").getOrThrow()
+        assertEquals("Sam Example", session.displayName)
+        assertEquals("user-1", f.entitlements.appUserId.value)
+        f.client.close()
+    }
+
+    @Test fun failed_token_refresh_keeps_the_user_signed_in() = runTest {
+        val f = fixture()
+        f.backend.route("token", body = f.session)
+        f.auth.signInWithEmail("sam@example.test", "password8").getOrThrow()
+        f.backend.goOffline()
+        f.refreshExpiredSessionUntilItFails()
+        runCurrent()
+        assertEquals("user-1", f.auth.session.value?.userId)
+        f.client.close()
+    }
+
+    @Test fun relaunch_offline_with_an_expired_token_restores_the_stored_session() = runTest {
+        val f = fixture()
+        f.client.auth.sessionManager.saveSession(f.expiredSession())
+        f.backend.goOffline()
+        f.refreshExpiredSessionUntilItFails()
+        runCurrent()
+        assertEquals("user-1", f.auth.session.value?.userId)
+        f.client.close()
+    }
+
+    @Test fun revoked_refresh_token_signs_the_user_out() = runTest {
+        val f = fixture()
+        f.backend.route("token", body = f.session)
+        f.auth.signInWithEmail("sam@example.test", "password8").getOrThrow()
+        f.backend.route("token", HttpStatusCode.BadRequest, """{"error_code":"refresh_token_not_found","msg":"Invalid Refresh Token"}""")
+        f.client.auth.importSession(f.expiredSession(), autoRefresh = true)
+        runCurrent()
+        assertNull(f.auth.session.value)
+        f.client.close()
+    }
+
     private class Fixture(scope: TestScope, provider: String) {
         val user = """{"id":"user-1","aud":"authenticated","email":"sam@example.test","identities":[{"id":"identity-1","user_id":"user-1","provider":"$provider","identity_data":{}}]}"""
         val session = """{"access_token":"fixture-access","refresh_token":"fixture-refresh","expires_in":3600,"token_type":"bearer","user":$user}"""
@@ -124,5 +197,22 @@ class AuthRepositoryTest {
         val entitlements = FakeEntitlementRepository()
         val push = PushRegistrarImpl(backend.client(), MemoryGuestTokenStore()) { client.auth.currentSessionOrNull() != null }
         val auth = AuthRepositoryImpl(client, backend.client(), entitlements, scope.backgroundScope, push)
+
+        /** The fixture session with a lifetime of zero, so the SDK treats it as expired at once. */
+        fun expiredSession(): UserSession =
+            Json { ignoreUnknownKeys = true }.decodeFromString<UserSession>(session.replace("\"expires_in\":3600", "\"expires_in\":0"))
+
+        /**
+         * Makes the SDK refresh an expired session and returns once it reports the failure.
+         * The SDK then waits in real time before retrying, so the refresh runs outside the test
+         * scheduler and is cancelled here.
+         */
+        suspend fun refreshExpiredSessionUntilItFails() {
+            val refresh = CoroutineScope(Dispatchers.Default).launch { client.auth.importSession(expiredSession(), autoRefresh = true) }
+            withContext(Dispatchers.Default) {
+                withTimeout(10.seconds) { client.auth.sessionStatus.first { it is SessionStatus.RefreshFailure } }
+            }
+            refresh.cancelAndJoin()
+        }
     }
 }

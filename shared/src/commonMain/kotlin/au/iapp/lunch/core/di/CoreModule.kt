@@ -42,6 +42,7 @@ import au.iapp.lunch.core.service.GroupRepositoryImpl
 import au.iapp.lunch.core.service.PurchasesDisabledEntitlementRepository
 import au.iapp.lunch.core.service.PushRegistrarImpl
 import au.iapp.lunch.core.service.createEntitlementRepository
+import au.iapp.lunch.core.service.retainedSessions
 import au.iapp.lunch.core.service.purchasesDisabled
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -51,7 +52,6 @@ import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.HttpClientEngine
 import kotlinx.coroutines.flow.map
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -98,7 +98,7 @@ internal fun coreModule(
         } else {
             val supabase = get<SupabaseClient>()
             AccountEntitlementRepository(createEntitlementRepository(config.revenueCatApiKey, get()), get(),
-                supabase.auth.sessionStatus.map { (it as? SessionStatus.Authenticated)?.session?.user?.id }) {
+                supabase.auth.retainedSessions().map { it?.user?.id }) {
                 supabase.auth.currentUserOrNull()?.id
             }
         }
