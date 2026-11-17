@@ -15,7 +15,11 @@ final class ProfileViewModel {
     private(set) var isSigningOut = false
     private(set) var isDeleting = false
     private(set) var isExporting = false
-    private(set) var error: CoreError?
+    private(set) var error: CoreError? {
+        didSet { errorMessage = error.map { $0 == .offline ? Copy.Error.offlineBody : Copy.Error.serviceBody } }
+    }
+    /// Text shown under the account actions for the last failure.
+    private(set) var errorMessage: String?
 
     private let core: LunchCoreClient
     private let tokens: any SignInTokenProvider
@@ -57,7 +61,7 @@ final class ProfileViewModel {
     func deleteAccount() async -> Bool {
         isDeleting = true
         defer { isDeleting = false }
-        return await perform {
+        let deleted = await perform {
             let code = if core.auth.session?.requiresAppleReauthentication == true {
                 try await tokens.appleCredential().authorizationCode
             } else {
@@ -66,6 +70,12 @@ final class ProfileViewModel {
             try await core.auth.deleteAccount(appleAuthorizationCode: code)
             AIDataConsent().revoke()
         }
+        // "Couldn't reach the lunch service" leaves someone who wants their data removed with no
+        // next step, so a deletion failure names the support address (App Review 5.1.1(v)).
+        if let error, error != .offline {
+            errorMessage = error == .notSignedIn ? Copy.Profile.deleteSignedOut : Copy.Profile.deleteFailed
+        }
+        return deleted
     }
 
     /// Writes the profile and every logged meal as JSON to a temporary file for the share sheet.

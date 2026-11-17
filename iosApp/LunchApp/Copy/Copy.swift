@@ -257,6 +257,9 @@ nonisolated enum Copy {
         static let deleteTitle = "Delete account"
         static let deleteBody = "This removes your account, groups, and invitations from our servers. Meals stay on this device unless you delete the app. Apple subscriptions continue until you cancel them in Manage subscription."
         static let deleteConfirm = "Delete"
+        static let deleteDone = "Your account is deleted. Meals on this device are kept."
+        static let deleteFailed = "We couldn't delete your account. Try again, or email hello@iapp.au and we'll delete it for you."
+        static let deleteSignedOut = "Your sign-in has expired. Sign in again, then delete your account."
     }
 
     enum Preferences {
@@ -336,7 +339,7 @@ nonisolated enum Copy {
     }
 
     enum Info {
-        static let privacyBody = "We store your meals and preferences on this device. Signing in copies them to your account so you can restore them on a new phone. We never sell your data. The full policy lives at lunch.iapp.au/privacy."
+        static let privacyBody = "Your meals, budget and preferences are stored on this device only. Signing in does not back them up or sync them; it links AI picks, purchases and group lunches to your account. Restaurant searches and, if you agree, AI requests go through our service to the providers named in the policy. We never sell your data. The full policy is at lunch.iapp.au/privacy."
         static let helpBody = "Tap I AM HUNGRY for a pick near you, log what you ate in Track, and set a weekly budget so the ring can guide you. Questions? Email hello@iapp.au."
     }
 

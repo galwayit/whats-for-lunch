@@ -208,6 +208,9 @@ Achievements (verbatim from the core): First Investment, Weekly Optimizer, Exper
 | profile.delete.title | Delete account |
 | profile.delete.body | This removes your account, groups, and invitations from our servers. Meals stay on this device unless you delete the app. |
 | profile.delete.confirm | Delete |
+| profile.delete.done | Your account is deleted. Meals on this device are kept. |
+| profile.delete.failed | We couldn't delete your account. Try again, or email hello@iapp.au and we'll delete it for you. |
+| profile.delete.signedout | Your sign-in has expired. Sign in again, then delete your account. |
 | preferences.title | Preferences |
 | preferences.section.budget | Budget preferences |
 | preferences.section.location | Location preferences |

@@ -294,7 +294,7 @@
     <string name="preferences_saved">Preferences saved</string>
 
     <!-- Info screens -->
-    <string name="info_privacy_body">We store your meals and preferences on this device. Signing in copies them to your account so you can restore them on a new phone. We never sell your data. The full policy lives at lunch.iapp.au/privacy.</string>
+    <string name="info_privacy_body">Your meals, budget and preferences are stored on this device only. Signing in does not back them up or sync them; it links AI picks, purchases and group lunches to your account. Restaurant searches and, if you agree, AI requests go through our service to the providers named in the policy. We never sell your data. The full policy is at lunch.iapp.au/privacy.</string>
     <string name="info_help_body">Tap I AM HUNGRY for a pick near you, log what you ate in Track, and set a weekly budget so the ring can guide you. Questions? Email hello@iapp.au.</string>
 
     <!-- Paywall and gates -->

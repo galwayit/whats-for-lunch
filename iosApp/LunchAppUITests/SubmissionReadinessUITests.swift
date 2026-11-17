@@ -40,6 +40,51 @@ final class SubmissionReadinessUITests: XCTestCase {
         add(shot)
     }
 
+    /// Only a signed-in user has a server account, so a signed-out user must not be offered a
+    /// deletion that can only fail (App Review 5.1.1(v) expects the flow to work when shown).
+    @MainActor
+    func testDeleteAccountIsHiddenWhenSignedOut() {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-previewCore", "-signedIn", "0"]
+        app.launch()
+        XCTAssertTrue(app.buttons["tab_profile"].waitForExistence(timeout: 15))
+        app.buttons["tab_profile"].tap()
+        XCTAssertTrue(app.buttons["profile_export"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["profile_delete"].exists)
+    }
+
+    /// Apple's name may only label the real Sign in with Apple control. The paywall's sign-in
+    /// prompt opens the general sheet, so it must carry a neutral title.
+    @MainActor
+    func testPaywallSignInPromptDoesNotUseApplesName() {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-previewCore", "-signedIn", "0", "-openRoute", "paywall"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Sign in"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["Continue with Apple"].exists)
+    }
+
+    @MainActor
+    func testSignedInUserCanDeleteAccountAndSeesConfirmation() {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-previewCore", "-signedIn", "1"]
+        app.launch()
+        XCTAssertTrue(app.buttons["tab_profile"].waitForExistence(timeout: 15))
+        app.buttons["tab_profile"].tap()
+        let delete = app.buttons["profile_delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 10))
+        for _ in 0..<5 { if delete.isHittable { break }; app.swipeUp() }
+        delete.tap()
+        let confirm = app.buttons["Delete"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(app.staticTexts["Your account is deleted. Meals on this device are kept."].waitForExistence(timeout: 10))
+        XCTAssertFalse(delete.exists)
+    }
+
     @MainActor
     func testGuestCanReachReportingAndBlockingFromInvitation() {
         continueAfterFailure = false

@@ -50,7 +50,7 @@ struct AIRecommendationsView: View {
                         }
                     }
                     if model.needsSignIn {
-                        LunchButton(title: Copy.Profile.signInApple, style: .primary) { app.present(.signIn) }
+                        LunchButton(title: Copy.Profile.signInTitle, style: .primary) { app.present(.signIn) }
                         Text("Sign in for one free AI request a day, or use your Lunch Pro subscription.").lunchText(.bodySmall)
                     }
                     if model.needsConsent {

@@ -38,7 +38,7 @@ struct PaywallScreen: View {
                 VStack(spacing: Tokens.Spacing.lg) {
                     Text("Lunch Pro follows your account").lunchText(.title)
                     Text("Sign in before subscribing or restoring so AI picks and group hosting unlock for the right account.").lunchText(.body)
-                    LunchButton(title: Copy.Profile.signInApple, style: .primary) { app.present(.signIn) }
+                    LunchButton(title: Copy.Profile.signInTitle, style: .primary) { app.present(.signIn) }
                     LunchButton(title: Copy.Paywall.terms, style: .text) { openURL(LunchConfig.termsUrl) }
                 }.padding(Tokens.Spacing.page)
             } else if case .failed(let error) = model.offerings {

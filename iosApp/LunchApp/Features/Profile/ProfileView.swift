@@ -48,10 +48,11 @@ struct ProfileView: View {
                 if app.session == nil { signInCard(signIn) }
                 section(Copy.Profile.sectionSettings) { settingsList }
                 section(Copy.Profile.sectionAccount) { accountList(model) }
-                if let error = model.error {
-                    Text(error == .offline ? Copy.Error.offlineBody : Copy.Error.serviceBody)
+                if let message = model.errorMessage {
+                    Text(message)
                         .lunchText(.bodySmall)
                         .foregroundStyle(Tokens.Palette.danger)
+                        .accessibilityIdentifier("profile_error")
                 }
             }
             .padding(Tokens.Spacing.page)
@@ -60,7 +61,7 @@ struct ProfileView: View {
         .task { await model.observeStatus() }
         .confirmationDialog(Copy.Profile.deleteTitle, isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
             Button(Copy.Profile.deleteConfirm, role: .destructive) {
-                Task { _ = await model.deleteAccount() }
+                Task { if await model.deleteAccount() { app.showToast(Copy.Profile.deleteDone) } }
             }
             Button(Copy.Action.cancel, role: .cancel) {}
         } message: {
@@ -192,14 +193,17 @@ struct ProfileView: View {
                     exportItem = ShareItem(url: url)
                 }
             }
-            listRow(icon: .download, title: Copy.Profile.exportData, identifier: "profile_export", isLoading: model.isExporting) {
+            listRow(icon: .download, title: Copy.Profile.exportData, identifier: "profile_export", isLoading: model.isExporting, isLast: app.session == nil) {
                 Task {
                     guard let user = app.user, let url = await model.exportData(user: user) else { return }
                     exportItem = ShareItem(url: url)
                 }
             }
-            listRow(icon: .delete, title: Copy.Profile.deleteTitle, identifier: "profile_delete", tint: Tokens.Palette.danger, isLoading: model.isDeleting, isLast: true) {
-                showsDeleteConfirmation = true
+            // Only a signed-in user has a server account; offering deletion without one can only fail.
+            if app.session != nil {
+                listRow(icon: .delete, title: Copy.Profile.deleteTitle, identifier: "profile_delete", tint: Tokens.Palette.danger, isLoading: model.isDeleting, isLast: true) {
+                    showsDeleteConfirmation = true
+                }
             }
         }
     }

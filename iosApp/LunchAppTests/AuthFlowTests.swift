@@ -74,6 +74,29 @@ struct AuthFlowTests {
         #expect(core.auth.session != nil)
     }
 
+    @Test func failed_account_deletion_says_what_to_do_next() async {
+        // NotConfiguredCore fails every backend call the way a server error does.
+        let model = ProfileViewModel(core: NotConfiguredCore(), tokens: CancelledTokens())
+        #expect(await model.deleteAccount() == false)
+        #expect(model.errorMessage == Copy.Profile.deleteFailed)
+        #expect(await model.signOut() == false)
+        #expect(model.errorMessage == Copy.Error.serviceBody)
+    }
+
+    @Test func offline_account_deletion_keeps_the_offline_message() async {
+        let model = ProfileViewModel(core: PreviewLunchCore(options: PreviewCoreOptions(isSignedIn: true, isOffline: true)), tokens: CancelledTokens())
+        #expect(await model.deleteAccount() == false)
+        #expect(model.errorMessage == Copy.Error.offlineBody)
+    }
+
+    @Test func successful_account_deletion_leaves_no_error_message() async throws {
+        let core = PreviewLunchCore()
+        _ = try await core.auth.signInWithEmail(email: "sam@example.test", password: "password8")
+        let model = ProfileViewModel(core: core, tokens: CancelledTokens())
+        #expect(await model.deleteAccount())
+        #expect(model.errorMessage == nil)
+    }
+
     private struct CancelledTokens: SignInTokenProvider {
         let supportedProviders = SignInProvider.allCases
         func appleCredential() async throws -> AppleCredential { throw CancellationError() }
